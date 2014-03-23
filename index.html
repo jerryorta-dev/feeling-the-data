@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title>Census</title>
+<meta charset="utf-8">
+<head>
+    <title>Indeed Geographical Map</title>
+    <script async data-main="app/utils/requirejs-config.js"
+            src="app/imports/libraries/requirejs-2.1.11/require.js"></script>
+    <style>
+        [ng-cloak] {
+            display: none;
+        }
+    </style>
 </head>
-<body>
-Hello World
+<body ng-cloak>
+<section class="content">
+    <div ui-view></div>
+</section>
+
+
 </body>
 </html>

@@ -1,0 +1,66 @@
+<div class="question-body-wrapper text-dark">
+    <div class="row">
+        <div class="col-md-12">
+            <p>
+                Your results are organized by final over-all score, by question category, and individual questions.
+                To see documentation for an specific answer option, just click on the answer.
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h5>Final Score:</h5>
+            <div class="progress">
+                <div class="progress-bar progress-bar-success" style="width: {{results.finalScorePercent}}%">
+                    <span>{{results.finalScorePercent}}% Correct</span>
+                </div>
+                <div class="progress-bar progress-bar-danger" style="width: {{results.finalWrongPercent}}%">
+                    <span >{{results.finalWrongPercent}}% Wrong</span>
+                </div>
+            </div>
+            <h5>Results by category:</h5>
+            <div ng-repeat="(key, value) in results.categories">
+                <span><strong>{{key}}</strong></span><br />
+                <div class="progress-bar progress-bar-success" style="width: {{value.finalScorePercent}}%">
+                    <span>{{value.finalScorePercent}}% Correct</span>
+                </div>
+                <div class="progress-bar progress-bar-danger" style="width: {{value.finalWrongPercent}}%">
+                    <span>{{value.finalWrongPercent}}% Wrong</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row answers">
+
+        <div class="question" ng-repeat="answer in scorecard.quiz">
+            <div class="well">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h5>{{answer.question}}</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-11 col-md-offset-1">
+                        <div class="answer" ng-repeat="option in answer.answers">
+                            <a href="" ng-click="open(option)">{{option.answer}}</a></span>
+                            <!--{{option.reference}}-->
+                        </div>
+
+                        <div>
+                            <p>
+                                <span><strong>Your Answer:</strong></span>
+                                {{answer.user.answer.answer}} is <span
+                                    ng-if="answer.user.isCorrect">correct.</span><span
+                                    ng-if="!answer.user.isCorrect">wrong.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+

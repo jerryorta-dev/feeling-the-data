@@ -1,0 +1,17 @@
+{
+
+    "data": [
+        {
+            "name": "CSS",
+            "description": "Test your knowledge of css properties.",
+            "directory": "css",
+            "passing": 70,
+            "numberOfQuestions":23,
+            "categories": [
+                "At-rules",
+                "Data Types"
+            ]
+
+        }
+    ]
+}
