@@ -1,0 +1,75 @@
+{
+  "sherpaManagerMain": {
+    "otherwise": {
+      "redirectTo": "/projectList"
+    },
+    "when": {
+      "projectList": {
+        "url": "/projectList",
+        "templateUrl": "app/ng/routes/projectList/projectList.html",
+        "controller": "projectList"
+      },
+      "newProject": {
+        "url": "/newProject",
+        "templateUrl": "app/ng/routes/newProject/newProject.html",
+        "controller": "newProject"
+      },
+      "newTemplate": {
+        "url": "/newTemplate",
+        "templateUrl": "app/ng/routes/newTemplate/newTemplate.html",
+        "controller": "newTemplate"
+      },
+      "newComponent": {
+        "url": "/newComponent",
+        "templateUrl": "app/ng/routes/newComponent/newComponent.html",
+        "controller": "newComponent"
+      },
+      "developerProjectStructure": {
+        "name": "developerProjectStructure",
+        "url": "/developerProjectStructure",
+        "templateUrl": "app/ng/routes/developerProjectStructure/developerProjectStructure.html",
+        "controller": "developerProjectStructure"
+      },
+      "demoRoute": {
+        "name": "demoRoute",
+        "url": "/demoRoute",
+        "templateUrl": "app/ng/routes/demoRoute/demoRoute.html",
+        "controller": "demoRoute"
+      },
+      "demoSQLite3": {
+        "name": "demoSQLite3",
+        "url": "/demoSQLite3",
+        "templateUrl": "app/ng/routes/demoSQLite3/demoSQLite3.html",
+        "controller": "demoSQLite3"
+      },
+      "libraryChildren": {
+        "name": "libraries",
+        "url": "/libraries",
+        "templateUrl": "app/ng/routes/libraries/libraries.html",
+        "controller": "libraries"
+      }
+    }
+  },
+  "sherpaManagerWelcome": {
+    "otherwise": {
+      "redirectTo": "/login"
+    },
+    "when": {
+      "login": {
+        "url": "/login",
+        "templateUrl": "welcomeApp/routes/login.html",
+        "controller": "login"
+      },
+      "createAccount": {
+        "url": "/createAccount",
+        "templateUrl": "welcomeApp/routes/createAccount.html",
+        "controller": "createAccount"
+      },
+      "changeProfile": {
+        "url": "/changeProfile",
+        "templateUrl": "welcomeApp/routes/changeProfile.html",
+        "controller": "changeProfile"
+      }
+
+    }
+  }}

@@ -1,1 +1,0 @@
-This directive is deprecated.
