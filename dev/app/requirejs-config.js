@@ -4,7 +4,7 @@ require.config(
             'preprocess': "loader/preprocess",
 
 
-            "angular": "vendors/angular-1.2.14/angular",
+            "angular": "vendors/angular-1.2.14/angular.min",
             "angularanimate": "vendors/angular-1.2.14/angular-animate.min",
             "uirouter": "vendors/uirouter-0.2.8/angular-ui-router.min",
             "angular-route": "vendors/angular-1.2.14/angular-route.min",
@@ -18,7 +18,7 @@ require.config(
             "uibootstrap": "vendors/angular-ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.min",
 
             //Angular Config
-            "ngConfig": "ng/ngConfigRoutes",
+            "ngConfig": "ng/configRoutes",
 
             //base angular modules
             "apiModule":"ng/api/apiModule",
@@ -93,6 +93,8 @@ require.config(
 require([
         'domReady',
 
+        "ngConfig",
+
         "angular",
         "angular-route",
         "angularanimate",
@@ -115,7 +117,7 @@ require([
 
         "customDirective"
         ],
-    function (document) {
+    function (document, angular) {
 
         angular.bootstrap(document, ['app']);
 

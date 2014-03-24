@@ -5,7 +5,7 @@
  * directives reference.
  */
 define(['angular', 'preprocess'], function(angular, p){
-    p.log('servicesModule')
+    p.loadOrder('servicesModule')
   angular.module('app.servicesModule', []).
     value('version', '0.1');
 });

@@ -8,6 +8,7 @@ define(["jquery", "underscore"],function () {
 
         var constants = {
             SHOW_CONSOLE_LOG: true, //Turn off all console.logs
+            SHOW_LOAD_ORDER: false, //Turn off all console.logs
             VERSION: 1.0,
             TYPE: 'app'
         };
@@ -26,6 +27,12 @@ define(["jquery", "underscore"],function () {
 
     PreProcessor.prototype.log = function (msg) {
         if (constant('SHOW_CONSOLE_LOG')) {
+            console.log(msg);
+        }
+    };
+
+    PreProcessor.prototype.loadOrder = function (msg) {
+        if (constant('SHOW_CONSOLE_LOG') && constant('SHOW_LOAD_ORDER')) {
             console.log(msg);
         }
     };
@@ -77,6 +84,7 @@ define(["jquery", "underscore"],function () {
   //Return API
   return {
     log:getPreProcessor().log,
+    loadOrder:getPreProcessor().loadOrder,
     getBasePath: getPreProcessor().getBasePath,
     getBaseUrl: getPreProcessor().getBaseUrl,
     getPathTo: getPreProcessor().getPathTo,

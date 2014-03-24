@@ -5,6 +5,6 @@
  * directives reference.
  */
 define(['angular', 'preprocess'], function(angular, p){
-    p.log("mockApiModule");
+    p.loadOrder("mockApiModule");
   angular.module('app.mockApiModule', [])
 });

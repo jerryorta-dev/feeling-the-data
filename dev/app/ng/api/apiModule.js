@@ -5,6 +5,6 @@
  * directives reference.
  */
 define(['angular', 'preprocess'], function(angular, p){
-    p.log("apiModule preprocess");
+    p.loadOrder("apiModule preprocess");
   angular.module('app.apiModule', [])
 });

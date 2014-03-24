@@ -5,6 +5,6 @@
  * directives reference.
  */
 define(['angular', 'preprocess'], function(angular, p){
-    p.log("filtersModule")
+    p.loadOrder("filtersModule")
   angular.module('app.filtersModule', [])
 });

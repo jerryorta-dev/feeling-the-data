@@ -5,6 +5,6 @@
  * directives reference.
  */
 define(['angular', 'preprocess'], function(angular, p){
-    p.log("routesModule");
+    p.loadOrder("routesModule");
   angular.module('app.routesModule', [])
 });
