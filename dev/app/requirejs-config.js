@@ -13,9 +13,10 @@ require.config(
             "domReady": "vendors/requirejs-domready-2.0.1/domReady",
 
 
-
+            //more 3rd party-ish
             "jquery": "vendors/jquery-2.1.0/jquery.min",
             "uibootstrap": "vendors/angular-ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.min",
+            "d3":"vendors/d3-3.4.3/d3.min",
 
             //Angular Config
             "ngConfig": "ng/configRoutes",
@@ -33,7 +34,8 @@ require.config(
             "servicesModule":"ng/services/servicesModule",
 
             //Custom modules
-            "customDirective" : "ng/directives/customDirective/customDirective"
+            "customDirective" : "ng/directives/customDirective/customDirective",
+            "d3Map":"ng/directives/d3-map/d3-map"
         },
         "shim": {
 
@@ -103,6 +105,8 @@ require([
         "uibootstrap",
         "uirouter",
 
+        "d3",
+
         "apiModule",
         "controllersModule",
         "constantsModule",
@@ -115,7 +119,8 @@ require([
         "routesModule",
         "servicesModule",
 
-        "customDirective"
+        "customDirective",
+        "d3Map"
         ],
     function (document, angular) {
 

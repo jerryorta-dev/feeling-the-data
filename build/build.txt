@@ -12,6 +12,7 @@ app/vendors/requirejs-domready-2.0.1/domReady.js
 app/vendors/angular-1.2.14/angular-route.min.js
 app/vendors/angular-1.2.14/angular-animate.min.js
 app/vendors/uirouter-0.2.8/angular-ui-router.min.js
+app/vendors/d3-3.4.3/d3.min.js
 app/ng/api/apiModule.js
 app/ng/controllers/controllersModule.js
 app/ng/constants/constantsModule.js
@@ -23,4 +24,5 @@ app/ng/providers/providersModule.js
 app/ng/routes/routesModule.js
 app/ng/services/servicesModule.js
 app/ng/directives/customDirective/customDirective.js
+app/ng/directives/d3-map/d3-map.js
 app/requirejs-config.js

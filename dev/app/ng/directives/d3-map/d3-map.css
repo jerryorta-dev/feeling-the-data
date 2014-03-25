@@ -1,0 +1,14 @@
+.my-button {
+    border-radius: 5px;
+    color:white;
+}
+
+.my-button-green {
+    background-color: #2a8028;
+    border-color: #2a8028;
+}
+
+.my-button-red {
+    background-color: #802729;
+    border-color: #802729;
+}
