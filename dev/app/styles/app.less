@@ -2,11 +2,13 @@
 @import "less/theme";
 
 body {
-
   color: white;
   #gradient > .vertical(@start-color: #4C4C4C; @end-color: #131313);
   background-color: #131313;
+}
 
+input[type = "text"] {
+  color: black;
 }
 
 .content {
@@ -16,13 +18,29 @@ body {
 
 }
 
-.text-dark {
-  color:@gray;
+.background {
+  fill: none;
+  pointer-events: all;
 }
 
+.feature {
+  fill: #ccc;
+  cursor: pointer;
+}
+
+.feature.active {
+  fill: orange;
+}
+
+.mesh {
+  fill: none;
+  stroke: #fff;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 
 .test {
-    color:blue;
+    color:#009900;
 }
 
 

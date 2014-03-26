@@ -1,28 +1,38 @@
-define(['angular', 'preprocess', 'd3'], function (angular, p, d3) {
+define(['angular', 'preprocess', 'd3', 'topojson'], function (angular, p, d3, topojson) {
     p.loadOrder('d3-map directive');
     p.log("d3 version: " + d3.version);
 
     angular.module('app.directivesModule')
-        .controller('DemoCtrl', ['$scope', function($scope){
-            $scope.title = "DemoCtrl";
-            $scope.d3Data = [
-                {name: "Greg", score:98},
-                {name: "Ari", score:96},
-                {name: "Loser", score: 48}
-            ];
-            $scope.d3OnClick = function(item){
-                alert(item.name);
-            };
+        .controller('WorldMapController', ['$scope', "GeoFactory", 'geoData', function($scope, GeoFactory, geoData){
+
+
+            /**
+             * this works
+             */
+            GeoFactory.all(geoData).getList().then(function( data ) {
+                $scope.d3Data = data[0].raw;
+//                console.log("raw",data[0].raw);
+            } )
+
+
+//            GeoFactory.all(geoData).getList().then(function (result) {
+////                $scope.stateData = result;
+//                console.log('getList', result.getList());
+//            }, function (error) {
+//                console.log(error)
+//            });
+
+            $scope.title = "World Map";
+//            $scope.d3Data = [
+//                {name: "Greg", score:98},
+//                {name: "Ari", score:96},
+//                {name: "Loser", score: 48}
+//            ];
+//            $scope.d3OnClick = function(item){
+//                alert(item.name);
+//            };
         }])
-        .controller('DemoCtrl2', ['$scope', function($scope){
-            $scope.title = "DemoCtrl2";
-            $scope.d3Data = [
-                {title: "Greg", score:12},
-                {title: "Ari", score:43},
-                {title: "Loser", score: 87}
-            ];
-        }])
-        .directive('d3Bars', function () {
+        .directive('worldMap', function () {
             p.loadOrder('d3 directive');
             return {
                 restrict: 'EA',
@@ -31,71 +41,135 @@ define(['angular', 'preprocess', 'd3'], function (angular, p, d3) {
                     label: "@",
                     onClick: "&"
                 },
-                link: function(scope, iElement, iAttrs) {
-                    var svg = d3.select(iElement[0])
+                link: function($scope, $element, $attr) {
+
+                    var svg = d3.select($element[0])
                         .append("svg")
                         .attr("width", "100%");
 
+
+
                     // on window resize, re-render d3 canvas
                     window.onresize = function() {
-                        return scope.$apply();
+                        return $scope.$apply();
                     };
-                    scope.$watch(function(){
+                    $scope.$watch(function(){
                             return angular.element(window)[0].innerWidth;
                         }, function(){
-                            return scope.render(scope.data);
+                            return $scope.render($scope.data);
                         }
                     );
 
                     // watch for data changes and re-render
-                    scope.$watch('data', function(newVals, oldVals) {
-                        return scope.render(newVals);
+                    $scope.$watch('data', function(newVals, oldVals) {
+                        return $scope.render(newVals);
                     }, true);
 
                     // define render function
-                    scope.render = function(data){
-                        // remove all previous items before render
+                    $scope.render = function(data){
+// remove all previous items before render
                         svg.selectAll("*").remove();
+
+                        svg.on("click", stopped, true)
 
                         // setup variables
                         var width, height, max;
-                        width = d3.select(iElement[0])[0][0].offsetWidth - 20;
+                        width = d3.select($element[0])[0][0].offsetWidth - 20;
+
                         // 20 is for margins and can be changed
-                        height = scope.data.length * 35;
+                        height = 600;
                         // 35 = 30(bar height) + 5(margin between bars)
                         max = 98;
                         // this can also be found dynamically when the data is not static
                         // max = Math.max.apply(Math, _.map(data, ((val)-> val.count)))
 
                         // set the height based on the calculations above
-                        svg.attr('height', height);
+                        svg.attr('height', "100%");
 
-                        //create the rectangles for the bar chart
-                        svg.selectAll("rect")
-                            .data(data)
-                            .enter()
-                            .append("rect")
-                            .on("click", function(d, i){return scope.onClick({item: d});})
-                            .attr("height", 30) // height of each bar
-                            .attr("width", 0) // initial width of 0 for transition
-                            .attr("x", 10) // half of the 20 side margin specified above
-                            .attr("y", function(d, i){
-                                return i * 35;
-                            }) // height + margin between bars
-                            .transition()
-                            .duration(1000) // time of duration
-                            .attr("width", function(d){
-                                return d.score/(max/width);
-                            }); // width based on scale
+                        var active = d3.select(null);
 
-                        svg.selectAll("text")
-                            .data(data)
-                            .enter()
-                            .append("text")
-                            .attr("fill", "#fff")
-                            .attr("y", function(d, i){return i * 35 + 22;})
-                            .attr("x", 15)
-                            .text(function(d){return d[scope.label];});
+                        var projection = d3.geo.albersUsa()
+                            .scale(1000)
+                            .translate([width / 2, height / 2]);
+
+                        var zoom = d3.behavior.zoom()
+                            .translate([0, 0])
+                            .scale(1)
+                            .scaleExtent([1, 8])
+                            .on("zoom", zoomed);
+
+                        var path = d3.geo.path()
+                            .projection(projection);
+
+//                        var svg = d3.select("body").append("svg")
+//                            .attr("width", width)
+//                            .attr("height", height)
+//                            .on("click", stopped, true);
+
+                        svg.append("rect")
+                            .attr("class", "background")
+                            .attr("width", width)
+                            .attr("height", height)
+                            .on("click", reset);
+
+                        var g = svg.append("g");
+
+                        svg.call(zoom) // delete this line to disable free zooming
+                           .call(zoom.event);
+
+                        d3.json("app/data/us.json", function(error, us) {
+                            g.selectAll("path")
+                                .data(topojson.feature(us, us.objects.states).features)
+                                .enter().append("path")
+                                .attr("d", path)
+                                .attr("class", "feature")
+                                .on("click", clicked);
+
+                            g.append("path")
+                                .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
+                                .attr("class", "mesh")
+                                .attr("d", path);
+                        });
+
+                        function clicked(d) {
+
+                            if (active.node() === this) return reset();
+                            active.classed("active", false);
+                            active = d3.select(this).classed("active", true);
+
+                            var bounds = path.bounds(d),
+                                dx = bounds[1][0] - bounds[0][0],
+                                dy = bounds[1][1] - bounds[0][1],
+                                x = (bounds[0][0] + bounds[1][0]) / 2,
+                                y = (bounds[0][1] + bounds[1][1]) / 2,
+                                scale = .9 / Math.max(dx / width, dy / height),
+                                translate = [width / 2 - scale * x, height / 2 - scale * y];
+
+                            svg.transition()
+                                .duration(750)
+                                .call(zoom.translate(translate).scale(scale).event);
+                        }
+
+                        function reset() {
+                            active.classed("active", false);
+                            active = d3.select(null);
+
+                            svg.transition()
+                                .duration(750)
+                                .call(zoom.translate([0, 0]).scale(1).event);
+                        }
+
+                        function zoomed() {
+                            g.style("stroke-width", 1.5 / d3.event.scale + "px");
+                            g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+                        }
+
+                        // If the drag behavior prevents the default click,
+                        // also stop propagation so we don’t click-to-zoom.
+                        function stopped() {
+                            if (d3.event.defaultPrevented) d3.event.stopPropagation();
+                        }
+
 
                     };
                 }

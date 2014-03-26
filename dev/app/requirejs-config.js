@@ -1,7 +1,7 @@
 require.config(
     {"baseUrl": "app/",
         "paths": {
-            'preprocess': "loader/preprocess",
+            'preprocess': "preprocess",
 
 
             "angular": "vendors/angular-1.2.14/angular.min",
@@ -16,7 +16,10 @@ require.config(
             //more 3rd party-ish
             "jquery": "vendors/jquery-2.1.0/jquery.min",
             "uibootstrap": "vendors/angular-ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.min",
+
+            //Mapping
             "d3":"vendors/d3-3.4.3/d3.min",
+            "topojson":"vendors/d3-3.4.3/topojson",
 
             //Angular Config
             "ngConfig": "ng/configRoutes",
@@ -106,6 +109,7 @@ require([
         "uirouter",
 
         "d3",
+        "topojson",
 
         "apiModule",
         "controllersModule",

@@ -18,20 +18,40 @@ define(["angular", "preprocess"], function (angular, p) {
         "app.providersModule",
         "app.routesModule",
         "app.servicesModule"]).
+        constant('geoData', 'us').
         config(["$stateProvider", "$urlRouterProvider", "RestangularProvider",
             function ($stateProvider, $urlRouterProvider, RestangularProvider) {
 
-                RestangularProvider.setBaseUrl(p.getRestangularPath("app/data"));
-                RestangularProvider.setRequestSuffix(".json");
 
-                RestangularProvider.addResponseInterceptor(function (response, operation) {
+                /*RestangularProvider.setBaseUrl(p.getRestangularPath("app/data"));
+                RestangularProvider.setRequestSuffix(".json");
+                RestangularProvider.setResponseExtractor(function(response, operation, what, url) {
+                    // This is a get for a list
+                    var newResponse;
+                    if (operation === "getList") {
+                        // Here we're returning an Array which has one special property metadata with our extra information
+                        newResponse = [ response ];
+
+                    } else {
+                        // This is an element
+                        newResponse = response;
+                    }
+                    return newResponse;
+                });*/
+
+                /*RestangularProvider.addResponseInterceptor(function (response, operation) {
                     if (operation === "getList") {
 
-                        var newResponse = response.data;
+                        console.log(response);
+
+                        var newResponse = response;
                         return newResponse;
                     }
                     return response;
-                });
+                });*/
+
+
+
 
                 $urlRouterProvider.otherwise("/home");
 
