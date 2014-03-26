@@ -18,7 +18,6 @@ define(["angular", "preprocess"], function (angular, p) {
         "app.providersModule",
         "app.routesModule",
         "app.servicesModule"]).
-        constant('geoData', 'us').
         config(["$stateProvider", "$urlRouterProvider", "RestangularProvider",
             function ($stateProvider, $urlRouterProvider, RestangularProvider) {
 

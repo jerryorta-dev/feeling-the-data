@@ -3,35 +3,30 @@ define(['angular', 'preprocess', 'd3', 'topojson'], function (angular, p, d3, to
     p.log("d3 version: " + d3.version);
 
     angular.module('app.directivesModule')
-        .controller('WorldMapController', ['$scope', "GeoFactory", 'geoData', function($scope, GeoFactory, geoData){
+        .controller('WorldMapController', ['$scope', "GeoFactory", function($scope, GeoFactory){
 
+            console.log("data", $scope.data);
 
             /**
              * this works
              */
-            GeoFactory.all(geoData).getList().then(function( data ) {
+            GeoFactory.all("us").getList().then(function( data ) {
                 $scope.d3Data = data[0].raw;
-//                console.log("raw",data[0].raw);
             } )
 
 
-//            GeoFactory.all(geoData).getList().then(function (result) {
-////                $scope.stateData = result;
-//                console.log('getList', result.getList());
-//            }, function (error) {
-//                console.log(error)
-//            });
-
             $scope.title = "World Map";
-//            $scope.d3Data = [
-//                {name: "Greg", score:98},
-//                {name: "Ari", score:96},
-//                {name: "Loser", score: 48}
-//            ];
-//            $scope.d3OnClick = function(item){
-//                alert(item.name);
-//            };
+
         }])
+        .directive('d3Map', function() {
+            return {
+                restrict: 'EA',
+                scope: {
+                    geoData: '='
+                },
+                templateUrl:"app/ng/directives/d3-map/d3-map.html"
+            }
+        })
         .directive('worldMap', function () {
             p.loadOrder('d3 directive');
             return {
@@ -62,6 +57,7 @@ define(['angular', 'preprocess', 'd3', 'topojson'], function (angular, p, d3, to
 
                     // watch for data changes and re-render
                     $scope.$watch('data', function(newVals, oldVals) {
+                        console.log(newVals);
                         return $scope.render(newVals);
                     }, true);
 

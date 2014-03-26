@@ -4,7 +4,7 @@ require.config(
             'preprocess': "preprocess",
 
 
-            "angular": "vendors/angular-1.2.14/angular.min",
+            "angular": "vendors/angular-1.2.14/angular",
             "angularanimate": "vendors/angular-1.2.14/angular-animate.min",
             "uirouter": "vendors/uirouter-0.2.8/angular-ui-router.min",
             "angular-route": "vendors/angular-1.2.14/angular-route.min",
@@ -38,10 +38,10 @@ require.config(
 
             //Custom modules
             "customDirective" : "ng/directives/customDirective/customDirective",
-            "d3Map":"ng/directives/d3-map/d3-map"
+            "d3Map":"ng/directives/d3-map/d3-map",
+            "d3MapFactory": "ng/directives/d3-map/d3MapFactory"
         },
         "shim": {
-
 
 
             'preprocess': {
@@ -124,7 +124,8 @@ require([
         "servicesModule",
 
         "customDirective",
-        "d3Map"
+        "d3Map",
+        "d3MapFactory"
         ],
     function (document, angular) {
 
