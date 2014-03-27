@@ -4,14 +4,14 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['angular', 'preprocess', "factoriesModule"], function(angular, p){
+define(['angular', 'preprocess', "factoriesModule"], function (angular, p) {
     p.loadOrder("factoriesModule");
     angular.module('app.factoriesModule')
         .factory('GeoFactory', ['$q', 'Restangular', function ($q, Restangular) {
             return Restangular.withConfig(function (RestangularConfigurer) {
                 RestangularConfigurer.setBaseUrl(p.getRestangularPath("app/data"));
                 RestangularConfigurer.setRequestSuffix(".json");
-                RestangularConfigurer.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
+                RestangularConfigurer.addResponseInterceptor(function (data, operation, what, url, response, deferred) {
 
                     var raw = {};
                     raw.type = data.type;
@@ -44,6 +44,19 @@ define(['angular', 'preprocess', "factoriesModule"], function(angular, p){
                      return newResponse;*/
 
                 });
+            });
+        }])
+        .factory('indeedJobs', ['$q', 'Restangular', function ($q, Restangular) {
+            return Restangular.withConfig(function (RestangularConfigurer) {
+                RestangularConfigurer.setBaseUrl("http://api.indeed.com/ads/apisearch");
+                RestangularConfigurer.setDefaultRequestParams('get',
+                    {
+                        format: "json",
+                        publisher: 4600389599611799,
+                        limit: 100,
+                        latlong: 1
+                    });
+
             });
         }]);
 });
