@@ -12,6 +12,8 @@ require.config(
       "domReady": "vendors/requirejs-domready-2.0.1/domReady",
 //      "async": "vendors/requirejs-plugins-1.0.2/async",
 
+      'ua-parser': "vendors/ua-parser-js-0.6.2/ua-parser.min",
+
       //more 3rd party-ish
       "jquery": "vendors/jquery-2.1.0/jquery.min",
       "uibootstrap": "vendors/angular-ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.min",
@@ -134,6 +136,7 @@ require([
     "routesModule",
     "servicesModule",
     "indeed",
+    'ua-parser',
     "customDirective"/*,
      "googleMapsDirectives",
      "googleMapsApi"*/
