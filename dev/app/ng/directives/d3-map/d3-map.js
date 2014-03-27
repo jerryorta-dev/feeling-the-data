@@ -5,7 +5,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule"], function 
     angular.module('app.directivesModule')
         .controller('WorldMapController', ['$scope', "GeoFactory", function($scope, GeoFactory){
 
-            console.log("data", $scope.data);
+//            console.log("data", $scope.data);
 
             /**
              * this works
@@ -57,7 +57,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule"], function 
 
                     // watch for data changes and re-render
                     $scope.$watch('data', function(newVals, oldVals) {
-                        console.log(newVals);
+//                        console.log(newVals);
                         return $scope.render(newVals);
                     }, true);
 
@@ -88,6 +88,10 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule"], function 
                             .scale(1000)
                             .translate([width / 2, height / 2]);
 
+//                        var coords = projection([d.lon, d.lat]);
+//                        var x = coords[0];
+//                        var y = coords[1];
+
                         var zoom = d3.behavior.zoom()
                             .translate([0, 0])
                             .scale(1)
@@ -113,7 +117,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule"], function 
                         svg.call(zoom) // delete this line to disable free zooming
                            .call(zoom.event);
 
-                        d3.json("app/data/us.json", function(error, us) {
+                        d3.json("app/data/world-50m.json", function(error, us) {
                             g.selectAll("path")
                                 .data(topojson.feature(us, us.objects.states).features)
                                 .enter().append("path")
