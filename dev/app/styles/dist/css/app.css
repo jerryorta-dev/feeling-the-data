@@ -6145,6 +6145,25 @@ input[type="text"] {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+/* INDEED SEARCH BOX  */
+.indeed {
+  font-family: arial;
+  color: #000;
+}
+.indeed-title {
+  color: #F60;
+}
+.indeed-description {
+  color: #fff;
+}
+#indeed_at {
+  padding-top: 20px;
+  color: white;
+  text-decoration: none;
+  /*& a {
+        color: white;
+    }*/
+}
 .test {
   color: #009900;
 }
