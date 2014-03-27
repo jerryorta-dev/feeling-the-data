@@ -112,12 +112,14 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule"], function 
                             .attr("height", height)
                             .on("click", reset);
 
+
+
                         var g = svg.append("g");
 
                         svg.call(zoom) // delete this line to disable free zooming
                            .call(zoom.event);
 
-                        d3.json("app/data/world-50m.json", function(error, us) {
+                        d3.json("app/data/us.json", function(error, us) {
                             g.selectAll("path")
                                 .data(topojson.feature(us, us.objects.states).features)
                                 .enter().append("path")
@@ -129,7 +131,25 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule"], function 
                                 .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
                                 .attr("class", "mesh")
                                 .attr("d", path);
+
+                            var lat = 30.3077609;
+                            var lon = -97.7534014;
+
+
+                            g.append("circle")
+                                .attr("cx", function(d) {
+
+                                    return projection([lon, lat ])[0];
+                                })
+                                .attr("cy", function(d) {
+                                    return projection([lon,lat])[1];
+                                })
+                                .attr("r", 3)
+                                .style("fill", "red");
+
                         });
+
+
 
                         function clicked(d) {
 
