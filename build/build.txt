@@ -2,7 +2,7 @@
 app/requirejs-config.js
 ----------------
 app/vendors/jquery-2.1.0/jquery.min.js
-app/vendors/angular-1.2.14/angular.js
+app/vendors/angular-1.2.14/angular.min.js
 app/vendors/angular-ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.min.js
 app/vendors/underscore-1.6.0/underscore-min.js
 app/vendors/restangular-1.3.1/restangular.min.js
