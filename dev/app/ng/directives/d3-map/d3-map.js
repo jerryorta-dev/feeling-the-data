@@ -1,4 +1,4 @@
-define(['angular', 'preprocess', 'd3', 'topojson'], function (angular, p, d3, topojson) {
+define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule"], function (angular, p, d3, topojson) {
     p.loadOrder('d3-map directive');
     p.log("d3 version: " + d3.version);
 

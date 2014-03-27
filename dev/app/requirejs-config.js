@@ -18,12 +18,12 @@ require.config(
             "jquery": "vendors/jquery-2.1.0/jquery.min",
             "uibootstrap": "vendors/angular-ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.min",
 
-            "googleMapsApi":"async!http://maps.googleapis.com/maps/api/js?libraries=weather,visualization&sensor=false&language=en&v=3.14",
-            "googleMapsDirectives": "vendors/angular-google-maps-1.0.15/angular-google-maps",
+//            "googleMapsApi":"async!http://maps.googleapis.com/maps/api/js?libraries=weather,visualization&sensor=false&language=en&v=3.14",
+//            "googleMapsDirectives": "vendors/angular-google-maps-1.0.15/angular-google-maps",
 
             //Mapping
-//            "d3":"vendors/d3-3.4.3/d3.min",
-//            "topojson":"vendors/d3-3.4.3/topojson",
+            "d3":"vendors/d3-3.4.3/d3.min",
+            "topojson":"vendors/d3-3.4.3/topojson",
 
             //Angular Config
             "ngConfig": "ng/configRoutes",
@@ -84,13 +84,13 @@ require.config(
                 "deps": ["angular"]
             },
 
-            "googleMapsDirectives": {
+           /* "googleMapsDirectives": {
                 "deps": ["underscore", "angular", "googleMapsApi"]
             },
-
-            "googleMapsApi": {
-                "deps":["async"]
-            },
+*/
+//            "googleMapsApi": {
+//                "deps":["async"]
+//            },
 
             "ngConfig": {
                 "deps": [
@@ -120,10 +120,10 @@ require([
         "uibootstrap",
         "uirouter",
 
-//        "d3",
-//        "topojson",
-//        "d3Map",
-//        "d3MapFactory"
+        "d3",
+        "topojson",
+        "d3Map",
+        "d3MapFactory",
 
         "apiModule",
         "controllersModule",
@@ -137,9 +137,9 @@ require([
         "routesModule",
         "servicesModule",
 
-        "customDirective",
+        "customDirective"/*,
         "googleMapsDirectives",
-        "googleMapsApi"
+        "googleMapsApi"*/
 
     ],
     function (document, angular) {

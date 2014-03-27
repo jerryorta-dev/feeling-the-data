@@ -4,7 +4,7 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['angular', 'preprocess'], function(angular, p){
+define(['angular', 'preprocess', "factoriesModule"], function(angular, p){
     p.loadOrder("factoriesModule");
     angular.module('app.factoriesModule')
         .factory('GeoFactory', ['$q', 'Restangular', function ($q, Restangular) {
