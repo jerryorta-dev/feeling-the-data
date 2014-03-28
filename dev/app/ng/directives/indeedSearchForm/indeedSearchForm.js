@@ -4,30 +4,36 @@ define(['angular', 'preprocess', 'ua-parser', "factoriesModule", "directivesModu
   p.loadOrder('indeed directive');
 
   angular.module('app.directivesModule')
-    .factory('indeedDataFactory', ['$q', 'Restangular', function ($q, Restangular) {
+   /* .factory('indeedDataFactory', ['$q', 'Restangular', function ($q, Restangular) {
       return Restangular.withConfig(function (RestangularConfigurer) {
+        console.log(RestangularConfigurer);
         RestangularConfigurer.setBaseUrl("http://api.indeed.com/ads/");
+//        RestangularConfigurer.setJsonp(true);
+//        RestangularConfigurer.jsonp = false;
         RestangularConfigurer.setDefaultRequestParams('get',
           {
             format: "json",
             publisher: 4600389599611799,
             limit: 100,
             latlong: 1,
-            indpubnum: 4600389599611799,
-            v: 2
-          });
-        RestangularConfigurer.addResponseInterceptor(function (data, operation, what, url, response, deferred) {
+//            indpubnum: 4600389599611799,
+            v: 2,
+            callback: "JSON_CALLBACK"
+          });*/
+
+        /*RestangularConfigurer.addResponseInterceptor(function (data, operation, what, url, response, deferred) {
           var newResponse;
+          console.log(data);
           if (operation === "getList") {
             // Here we're returning an Array which has one special property metadata with our extra information
             newResponse = data.results;
           }
           return newResponse;
-        });
+        });*/
 
-      });
-    }])
-    .directive('indeedJobs', ['$compile', 'indeedDataFactory', 'ip', function ($compile, indeedDataFactory, ip) {
+//      });
+//    }])
+    .directive('indeedJobs', ['$compile', 'Restangular', 'ip', function ($compile, Restangular, ip) {
       p.loadOrder('indeed jobs directive');
       return {
         restrict: 'EA',
@@ -43,10 +49,10 @@ define(['angular', 'preprocess', 'ua-parser', "factoriesModule", "directivesModu
 
           $scope.findJobs = function () {
 
-            indeedDataFactory.all('apisearch').getList({userip: $scope.ip, useragent: $scope.ua}).then(function (result) {
+            /*Restangular.all('apisearch').getList({userip: $scope.ip, useragent: $scope.ua}).then(function (result) {
               console.log(result);
             })
-
+*/
           }
 
         },
