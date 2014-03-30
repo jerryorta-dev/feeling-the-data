@@ -121,11 +121,11 @@ define(['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "factories
 
                         var deferred = $q.defer();
 
-                        $http.get(getParams().getUrl())
-                            .success(function(data) {
-                                console.log(data);
-                                deferred.resolve(data);
-                            });
+//                        $http.get(getParams().getUrl())
+//                            .success(function(data) {
+//                                console.log(data);
+//                                deferred.resolve(data);
+//                            });
                         var flickerAPI = "http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?";
 
 
