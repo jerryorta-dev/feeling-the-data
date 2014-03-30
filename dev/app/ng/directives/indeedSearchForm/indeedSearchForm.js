@@ -94,6 +94,8 @@ define(['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "factories
 
                         this.url = this.url.substring(0, this.url.length - 1);
 
+                        console.log(this.url);
+
                         return this.url;
                     },
                     jsonp:function() {
@@ -103,7 +105,7 @@ define(['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "factories
                         }, this);
 
                         this.url = this.url.substring(0, this.url.length - 1);
-
+                        console.log(this.url);
                         return this.url;
                     }
 
@@ -115,7 +117,7 @@ define(['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "factories
                         return ipResult.ip;
                     }).then( function(ip) {
 
-                        getParams().getUrl();
+//                        getParams().getUrl();
 
                         var deferred = $q.defer();
 
