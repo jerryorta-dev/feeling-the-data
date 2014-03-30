@@ -21,17 +21,17 @@ define(["angular", "preprocess"], function (angular, p) {
     config(["$stateProvider", "$urlRouterProvider", "RestangularProvider",
       function ($stateProvider, $urlRouterProvider, RestangularProvider) {
 
-        RestangularProvider.setBaseUrl("http://api.indeed.com/ads/");
-        RestangularProvider.setJsonp(true);
-        RestangularProvider.setDefaultRequestParams('jsonp',
-          {
-            format: "json",
-            publisher: 4600389599611799,
-            limit: 100,
-            latlong: 1,
-            v: 2,
-            callback: "JSON_CALLBACK"
-          });
+//        RestangularProvider.setBaseUrl("http://api.indeed.com/ads/");
+//        RestangularProvider.setJsonp(true);
+//        RestangularProvider.setDefaultRequestParams('jsonp',
+//          {
+//            format: "json",
+//            publisher: 4600389599611799,
+//            limit: 100,
+//            latlong: 1,
+//            v: 2,
+//            callback: "JSON_CALLBACK"
+//          });
 
         /*RestangularProvider.setBaseUrl(p.getRestangularPath("app/data"));
          RestangularProvider.setRequestSuffix(".json");
