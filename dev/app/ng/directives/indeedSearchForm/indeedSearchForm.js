@@ -119,7 +119,7 @@ define(['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "factories
 
                         var deferred = $q.defer();
 
-                        $http.jsonp(getParams().jsonp())
+                        $http.get(getParams().getUrl())
                             .success(function(data) {
                                 console.log(data);
                                 deferred.resolve(data);
