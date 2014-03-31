@@ -2,7 +2,6 @@ require.config(
   {"baseUrl": "app/",
     "paths": {
       'preprocess': "preprocess",
-
       "angular": "vendors/angular-1.2.14/angular",
       "angularanimate": "vendors/angular-1.2.14/angular-animate.min",
       "uirouter": "vendors/uirouter-0.2.8/angular-ui-router.min",
@@ -10,25 +9,12 @@ require.config(
       "restangular": "vendors/restangular-1.3.1/restangular.min",
       "underscore": "vendors/underscore-1.6.0/underscore-min",
       "domReady": "vendors/requirejs-domready-2.0.1/domReady",
-//      "async": "vendors/requirejs-plugins-1.0.2/async",
-
       'ua-parser': "vendors/ua-parser-js-0.6.2/ua-parser.min",
-
-      //more 3rd party-ish
       "jquery": "vendors/jquery-2.1.0/jquery.min",
       "uibootstrap": "vendors/angular-ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.min",
-
-//            "googleMapsApi":"async!http://maps.googleapis.com/maps/api/js?libraries=weather,visualization&sensor=false&language=en&v=3.14",
-//            "googleMapsDirectives": "vendors/angular-google-maps-1.0.15/angular-google-maps",
-
-      //Mapping
       "d3": "vendors/d3-3.4.3/d3.min",
       "topojson": "vendors/d3-3.4.3/topojson",
-
-      //Angular Config
       "ngConfig": "ng/configRoutes",
-
-      //base angular modules
       "apiModule": "ng/api/apiModule",
       "constantsModule": "ng/constants/constantsModule",
       "controllersModule": "ng/controllers/controllersModule",
@@ -39,8 +25,6 @@ require.config(
       "providersModule": "ng/providers/providersModule",
       "routesModule": "ng/routes/routesModule",
       "servicesModule": "ng/services/servicesModule",
-
-      //Custom modules
       "customDirective": "ng/directives/customDirective/customDirective",
       "indeed": "ng/directives/indeedSearchForm/indeedSearchForm",
       "d3Map": "ng/directives/d3-map/d3-map"
@@ -83,15 +67,6 @@ require.config(
       "uibootstrap": {
         "deps": ["angular"]
       },
-
-      /* "googleMapsDirectives": {
-       "deps": ["underscore", "angular", "googleMapsApi"]
-       },
-       */
-//            "googleMapsApi": {
-//                "deps":["async"]
-//            },
-
       "ngConfig": {
         "deps": [
           "uibootstrap",
@@ -109,9 +84,7 @@ require.config(
  */
 require([
     'domReady',
-
     "ngConfig",
-
     "angular",
     "angular-route",
     "angularanimate",
@@ -119,11 +92,9 @@ require([
     "restangular",
     "uibootstrap",
     "uirouter",
-
     "d3",
     "topojson",
     "d3Map",
-
     "apiModule",
     "controllersModule",
     "constantsModule",
@@ -137,9 +108,7 @@ require([
     "servicesModule",
     "indeed",
     'ua-parser',
-    "customDirective"/*,
-     "googleMapsDirectives",
-     "googleMapsApi"*/
+    "customDirective"
 
   ],
   function (document, angular) {

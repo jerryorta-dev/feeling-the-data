@@ -1,4 +1,4 @@
-define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule"], function (angular, p, d3, topojson) {
+define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"], function (angular, p, d3, topojson) {
     p.loadOrder('d3-map directive');
     p.log("d3 version: " + d3.version);
 
@@ -27,7 +27,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule"], function 
                 templateUrl:"app/ng/directives/d3-map/d3-map.html"
             }
         })
-        .directive('worldMap', function () {
+        .directive('worldMap', ['indeedData', function (indeedData) {
             p.loadOrder('d3 directive');
             return {
                 restrict: 'EA',
@@ -43,11 +43,11 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule"], function 
                         .attr("width", "100%");
 
 
-
                     // on window resize, re-render d3 canvas
                     window.onresize = function() {
                         return $scope.$apply();
                     };
+
                     $scope.$watch(function(){
                             return angular.element(window)[0].innerWidth;
                         }, function(){
@@ -59,6 +59,16 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule"], function 
                     $scope.$watch('data', function(newVals, oldVals) {
 //                        console.log(newVals);
                         return $scope.render(newVals);
+                    }, true);
+
+                    // watch for data changes and re-render
+                    $scope.indeedData = indeedData.params()
+
+                    //newVals is an array
+                    $scope.$watch('indeedData.indeedResults', function(newVals, oldVals) {
+
+                        $scope.renderCircles(newVals);
+//
                     }, true);
 
                     // define render function
@@ -84,7 +94,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule"], function 
 
                         var active = d3.select(null);
 
-                        var projection = d3.geo.albersUsa()
+                        $scope.projection = d3.geo.albersUsa()
                             .scale(1000)
                             .translate([width / 2, height / 2]);
 
@@ -99,7 +109,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule"], function 
                             .on("zoom", zoomed);
 
                         var path = d3.geo.path()
-                            .projection(projection);
+                            .projection($scope.projection);
 
 //                        var svg = d3.select("body").append("svg")
 //                            .attr("width", width)
@@ -132,22 +142,11 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule"], function 
                                 .attr("class", "mesh")
                                 .attr("d", path);
 
-                            var lat = 30.3077609;
-                            var lon = -97.7534014;
-
-
-                            g.append("circle")
-                                .attr("cx", function(d) {
-
-                                    return projection([lon, lat ])[0];
-                                })
-                                .attr("cy", function(d) {
-                                    return projection([lon,lat])[1];
-                                })
-                                .attr("r", 3)
-                                .style("fill", "red");
+                            $scope.renderCircles();
 
                         });
+
+
 
 
 
@@ -192,10 +191,34 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule"], function 
 
 
                     };
+
+                    $scope.renderCircles = function(data) {
+
+                        if (!data) {
+                            return;
+                        }
+
+                        var g = svg.select("g");
+                        g.selectAll("circle").remove();
+
+                        var len = data.length, i = 0;
+                        for (i; i < len; i++) {
+                            g.append("circle")
+                                .attr("cx", function(d) {
+
+                                    return $scope.projection([data[i].longitude, data[i].latitude ])[0];
+                                })
+                                .attr("cy", function(d) {
+                                    return $scope.projection([data[i].longitude,data[i].latitude])[1];
+                                })
+                                .attr("r", 2)
+                                .style("fill", "red");
+                        }
+                    }
                 }
             };
 
-        }).factory('GeoFactory', ['$q', 'Restangular', function ($q, Restangular) {
+        }]).factory('GeoFactory', ['$q', 'Restangular', function ($q, Restangular) {
         return Restangular.withConfig(function (RestangularConfigurer) {
           RestangularConfigurer.setBaseUrl(p.getRestangularPath("app/data"));
           RestangularConfigurer.setRequestSuffix(".json");

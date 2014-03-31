@@ -1,22 +1,32 @@
 define(['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "factoriesModule", "directivesModule", "providersModule"], function (angular, _, p, UAParser, $) {
     p.loadOrder('indeed directive');
 
+
+    window.INDEED_CALLBACK = function (data) {
+        console.log("INDEED_CALLBACK NOT OVERWRITTEN BY FUNCTION");
+    }
+
+
+    window.INDEED_DATA = function (data) {
+        window.INDEED_CALLBACK.call(null, data);
+    }
+
+
     angular.module('app.directivesModule')
         .provider('indeedData', function ipProvider() {
 
+
             this.$get = ['$q', '$http', 'ip', function ($q, $http, ip) {
-
-
 
                 var parser = new UAParser();
 
                 var paramsInstance = null;
 
-                var getParams = function() {
+                var getParams = function () {
                     if (paramsInstance == null) {
                         paramsInstance = new Params();
 
-                        paramsInstance.useragent(parser.getResult().browser.name + '-' + parser.getBrowser().version)
+                        paramsInstance.useragent(parser.getResult().browser.name);
 
                         return paramsInstance;
                     } else {
@@ -24,133 +34,159 @@ define(['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "factories
                     }
                 }
 
-                var Params = function() {
+                var Params = function () {
                     this.baseUrl = "http://api.indeed.com/ads/apisearch";
 
                     this.url = "";
 
-                    this.params = {};
-                    this.params.publisher = 4600389599611799;
-                    this.params.v = 2;
-                    this.params.format = "json";
-                    this.params.callback = "JSON_CALLBACK";
-                    this.params.q = "";
-                    this.params.l = "";
-                    this.params.sort = "";
-                    this.params.radius="";
-                    this.params.st = "";
-                    this.params.jt = "";
-                    this.params.start = "";
-                    this.params.limit = 100;
-                    this.params.fromage = "";
-                    this.params.highlight = "";
-                    this.params.filter = 1;
-                    this.params.latlong = 1;
-                    this.params.co = "us";
-                    this.params.chnl = "";
-                    this.params.userip = "";
-                    this.params.useragent = "";
+                    this.indeedparams = {};
+                    this.indeedparams.publisher = "4600389599611799"; //Jerry Orta
+//                    this.indeedparams.publisher = "3389910236391419"; //Leo
+                    this.indeedparams.v = 2;
+                    this.indeedparams.format = "json";
+//                    this.indeedparams.callback = "JSON_CALLBACK";
+                    this.indeedparams.callback = "INDEED_DATA";
+//                    this.indeedparams.callback = "test._1";
+                    this.indeedparams.q = "";
+                    this.indeedparams.l = "";
+                    this.indeedparams.sort = "";
+                    this.indeedparams.radius = "";
+                    this.indeedparams.st = "";
+                    this.indeedparams.jt = "";
+                    this.indeedparams.start = "";
+                    this.indeedparams.limit = 100;
+                    this.indeedparams.fromage = "";
+                    this.indeedparams.highlight = "";
+                    this.indeedparams.filter = 1;
+                    this.indeedparams.latlong = 1;
+                    this.indeedparams.co = "us";
+                    this.indeedparams.chnl = "";
+                    this.indeedparams.userip = "1.2.3.4";
+                    this.indeedparams.useragent = "Mozilla/%2F4.0%28Firefox%29";
+
+                    this.indeedResults = [];
 
                 };
 
                 Params.prototype = {
-                    constructor:Params,
+                    constructor: Params,
 
-                    getBaseurl:function() {
+                    getBaseurl: function () {
                         return this.baseUrl;
                     },
 
-                    getParams:function() {
-                        return this.params;
-                    },
+                    results: function (data) {
+                        if (data != null) {
+                            this.indeedResults = data;
+                            return true;
+                        }
 
-                    query:function(q) {
-                      this.params.q = encodeURIComponent(q);
-
-                    },
-
-                    location:function(l) {
-                      this.l = encodeURIComponent(l);
-
-                    },
-
-                    userip:function(ip) {
-                        this.params.userip = ip;
+                        return this.indeedResults;
                     },
 
 
-                    useragent:function(ua) {
-                        this.params.useragent = ua;
+                    query: function (q) {
+//                        console.log("what", q);
+                        this.indeedparams.q = encodeURIComponent(q);
+
                     },
 
-                    getUrl:function() {
+                    location: function (l) {
+//                        console.log("where", l);
+                        this.indeedparams.l = encodeURIComponent(l);
+
+                    },
+
+                    userip: function (ip) {
+                        this.indeedparams.userip = encodeURIComponent(ip);
+                    },
+
+
+                    useragent: function (ua) {
+                        this.indeedparams.useragent = encodeURIComponent(ua);
+                    },
+
+
+                    xml: function () {
                         this.url = this.baseUrl + "?";
-                        _.each(this.params, function(value, key, list) {
-                            if (key != "format" || key != "callback") {
+                        _.each(this.indeedparams, function (value, key, list) {
+                            var valid = true;
+
+                            if (value == "json") {
+                                valid = false;
+                            }
+
+                            if (value == "JSON_CALLBACK") {
+                                valid = false;
+                            }
+
+                            if (valid) {
                                 this.url += key + "=" + value + "&";
                             }
+
 
                         }, this);
 
                         this.url = this.url.substring(0, this.url.length - 1);
 
-                        console.log(this.url);
+//                        console.log(this.url);
 
                         return this.url;
                     },
-                    jsonp:function() {
+                    jsonp: function () {
                         this.url = this.baseUrl + "?";
-                        _.each(this.params, function(value, key, list) {
+                        _.each(this.indeedparams, function (value, key, list) {
                             this.url += key + "=" + value + "&";
                         }, this);
 
                         this.url = this.url.substring(0, this.url.length - 1);
-                        console.log(this.url);
+//                        console.log(this.url);
                         return this.url;
                     }
 
                 }
 
-                var getData = function() {
+                var getData = function () {
+//                    console.log(getParams().jsonp());
                     return ip.then(function (ipResult) {
                         getParams().userip(ipResult.ip);
                         return ipResult.ip;
-                    }).then( function(ip) {
+                    }).then(function (ip) {
 
 //                        getParams().getUrl();
 
                         var deferred = $q.defer();
 
-//                        $http.get(getParams().getUrl())
-//                            .success(function(data) {
-//                                console.log(data);
-//                                deferred.resolve(data);
-//                            });
-                        var flickerAPI = "http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?";
+                        window.INDEED_CALLBACK = function (data) {
+                            deferred.resolve(data.results);
+                            getParams().results(data.results);
+                        }
 
 
-//                        $.getJSON( getParams().getBaseurl(), getParams().getParams())
-//                            .done(function( data ) {
-//                                console.log(data)
-//                            });
-
-                        $.get( "http://api.indeed.com/ads/apisearch?publisher=4600389599611799&q=java&l=austin%2C+tx&sort=&radius=&st=&jt=&start=&limit=&fromage=&filter=&latlong=1&co=us&chnl=&userip=1.2.3.4&useragent=Mozilla/%2F4.0%28Firefox%29&v=2", function( data ) {
-                           console.log(data);
-                        });
+                        $http.jsonp(getParams().jsonp());
 
 
-
-                    return deferred.promise;
+                        return deferred.promise;
 
                     })
+                };
+
+                var getResults = function() {
+                    return getParams().results()
+//                    var deferred = $q.defer();
+//
+//                    deferred.resolve(getParams().results());
+//
+//                    return deferred.promise;
+
                 }
 
 
                 return {
-                    params: getParams(),
-                    getData: getData()
+                    params: getParams,
+                    getData: getData,
+                    results: getResults
                 }
-
 
 
             }]
@@ -163,30 +199,21 @@ define(['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "factories
                     $scope.indeed = {what: "what", where: "where"};
 
                     var parser = new UAParser();
-                    $scope.ua = parser.getResult().browser.name + '-' + parser.getBrowser().version;
-
-                    indeedData.params.query('angularjs');
-                    indeedData.params.location('Austin, Tx');
-                    indeedData.getData;
-
-
+                    $scope.ua = parser.getResult().browser.name;
 
 
                     $scope.findJobs = function () {
 
-                        /*indeedDataFactory.all('apisearch').getList(
-                            {
-                                q: $scope.indeed.what,
-                                l: $scope.indeed.where,
-                                userip: $scope.ip,
-                                useragent: $scope.ua
-                            }).then(function (result) {
-                            console.log(result);
-                        })*/
+                        indeedData.params().query($scope.indeed.what);
+                        indeedData.params().location($scope.indeed.where);
+                        indeedData.getData().then(function (results) {
+//                            console.log("results from indeed: ", results);
+                        });
+
                     }
 
                 },
-                templateUrl:"app/ng/directives/indeedSearchForm/indeedSearchForm.html"
+                templateUrl: "app/ng/directives/indeedSearchForm/indeedSearchForm.html"
             };
 
         }])
