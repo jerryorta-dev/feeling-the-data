@@ -1,5 +1,6 @@
 @import "less/bootstrap";
 @import "less/theme";
+@import "app-mixins";
 
 body {
   color: white;
@@ -66,8 +67,50 @@ input[type = "text"] {
     }*/
 }
 
+.d3-tip {
+  font-size: 12px;
+  stroke: none;
+  color: #fff;
+  background-color: #333;
+  padding:10px;
+  .app-border-radius(6px, 6px, 6px, 6px)
+}
 
+.arrow-bottom {
+  position: relative;
+  left: 37%;
+  width: 0;
+  height: 0;
+  border-top: 10px solid #333;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+}
 
+circle {
+  fill: #ccc;
+  fill-opacity: 0.6;
+  stroke: #bbb;
+  stroke-width: 1px;
+}
+
+circle:hover {
+  fill: #bbb;
+  stroke: #999;
+}
+
+circle.clickable:hover {
+  cursor: pointer;
+}
+
+.rule {
+  stroke-width: 1px;
+  stroke: #c00;
+  shape-rendering: crispedges;
+}
+
+.popover {
+  color:#333;
+}
 
 
 .test {
