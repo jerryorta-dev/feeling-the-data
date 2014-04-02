@@ -96,7 +96,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                         var active = d3.select(null);
 
                         $scope.projection = d3.geo.albersUsa()
-                            .scale(1000)
+                            .scale(1300)
                             .translate([width / 2, height / 2]);
 
 //                        var coords = projection([d.lon, d.lat]);
@@ -128,16 +128,16 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                         svg.call(zoom) // delete this line to disable free zooming
                             .call(zoom.event);
 
-                        d3.json("app/data/us.json", function (error, us) {
+                        d3.json("app/data/topojson-0.0.1/us/counties/us-10m.json", function (error, us) {
                             g.selectAll("path")
-                                .data(topojson.feature(us, us.objects.states).features)
+                                .data(topojson.feature(us, us.objects.counties).features)
                                 .enter().append("path")
                                 .attr("d", path)
                                 .attr("class", "feature")
                                 .on("click", clicked);
 
                             g.append("path")
-                                .datum(topojson.mesh(us, us.objects.states, function (a, b) {
+                                .datum(topojson.mesh(us, us.objects.counties, function (a, b) {
                                     return a !== b;
                                 }))
                                 .attr("class", "mesh")
