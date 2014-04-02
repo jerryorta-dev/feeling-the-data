@@ -11,9 +11,9 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
             /**
              * this works
              */
-            GeoFactory.all("us").getList().then(function (data) {
+           /* GeoFactory.all("us").getList().then(function (data) {
                 $scope.d3Data = data[0].raw;
-            })
+            })*/
 
 
             $scope.title = "World Map";
