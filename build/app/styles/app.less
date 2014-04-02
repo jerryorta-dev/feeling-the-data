@@ -1,0 +1,132 @@
+@import "less/bootstrap";
+@import "less/theme";
+@import "app-mixins";
+
+body {
+  color: white;
+  #gradient > .vertical(@start-color: #4C4C4C; @end-color: #131313);
+  background-color: #131313;
+}
+
+input[type = "text"] {
+  color: black;
+}
+
+.content {
+  width: 100%;
+  height: 100%;
+  margin:20px;
+
+}
+
+.background {
+  fill: none;
+  pointer-events: all;
+}
+
+.feature {
+  fill: #ccc;
+  cursor: pointer;
+}
+
+.feature.active {
+  fill: orange;
+}
+
+.mesh {
+  fill: none;
+  stroke: #fff;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* INDEED SEARCH BOX  */
+.indeed {
+    font-family: arial;
+    color: #000;
+
+    &-title {
+        color:#F60;
+    }
+
+    &-input {
+//        color: #000;
+    }
+
+    &-description {
+        color:#fff;
+    }
+}
+
+#indeed_at {
+    padding-top:20px;
+    color: white;
+    text-decoration: none;
+    /*& a {
+        color: white;
+    }*/
+}
+
+.popover-wrapper {
+  max-width: 400px;
+
+
+
+  .d3-tip {
+    font-size: 12px;
+    stroke: none;
+    color: #fff;
+    background-color: #333;
+    padding:1px 20px 10px 20px;
+    .app-border-radius(6px, 6px, 6px, 6px)
+  }
+
+  .arrow-bottom {
+    position: relative;
+    left: 47%;
+    width: 0;
+    height: 0;
+    border-top: 10px solid #333;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+  }
+
+
+}
+
+
+
+
+circle {
+  fill: #ccc;
+  fill-opacity: 0.6;
+  stroke: #bbb;
+  stroke-width: 1px;
+}
+
+circle:hover {
+  fill: #bbb;
+  stroke: #999;
+}
+
+circle.clickable:hover {
+  cursor: pointer;
+}
+
+.rule {
+  stroke-width: 1px;
+  stroke: #c00;
+  shape-rendering: crispedges;
+}
+
+//.popover {
+//  color:#333;
+//}
+
+
+.test {
+    color:#009900;
+}
+
+
+
