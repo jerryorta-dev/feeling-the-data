@@ -41,7 +41,6 @@ define(['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "factories
 
                     this.indeedparams = {};
                     this.indeedparams.publisher = "4600389599611799"; //Jerry Orta
-//                    this.indeedparams.publisher = "3389910236391419"; //Leo
                     this.indeedparams.v = 2;
                     this.indeedparams.format = "json";
 //                    this.indeedparams.callback = "JSON_CALLBACK";

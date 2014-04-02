@@ -6164,18 +6164,21 @@ input[type="text"] {
         color: white;
     }*/
 }
-.d3-tip {
+.popover-wrapper {
+  max-width: 400px;
+}
+.popover-wrapper .d3-tip {
   font-size: 12px;
   stroke: none;
   color: #fff;
   background-color: #333;
-  padding: 10px;
+  padding: 1px 20px 10px 20px;
   -webkit-border-radius: 6px 6px 6px 6px;
   border-radius: 6px 6px 6px 6px;
 }
-.arrow-bottom {
+.popover-wrapper .arrow-bottom {
   position: relative;
-  left: 37%;
+  left: 47%;
   width: 0;
   height: 0;
   border-top: 10px solid #333;
@@ -6199,9 +6202,6 @@ circle.clickable:hover {
   stroke-width: 1px;
   stroke: #c00;
   shape-rendering: crispedges;
-}
-.popover {
-  color: #333;
 }
 .test {
   color: #009900;

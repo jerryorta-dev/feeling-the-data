@@ -28,7 +28,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                 templateUrl: "app/ng/directives/d3-map/d3-map.html"
             }
         })
-        .directive('worldMap', ['indeedData', function (indeedData) {
+        .directive('worldMap', ['$filter', 'indeedData', function ($filter, indeedData) {
             p.loadOrder('d3 directive');
             return {
                 restrict: 'EA',
@@ -197,6 +197,24 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                         }
 
 
+                        var htmlFormatFactory = function(data) {
+                            var html = "";
+
+                            var date = Date(Date.parse(data.date));
+
+                            //Header
+                            html += '<h3>' + data.jobtitle + '</h3>';
+                            html += '<p>' + data.company + '</p>';
+                            html += '<p>' + data.formattedLocation + '</p>';
+//                            html += '<p>' + Date(Date.parse(data.date)) + '</p>';
+                            html += '<p>' + $filter('date')(Date.parse(data.date), 'MMM d, y h:mm:ss a') + " " + date.substr(date.length - 5) + '</p>';
+                            html += '<p>' + data.snippet + '</p>';
+
+
+                            return html;
+                        }
+
+
                         var popoverFactory = function(data, iter) {
 //                            console.log(data);
 
@@ -212,7 +230,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                             d3.select("#popover-" + iter)
                                 .append("div")
                                 .attr("class", "d3-tip")
-                                .html(data.formattedLocation)
+                                .html(htmlFormatFactory(data))
 
                             d3.select("#popover-" + iter)
                                 .append("div")
@@ -245,16 +263,16 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                                 .style("fill", "red")
                                 .on("mouseover", function () {
                                     var id = "#popover-" + this.id.split("-")[1];
-                                    var contentSelect = id + " > t3-tip";
+//                                    var contentSelect = id + " > t3-tip";
                                     var arrowSelect = id + " > arrow-bottom";
 
                                     d3.select(id).style("visibility", "visible")
 
-                                    var padding = 20;
-                                    var margin = 10;
+//                                    var padding = 20;
+//                                    var margin = 10;
 
-                                    var xPos = this.cx.baseVal.value;
-                                    var yPos = this.cy.baseVal.value;
+//                                    var xPos = this.cx.baseVal.value;
+//                                    var yPos = this.cy.baseVal.value;
 
 //                                    console.log(this, event, d3.event);
 

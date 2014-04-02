@@ -60,13 +60,13 @@ define(["angular", "preprocess"], function (angular, p) {
          return response;
          });*/
 
-        $urlRouterProvider.otherwise("/home");
+        $urlRouterProvider.otherwise("/indeed");
 
         $stateProvider
-          .state("home", {
-            url: "/home",
+          .state("indeed", {
+            url: "/indeed",
             views: {
-              "@": {templateUrl: "app/partials/home.html",
+              "@": {templateUrl: "app/partials/indeed.html",
                 controller: "MainAppController"}
             }
           })
