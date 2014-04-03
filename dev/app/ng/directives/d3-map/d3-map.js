@@ -128,16 +128,16 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                         svg.call(zoom) // delete this line to disable free zooming
                             .call(zoom.event);
 
-                        d3.json("app/data/topojson-0.0.1/us/us-zipcodes.json", function (error, us) {
+                        d3.json("app/data/topojson-0.0.1/2013/us/zipcodes/tx-zipcodes.json", function (error, us) {
                             g.selectAll("path")
-                                .data(topojson.feature(us, us.objects.counties).features)
+                                .data(topojson.feature(us, us.objects.zipcodes).features)
                                 .enter().append("path")
                                 .attr("d", path)
                                 .attr("class", "feature")
                                 .on("click", clicked);
 
                             g.append("path")
-                                .datum(topojson.mesh(us, us.objects.counties, function (a, b) {
+                                .datum(topojson.mesh(us, us.objects.zipcodes, function (a, b) {
                                     return a !== b;
                                 }))
                                 .attr("class", "mesh")
@@ -337,3 +337,6 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
         }])
 });
 
+/*
+ GET http://gdc.indeed.com/ads/apiresults.js net::ERR_BLOCKED_BY_CLIENT
+ */
