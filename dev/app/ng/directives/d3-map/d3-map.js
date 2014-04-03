@@ -128,7 +128,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                         svg.call(zoom) // delete this line to disable free zooming
                             .call(zoom.event);
 
-                        d3.json("app/data/topojson-0.0.1/us/counties/us-10m.json", function (error, us) {
+                        d3.json("app/data/topojson-0.0.1/us/us-zipcodes.json", function (error, us) {
                             g.selectAll("path")
                                 .data(topojson.feature(us, us.objects.counties).features)
                                 .enter().append("path")
