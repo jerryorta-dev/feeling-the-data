@@ -1,0 +1,36 @@
+{
+  "name": "data-dist-topojson-us",
+  "version": "2013.0.0",
+  "homepage": "https://github.com/data-dist/data-dist-topojson-us.git",
+  "ignore": [
+    ".jshintrc",
+    "**/*.txt",
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "authors": [
+    "Jerry Orta <jerryorta@gmail.com>"
+  ],
+  "description": "US States for the whole nation as one file, and separate files separated by state.",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "topojson",
+    "us",
+    "data",
+    "state",
+    "counties",
+    "zipcodes",
+    "zip",
+    "codes",
+    "tracts",
+    "blocks",
+    "roads",
+    "streams"
+  ],
+  "license": "MIT"
+}
