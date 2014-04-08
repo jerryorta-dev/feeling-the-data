@@ -4,16 +4,16 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
 
 
     angular.module('app.directivesModule')
-        .controller('WorldMapController', ['$scope', "GeoFactory", function ($scope, GeoFactory) {
+        .controller('WorldMapController', ['$scope', function ($scope) {
 
 //            console.log("data", $scope.data);
 
             /**
              * this works
              */
-           /* GeoFactory.all("us").getList().then(function (data) {
-                $scope.d3Data = data[0].raw;
-            })*/
+//            GeoFactory.all("us").getList().then(function (data) {
+//                $scope.d3Data = data[0].raw;
+//            })
 
 
             $scope.title = "World Map";
@@ -99,6 +99,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                             .scale(1300)
                             .translate([width / 2, height / 2]);
 
+
 //                        var coords = projection([d.lon, d.lat]);
 //                        var x = coords[0];
 //                        var y = coords[1];
@@ -128,16 +129,16 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                         svg.call(zoom) // delete this line to disable free zooming
                             .call(zoom.event);
 
-                        d3.json("app/data/topojson-0.0.1/2013/us/zipcodes/tx-zipcodes.json", function (error, us) {
+                        d3.json("app/data/data-dist-topojson-us/2013/us/us-states-10m.json", function (error, us) {
                             g.selectAll("path")
-                                .data(topojson.feature(us, us.objects.zipcodes).features)
+                                .data(topojson.feature(us, us.objects.states).features)
                                 .enter().append("path")
                                 .attr("d", path)
                                 .attr("class", "feature")
                                 .on("click", clicked);
 
                             g.append("path")
-                                .datum(topojson.mesh(us, us.objects.zipcodes, function (a, b) {
+                                .datum(topojson.mesh(us, us.objects.states, function (a, b) {
                                     return a !== b;
                                 }))
                                 .attr("class", "mesh")
@@ -196,8 +197,9 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                             return;
                         }
 
+                        console.log(data);
 
-                        var htmlFormatFactory = function(data) {
+                        var htmlFormatFactory = function (data) {
                             var html = "";
 
                             var date = Date(Date.parse(data.date));
@@ -215,7 +217,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                         }
 
 
-                        var popoverFactory = function(data, iter) {
+                        var popoverFactory = function (data, iter) {
 //                            console.log(data);
 
                             d3.select("body")
@@ -245,28 +247,27 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                         d3.selectAll(".popover-wrapper").remove();
 
                         var len = data.length, i = 0;
+
                         for (i; i < len; i++) {
+                            if (data[i].longitude && data[i].latitude) {
+                                popoverFactory(data[i], i)
 
-                            popoverFactory(data[i], i)
-
-
-
-                            g.append("circle")
-                                .attr("cx", function (d) {
-                                    return $scope.projection([data[i].longitude, data[i].latitude ])[0];
-                                })
-                                .attr("cy", function (d) {
-                                    return $scope.projection([data[i].longitude, data[i].latitude])[1];
-                                })
-                                .attr("r", 2)
-                                .attr("id", "c-" + i)
-                                .style("fill", "red")
-                                .on("mouseover", function () {
-                                    var id = "#popover-" + this.id.split("-")[1];
+                                g.append("circle")
+                                    .attr("cx", function (d) {
+                                        return $scope.projection([data[i].longitude, data[i].latitude ])[0];
+                                    })
+                                    .attr("cy", function (d) {
+                                        return $scope.projection([data[i].longitude, data[i].latitude])[1];
+                                    })
+                                    .attr("r", 2)
+                                    .attr("id", "c-" + i)
+                                    .style("fill", "red")
+                                    .on("mouseover", function () {
+                                        var id = "#popover-" + this.id.split("-")[1];
 //                                    var contentSelect = id + " > t3-tip";
-                                    var arrowSelect = id + " > arrow-bottom";
+                                        var arrowSelect = id + " > arrow-bottom";
 
-                                    d3.select(id).style("visibility", "visible")
+                                        d3.select(id).style("visibility", "visible")
 
 //                                    var padding = 20;
 //                                    var margin = 10;
@@ -277,18 +278,17 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
 //                                    console.log(this, event, d3.event);
 
 
-                                    var verticalOffset = $(id).height();
-                                    var horizontalOffset = $(id).width() / 2;
+                                        var verticalOffset = $(id).height();
+                                        var horizontalOffset = $(id).width() / 2;
 
-                                    d3.select(id).style("top", (event.pageY - verticalOffset) + "px").style("left", (event.pageX - horizontalOffset) + "px");
+                                        d3.select(id).style("top", (event.pageY - verticalOffset) + "px").style("left", (event.pageX - horizontalOffset) + "px");
 
-                                })
-                                .on("mouseout", function () {
-                                    var id = "#popover-" + this.id.split("-")[1];
-                                    return d3.select(id).style("visibility", "hidden");
-                                });
-
-
+                                    })
+                                    .on("mouseout", function () {
+                                        var id = "#popover-" + this.id.split("-")[1];
+                                        return d3.select(id).style("visibility", "hidden");
+                                    });
+                            }
                         }
 
 
@@ -297,6 +297,45 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
             };
 
         }])
+//        .factory('GeoFactory', ['$q', 'Restangular', function ($q, Restangular) {
+//            return Restangular.withConfig(function (RestangularConfigurer) {
+//                RestangularConfigurer.setBaseUrl(p.getRestangularPath("app/data"));
+//                RestangularConfigurer.setRequestSuffix(".json");
+//                RestangularConfigurer.addResponseInterceptor(function (data, operation, what, url, response, deferred) {
+//
+//                    var raw = {};
+//                    raw.type = data.type;
+//                    raw.objects = data.objects;
+//                    raw.arcs = data.arcs;
+//                    raw.transform = data.tranform;
+//                    data.raw = raw;
+//
+//
+//                    var newResponse;
+//                    if (operation === "getList") {
+//                        // Here we're returning an Array which has one special property metadata with our extra information
+//                        newResponse = [ data ];
+//                    } else {
+//                        // This is an element
+//                        newResponse = data;
+//                    }
+//                    return newResponse;
+//
+//
+//                    /*var newResponse = data;
+//                     if (angular.isArray(data)) {
+//                     angular.forEach(newResponse, function(value, key) {
+//                     newResponse[key].originalElement = angular.copy(value);
+//                     });
+//                     } else {
+//                     newResponse.originalElement = angular.copy(data);
+//                     }
+//
+//                     return newResponse;*/
+//
+//                });
+//            });
+//        }])
 });
 
 /*

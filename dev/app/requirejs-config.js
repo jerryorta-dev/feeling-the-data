@@ -6,7 +6,7 @@ require.config(
             "angularanimate": "vendors/angular-1.2.14/angular-animate.min",
             "uirouter": "vendors/uirouter-0.2.8/angular-ui-router.min",
             "angular-route": "vendors/angular-1.2.14/angular-route.min",
-            "restangular": "vendors/restangular-1.3.1/restangular.min",
+//            "restangular": "vendors/restangular-1.3.1/restangular.min",
             "underscore": "vendors/underscore-1.6.0/underscore-min",
             "domReady": "vendors/requirejs-domready-2.0.1/domReady",
             'ua-parser': "vendors/ua-parser-js-0.6.2/ua-parser.min",
@@ -63,17 +63,22 @@ require.config(
             "underscore": {
                 "exports": "_"
             },
-            "restangular": {
-                "deps": ["angular", "underscore"]
-            },
+//            "restangular": {
+//                "deps": ["angular", "underscore"]
+//            },
             "uibootstrap": {
                 "deps": ["angular"]
             },
 
+//            "ngConfig": {
+//                "deps": [
+//                    "uibootstrap",
+//                    'restangular'
+//                ]
+//            }
             "ngConfig": {
                 "deps": [
-                    "uibootstrap",
-                    'restangular'
+                    "uibootstrap"
                 ]
             }
 
@@ -92,7 +97,7 @@ require([
         "angular-route",
         "angularanimate",
         "underscore",
-        "restangular",
+//        "restangular",
         "uibootstrap",
         "uirouter",
         "d3",

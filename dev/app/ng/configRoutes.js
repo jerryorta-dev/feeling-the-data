@@ -7,7 +7,7 @@ define(["angular", "preprocess"], function (angular, p) {
     "ui.router",
     "ngAnimate",
     "ui.bootstrap",
-    "restangular",
+//    "restangular",
     "app.apiModule",
     "app.constantsModule",
     "app.controllersModule",
@@ -18,8 +18,8 @@ define(["angular", "preprocess"], function (angular, p) {
     "app.providersModule",
     "app.routesModule",
     "app.servicesModule"]).
-    config(["$stateProvider", "$urlRouterProvider", "RestangularProvider",
-      function ($stateProvider, $urlRouterProvider, RestangularProvider) {
+    config(["$stateProvider", "$urlRouterProvider",
+      function ($stateProvider, $urlRouterProvider) {
 
 
         $urlRouterProvider.otherwise("/indeed");
