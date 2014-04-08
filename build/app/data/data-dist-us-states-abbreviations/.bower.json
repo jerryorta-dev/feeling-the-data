@@ -1,0 +1,36 @@
+{
+  "name": "data-dist-us-states-abbreviations",
+  "version": "1.0.1",
+  "homepage": "https://github.com/data-dist/data-dist-us-states-abbreviations",
+  "authors": [
+    "Jerry Orta <jerryorta@gmail.com>"
+  ],
+  "description": "US States and abbreviations in json format.",
+  "moduleType": [
+    "amd",
+    "node"
+  ],
+  "keywords": [
+    "us",
+    "states",
+    "json",
+    "data"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "_release": "1.0.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.0.1",
+    "commit": "787133428b481f17a5518a84d8eeeb10f42545c2"
+  },
+  "_source": "git://github.com/data-dist/data-dist-us-states-abbreviations.git",
+  "_target": "*",
+  "_originalSource": "data-dist-us-states-abbreviations"
+}
