@@ -1,0 +1,27 @@
+{
+  "name": "data-dist-us-states-abbreviations",
+  "version": "1.0.0",
+  "homepage": "https://github.com/data-dist/data-dist-us-states-abbreviations",
+  "authors": [
+    "Jerry Orta <jerryorta@gmail.com>"
+  ],
+  "description": "US States and abbreviations in json format.",
+  "moduleType": [
+    "amd",
+    "node"
+  ],
+  "keywords": [
+    "us",
+    "states",
+    "json",
+    "data"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
