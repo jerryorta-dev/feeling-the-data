@@ -26,7 +26,8 @@
         "tests"
     ],
     "dependencies": {
-        "data-dist-topojson-us": "~2013"
+        "data-dist-topojson-us": "~2013",
+        "data-dist-us-states-abbreviations":"latest"
     }
 
 }

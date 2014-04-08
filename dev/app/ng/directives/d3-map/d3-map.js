@@ -28,7 +28,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                 templateUrl: "app/ng/directives/d3-map/d3-map.html"
             }
         })
-        .directive('worldMap', ['$filter', 'indeedData', function ($filter, indeedData) {
+        .directive('worldMap', ['$filter', 'indeedData', 'd3MapData', function ($filter, indeedData, d3MapData) {
             p.loadOrder('d3 directive');
             return {
                 restrict: 'EA',
@@ -38,6 +38,9 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                     onClick: "&"
                 },
                 link: function ($scope, $element, $attr) {
+
+                    //init service call
+                    d3MapData.getStatesAbbr();
 
                     var svg = d3.select($element[0])
                         .append("svg")
@@ -122,37 +125,107 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                             .attr("class", "background")
                             .attr("width", width)
                             .attr("height", height)
-                            .on("click", reset);
+                            .on("click", resteState);
 
                         var g = svg.append("g");
 
                         svg.call(zoom) // delete this line to disable free zooming
                             .call(zoom.event);
 
-                        d3.json("app/data/data-dist-topojson-us/2013/us/us-states-10m.json", function (error, us) {
-                            g.selectAll("path")
-                                .data(topojson.feature(us, us.objects.states).features)
-                                .enter().append("path")
-                                .attr("d", path)
-                                .attr("class", "feature")
-                                .on("click", clicked);
+                        d3MapData.getUsMap().then(function (us) {
 
-                            g.append("path")
-                                .datum(topojson.mesh(us, us.objects.states, function (a, b) {
-                                    return a !== b;
-                                }))
-                                .attr("class", "mesh")
-                                .attr("d", path);
+                                g.selectAll("path")
+                                    .data(topojson.feature(us, us.objects.states).features)
+                                    .enter().append("path")
+                                    .attr("d", path)
+                                    .attr("class", "feature state")
 
-                            $scope.renderCircles();
+                                g.selectAll("path.state")
+                                    .on("click", stateClicked);
 
-                        });
+                                g.append("path")
+                                    .datum(topojson.mesh(us, us.objects.states, function (a, b) {
+                                        return a !== b;
+                                    }))
+                                    .attr("class", "mesh")
+                                    .attr("d", path);
 
-                        function clicked(d) {
+                                $scope.renderCircles();
 
-                            if (active.node() === this) return reset();
-                            active.classed("active", false);
-                            active = d3.select(this).classed("active", true);
+                            }
+                        )
+
+
+                        var stateZoomScale = {};
+
+                        function stateClicked(d) {
+
+                            console.log("stateClicked", d)
+                            console.log("evnt", event.pageX, event.pageY);
+
+
+
+
+
+                            d3MapData.getStateZipCodes(d.properties.name).then(function (zipCodeData) {
+
+                                var g = svg.select("g");
+                                g.selectAll("path")
+                                    .data(topojson.feature(zipCodeData, zipCodeData.objects.zipcodes).features)
+                                    .enter().append("path")
+                                    .attr("d", path)
+                                    .attr("class", "feature zipcodes")
+
+                               g.selectAll("path.zipcodes")
+                                    .on("click", zipCodeClicked);
+
+                               g.append("path")
+                                    .datum(topojson.mesh(zipCodeData, zipCodeData.objects.zipcodes, function (a, b) {
+                                        return a !== b;
+                                    }))
+                                    .attr("class", "mesh")
+                                    .attr("d", path);
+
+                            }, function(error) { //Not a state
+//                                svg.on("click", stopped, true)
+                                console.log("error", error)
+                                var g = svg.select("g");
+                                g.selectAll("path.zipcodes").remove();
+                            })
+
+
+                            if (active.node() === this) return resteState();
+                            active.classed("state-active", false);
+                            active = d3.select(this).classed("state-active", true);
+
+                            var bounds = path.bounds(d),
+                                dx = bounds[1][0] - bounds[0][0],
+                                dy = bounds[1][1] - bounds[0][1],
+                                x = (bounds[0][0] + bounds[1][0]) / 2,
+                                y = (bounds[0][1] + bounds[1][1]) / 2,
+                                scale = .9 / Math.max(dx / width, dy / height),
+                                translate = [width / 2 - scale * x, height / 2 - scale * y];
+
+                            stateZoomScale.bounds = bounds;
+                            stateZoomScale.dx = dx;
+                            stateZoomScale.dy = dy;
+                            stateZoomScale.x = x;
+                            stateZoomScale.y = y;
+                            stateZoomScale.scale = scale;
+                            stateZoomScale.translate = translate;
+
+                            svg.transition()
+                                .duration(750)
+                                .call(zoom.translate(translate).scale(scale).event);
+                        }
+
+
+                        function zipCodeClicked(d) {
+                            console.log("zipCodeClicked", d)
+
+                            if (active.node() === this) return resetZipCode();
+                            active.classed("zipcode-active", false);
+                            active = d3.select(this).classed("zipcode-active", true);
 
                             var bounds = path.bounds(d),
                                 dx = bounds[1][0] - bounds[0][0],
@@ -167,8 +240,18 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                                 .call(zoom.translate(translate).scale(scale).event);
                         }
 
-                        function reset() {
-                            active.classed("active", false);
+                        function resetZipCode() {
+                            active.classed("zipcode-active", false);
+                            active = d3.select(null);
+
+                            svg.transition()
+                                .duration(750)
+                                .call(zoom.translate(stateZoomScale.translate).scale(stateZoomScale.scale).event);
+                        }
+
+
+                        function resteState() {
+                            active.classed("state-active", false);
                             active = d3.select(null);
 
                             svg.transition()
@@ -196,8 +279,6 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                         if (!data) {
                             return;
                         }
-
-                        console.log(data);
 
                         var htmlFormatFactory = function (data) {
                             var html = "";
@@ -297,47 +378,4 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
             };
 
         }])
-//        .factory('GeoFactory', ['$q', 'Restangular', function ($q, Restangular) {
-//            return Restangular.withConfig(function (RestangularConfigurer) {
-//                RestangularConfigurer.setBaseUrl(p.getRestangularPath("app/data"));
-//                RestangularConfigurer.setRequestSuffix(".json");
-//                RestangularConfigurer.addResponseInterceptor(function (data, operation, what, url, response, deferred) {
-//
-//                    var raw = {};
-//                    raw.type = data.type;
-//                    raw.objects = data.objects;
-//                    raw.arcs = data.arcs;
-//                    raw.transform = data.tranform;
-//                    data.raw = raw;
-//
-//
-//                    var newResponse;
-//                    if (operation === "getList") {
-//                        // Here we're returning an Array which has one special property metadata with our extra information
-//                        newResponse = [ data ];
-//                    } else {
-//                        // This is an element
-//                        newResponse = data;
-//                    }
-//                    return newResponse;
-//
-//
-//                    /*var newResponse = data;
-//                     if (angular.isArray(data)) {
-//                     angular.forEach(newResponse, function(value, key) {
-//                     newResponse[key].originalElement = angular.copy(value);
-//                     });
-//                     } else {
-//                     newResponse.originalElement = angular.copy(data);
-//                     }
-//
-//                     return newResponse;*/
-//
-//                });
-//            });
-//        }])
 });
-
-/*
- GET http://gdc.indeed.com/ads/apiresults.js net::ERR_BLOCKED_BY_CLIENT
- */
