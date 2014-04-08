@@ -128,6 +128,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                             .on("click", resteState);
 
                         var g = svg.append("g");
+                        var z = svg.append("z"); //zipcodes
 
                         svg.call(zoom) // delete this line to disable free zooming
                             .call(zoom.event);
@@ -163,23 +164,21 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                             console.log("stateClicked", d)
                             console.log("evnt", event.pageX, event.pageY);
 
-
-
-
-
                             d3MapData.getStateZipCodes(d.properties.name).then(function (zipCodeData) {
 
-                                var g = svg.select("g");
-                                g.selectAll("path")
+                                console.log(zipCodeData);
+
+                                z.selectAll("path")
                                     .data(topojson.feature(zipCodeData, zipCodeData.objects.zipcodes).features)
                                     .enter().append("path")
                                     .attr("d", path)
-                                    .attr("class", "feature zipcodes")
+                                    .attr("data", "zipcode")
+                                    .attr("class", "feature")
 
-                               g.selectAll("path.zipcodes")
+                               z.selectAll("path")
                                     .on("click", zipCodeClicked);
 
-                               g.append("path")
+                               z.append("path")
                                     .datum(topojson.mesh(zipCodeData, zipCodeData.objects.zipcodes, function (a, b) {
                                         return a !== b;
                                     }))
@@ -189,14 +188,14 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                             }, function(error) { //Not a state
 //                                svg.on("click", stopped, true)
                                 console.log("error", error)
-                                var g = svg.select("g");
-                                g.selectAll("path.zipcodes").remove();
+
+                                d3.selectAll("path[data=zipcode]").remove();
                             })
 
 
                             if (active.node() === this) return resteState();
-                            active.classed("state-active", false);
-                            active = d3.select(this).classed("state-active", true);
+                            active.classed("active", false);
+                            active = d3.select(this).classed("active", true);
 
                             var bounds = path.bounds(d),
                                 dx = bounds[1][0] - bounds[0][0],
@@ -224,8 +223,8 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                             console.log("zipCodeClicked", d)
 
                             if (active.node() === this) return resetZipCode();
-                            active.classed("zipcode-active", false);
-                            active = d3.select(this).classed("zipcode-active", true);
+                            active.classed("active", false);
+                            active = d3.select(this).classed("active", true);
 
                             var bounds = path.bounds(d),
                                 dx = bounds[1][0] - bounds[0][0],
@@ -241,7 +240,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                         }
 
                         function resetZipCode() {
-                            active.classed("zipcode-active", false);
+                            active.classed("active", false);
                             active = d3.select(null);
 
                             svg.transition()
@@ -251,7 +250,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
 
 
                         function resteState() {
-                            active.classed("state-active", false);
+                            active.classed("active", false);
                             active = d3.select(null);
 
                             svg.transition()
@@ -262,6 +261,10 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                         function zoomed() {
                             g.style("stroke-width", 1.5 / d3.event.scale + "px");
                             g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+
+                            z.style("stroke-width", 1.5 / d3.event.scale + "px");
+                            z.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+
                         }
 
                         // If the drag behavior prevents the default click,
