@@ -1,4 +1,4 @@
-define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"], function (angular, p, d3, topojson) {
+define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModule", "indeed"], function (angular, p, d3, topojson, _) {
     p.loadOrder('d3-map directive');
     p.log("d3 version: " + d3.version);
 
@@ -28,7 +28,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                 templateUrl: "app/ng/directives/d3-map/d3-map.html"
             }
         })
-        .directive('worldMap', ['$filter', 'indeedData', 'd3MapData', function ($filter, indeedData, d3MapData) {
+        .directive('worldMap', ['$filter', 'indeedData', 'd3MapData', '$timeout', function ($filter, indeedData, d3MapData, $timeout) {
             p.loadOrder('d3 directive');
             return {
                 restrict: 'EA',
@@ -128,7 +128,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
                             .on("click", resteState);
 
                         var g = svg.append("g");
-                        var z = svg.append("z"); //zipcodes
+                        var z = svg.append("g"); //zipcodes
 
                         svg.call(zoom) // delete this line to disable free zooming
                             .call(zoom.event);
@@ -159,38 +159,63 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
 
                         var stateZoomScale = {};
 
+
+
                         function stateClicked(d) {
 
-                            console.log("stateClicked", d)
-                            console.log("evnt", event.pageX, event.pageY);
+                            z.selectAll('path')
+                                .transition()
+                                .duration(750)
+                                .style("opacity", 0);
 
-                            d3MapData.getStateZipCodes(d.properties.name).then(function (zipCodeData) {
 
-                                console.log(zipCodeData);
+//                            console.log("evnt", event.pageX, event.pageY);
 
-                                z.selectAll("path")
-                                    .data(topojson.feature(zipCodeData, zipCodeData.objects.zipcodes).features)
-                                    .enter().append("path")
-                                    .attr("d", path)
-                                    .attr("data", "zipcode")
-                                    .attr("class", "feature")
+                            function drawZipCodes() {
+                                z.selectAll('path').remove();
 
-                               z.selectAll("path")
-                                    .on("click", zipCodeClicked);
+                                d3MapData.getStateZipCodes(d.properties.name).then(function (zipCodeData) {
 
-                               z.append("path")
-                                    .datum(topojson.mesh(zipCodeData, zipCodeData.objects.zipcodes, function (a, b) {
-                                        return a !== b;
-                                    }))
-                                    .attr("class", "mesh")
-                                    .attr("d", path);
+                                    z.selectAll("path")
+                                        .data(topojson.feature(zipCodeData, zipCodeData.objects.zipcodes).features)
+                                        .enter().append("path")
+                                        .attr("d", path)
+                                        .attr("data", d.properties.name)
+                                        .attr("class", "feature")
+                                        .style("opacity", 0)
+                                        .transition()
+                                        .duration(750)
+//                                        .delay(750)
+                                        .style("opacity", 1);
 
-                            }, function(error) { //Not a state
+                                    z.selectAll("path")
+                                        .on("click", zipCodeClicked);
+
+                                    z.append("path")
+                                        .datum(topojson.mesh(zipCodeData, zipCodeData.objects.zipcodes, function (a, b) {
+                                            return a !== b;
+                                        }))
+                                        .attr("class", "mesh")
+                                        .attr("d", path)
+                                        .style("opacity", 0)
+                                        .transition()
+                                        .duration(750)
+                                        .style("opacity", 1);
+
+
+                                }, function (error) { //Not a state
 //                                svg.on("click", stopped, true)
-                                console.log("error", error)
+                                    console.log("error", error)
 
-                                d3.selectAll("path[data=zipcode]").remove();
-                            })
+                                    z.selectAll("path").remove();
+                                })
+                            }
+
+                            $timeout(drawZipCodes, 750);
+
+
+
+
 
 
                             if (active.node() === this) return resteState();
@@ -220,7 +245,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"],
 
 
                         function zipCodeClicked(d) {
-                            console.log("zipCodeClicked", d)
+//                            console.log("zipCodeClicked", d)
 
                             if (active.node() === this) return resetZipCode();
                             active.classed("active", false);
