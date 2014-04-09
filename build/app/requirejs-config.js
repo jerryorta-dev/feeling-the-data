@@ -21088,7 +21088,7 @@ return i==js.length?[t.year,Yi(n.map(function(n){return n/31536e6}),e)[2]]:i?t[u
 /**
  * Created by jerryorta on 3/14/14.
  */
-define('preprocess',["jquery", "underscore"],function () {
+define('preprocess',["jquery", "underscore"], function () {
 
 
     var PreProcessor = (function () {
@@ -21109,7 +21109,6 @@ define('preprocess',["jquery", "underscore"],function () {
         };
 
     })();
-
 
 
     PreProcessor.prototype.log = function (msg) {
@@ -21156,10 +21155,24 @@ define('preprocess',["jquery", "underscore"],function () {
         return '/' + this.getBasePath() + path;
     };
 
+    PreProcessor.prototype.createSearchUrl = function (baseUrl, params) {
+
+        var url = baseUrl + "?";
+        _.each(params, function (value, key, list) {
+            url += key + "=" + value + "&";
+        });
+
+        url = url.substring(0, url.length - 1);
+//                        console.log(this.url);
+        return url;
+
+
+    };
+
 
     var singletonInstance = null;
 
-    var getPreProcessor = function() {
+    var getPreProcessor = function () {
 
         if (singletonInstance === null) {
             singletonInstance = new PreProcessor();
@@ -21168,15 +21181,16 @@ define('preprocess',["jquery", "underscore"],function () {
         return singletonInstance;
     }
 
-  //Return API
-  return {
-    log:getPreProcessor().log,
-    loadOrder:getPreProcessor().loadOrder,
-    getBasePath: getPreProcessor().getBasePath,
-    getBaseUrl: getPreProcessor().getBaseUrl,
-    getPathTo: getPreProcessor().getPathTo,
-    getRestangularPath: getPreProcessor().getRestangularPath
-  }
+    //Return API
+    return {
+        log: getPreProcessor().log,
+        loadOrder: getPreProcessor().loadOrder,
+        getBasePath: getPreProcessor().getBasePath,
+        getBaseUrl: getPreProcessor().getBaseUrl,
+        getPathTo: getPreProcessor().getPathTo,
+        getRestangularPath: getPreProcessor().getRestangularPath,
+        createSearchUrl: getPreProcessor().createSearchUrl
+    }
 
 });
 define('ngConfig',["angular", "preprocess"], function (angular, p) {
@@ -21198,8 +21212,16 @@ define('ngConfig',["angular", "preprocess"], function (angular, p) {
     "app.mockApiModule",
     "app.providersModule",
     "app.routesModule",
-    "app.servicesModule"]).
-    config(["$stateProvider", "$urlRouterProvider",
+    "app.servicesModule"]);
+
+    angular.module("app")
+        .constant("zillowApiKey", "X1-ZWz1dshk18nnyj_76gmj")
+        .constant("truliaApiKey", "5kpnkmaued687936qm6y9chc")
+        .constant("indeedApiKey", "4600389599611799")
+        .constant("usaTodayApiKey", "474qrq8eh68cqa4hvw45tqfu")
+        .constant("censusDataApiKey", "f136a395509816b3bda96f6a1375b3960f27cbbb")
+
+    angular.module("app").config(["$stateProvider", "$urlRouterProvider",
       function ($stateProvider, $urlRouterProvider) {
 
 
@@ -21905,6 +21927,27 @@ define("uirouter", ["angular"], function(){});
 define('factoriesModule',['angular', 'preprocess'], function(angular, p){
     p.loadOrder("factoriesModule");
   angular.module('app.factoriesModule', [])
+      .factory('ZillowGetRegionChildren', ['$q', '$http', "zillowApiKey", function($q, $http, zillowApiKey) {
+
+          var baseUrl = 'http://www.zillow.com/webservice/GetRegionChildren.htm';
+          var params = {
+              "zws-id": zillowApiKey,
+              "state":null,
+              childtype:"zipcode"
+          }
+
+          var getDataByState = function(state) {
+
+              params.state = state;
+
+              return $http.get(p.createSearchUrl(baseUrl, params));
+          }
+
+          return {
+              getDataByState:getDataByState
+          }
+
+      }])
 
 
 
@@ -22010,7 +22053,7 @@ define('providersModule',['angular', 'preprocess'], function (angular, p) {
 
     var D3MapsCache = function () {
         this.usMap = null;
-        this.getStateAbbr = null;
+        this.getStatesAbbr = null;
         this.stateZipCodes = {};
     }
 
@@ -22027,9 +22070,9 @@ define('providersModule',['angular', 'preprocess'], function (angular, p) {
                 var getStatesAbbr = function (_state) {
                     var deferred = $q.defer();
 
-                    if (D3MapsCache.getStateAbbr != null) {
-                        if (D3MapsCache.getStateAbbr[_state] != null) {
-                            deferred.resolve(D3MapsCache.getStateAbbr[_state].toLowerCase());
+                    if (D3MapsCache.getStatesAbbr != null) {
+                        if (D3MapsCache.getStatesAbbr[_state] != null) {
+                            deferred.resolve(D3MapsCache.getStatesAbbr[_state].toLowerCase());
                         } else {
                             deferred.reject("nostate");
                         }
@@ -22037,7 +22080,7 @@ define('providersModule',['angular', 'preprocess'], function (angular, p) {
                     } else {
                         $http.get('app/data/data-dist-us-states-abbreviations/us-states-name-key.json')
                             .then(function(result) {
-                                D3MapsCache.getStateAbbr = result.data;
+                                D3MapsCache.getStatesAbbr = result.data;
                                 if (_state != null) {
                                     deferred.resolve(result.data[_state].toLowerCase());
                                 }
@@ -22116,7 +22159,7 @@ define('indeed',['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "
         .provider('indeedData', function ipProvider() {
 
 
-            this.$get = ['$q', '$http', 'ip', function ($q, $http, ip) {
+            this.$get = ['$q', '$http', 'ip', "indeedApiKey", function ($q, $http, ip, indeedApiKey) {
 
                 var parser = new UAParser();
 
@@ -22124,7 +22167,7 @@ define('indeed',['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "
 
                 var getParams = function () {
                     if (paramsInstance == null) {
-                        paramsInstance = new Params();
+                        paramsInstance = new Params(indeedApiKey);
 
                         paramsInstance.useragent(parser.getResult().browser.name);
 
@@ -22134,13 +22177,13 @@ define('indeed',['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "
                     }
                 }
 
-                var Params = function () {
+                var Params = function (indeedApiKey) {
                     this.baseUrl = "http://api.indeed.com/ads/apisearch";
 
                     this.url = "";
 
                     this.indeedparams = {};
-                    this.indeedparams.publisher = "4600389599611799"; //Jerry Orta
+                    this.indeedparams.publisher = indeedApiKey; //Jerry Orta
                     this.indeedparams.v = 2;
                     this.indeedparams.format = "json";
 //                    this.indeedparams.callback = "JSON_CALLBACK";
@@ -22319,7 +22362,7 @@ define('indeed',['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "
 });
 
 
-define('d3Map',['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "indeed"], function (angular, p, d3, topojson) {
+define('d3Map',['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModule", "indeed"], function (angular, p, d3, topojson, _) {
     p.loadOrder('d3-map directive');
     p.log("d3 version: " + d3.version);
 
@@ -22349,7 +22392,7 @@ define('d3Map',['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "i
                 templateUrl: "app/ng/directives/d3-map/d3-map.html"
             }
         })
-        .directive('worldMap', ['$filter', 'indeedData', 'd3MapData', function ($filter, indeedData, d3MapData) {
+        .directive('worldMap', ['$filter', '$timeout', 'indeedData', 'd3MapData', 'ZillowGetRegionChildren', function ($filter, $timeout, indeedData, d3MapData, ZillowGetRegionChildren) {
             p.loadOrder('d3 directive');
             return {
                 restrict: 'EA',
@@ -22398,7 +22441,7 @@ define('d3Map',['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "i
 
                     // define render function
                     $scope.render = function (data) {
-// remove all previous items before render
+                        // remove all previous items before render
                         svg.selectAll("*").remove();
 
                         svg.on("click", stopped, true)
@@ -22449,6 +22492,11 @@ define('d3Map',['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "i
                             .on("click", resteState);
 
                         var g = svg.append("g");
+                        g.attr("class", "nation-graphic");
+                        var z = svg.append("g"); //zipcodes
+                        z.attr("class", "zipcodes-graphic")
+                        var j = svg.append("g"); //Job circles
+                        j.attr("class", "jobs-graphic");
 
                         svg.call(zoom) // delete this line to disable free zooming
                             .call(zoom.event);
@@ -22479,45 +22527,76 @@ define('d3Map',['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "i
 
                         var stateZoomScale = {};
 
+
+
                         function stateClicked(d) {
 
-                            console.log("stateClicked", d)
-                            console.log("evnt", event.pageX, event.pageY);
+                            d3MapData.getStatesAbbr(d.properties.name).then(function(stateAbbr) {
+                                console.log(stateAbbr);
+                                return ZillowGetRegionChildren.getDataByState(stateAbbr);
 
-
-
-
-
-                            d3MapData.getStateZipCodes(d.properties.name).then(function (zipCodeData) {
-
-                                var g = svg.select("g");
-                                g.selectAll("path")
-                                    .data(topojson.feature(zipCodeData, zipCodeData.objects.zipcodes).features)
-                                    .enter().append("path")
-                                    .attr("d", path)
-                                    .attr("class", "feature zipcodes")
-
-                               g.selectAll("path.zipcodes")
-                                    .on("click", zipCodeClicked);
-
-                               g.append("path")
-                                    .datum(topojson.mesh(zipCodeData, zipCodeData.objects.zipcodes, function (a, b) {
-                                        return a !== b;
-                                    }))
-                                    .attr("class", "mesh")
-                                    .attr("d", path);
-
-                            }, function(error) { //Not a state
-//                                svg.on("click", stopped, true)
-                                console.log("error", error)
-                                var g = svg.select("g");
-                                g.selectAll("path.zipcodes").remove();
+                            }).then(function(zillowStateData) {
+                                console.log(zillowStateData);
                             })
+
+                            z.selectAll('path')
+                                .transition()
+                                .duration(750)
+                                .style("opacity", 0);
+
+
+//                            console.log("evnt", event.pageX, event.pageY);
+
+                            function drawZipCodes() {
+                                z.selectAll('path').remove();
+
+                                d3MapData.getStateZipCodes(d.properties.name).then(function (zipCodeData) {
+
+                                    z.selectAll("path")
+                                        .data(topojson.feature(zipCodeData, zipCodeData.objects.zipcodes).features)
+                                        .enter().append("path")
+                                        .attr("d", path)
+                                        .attr("data", d.properties.name)
+                                        .attr("class", "feature")
+                                        .style("opacity", 0)
+                                        .transition()
+                                        .duration(750)
+//                                        .delay(750)
+                                        .style("opacity", 1);
+
+                                    z.selectAll("path")
+                                        .on("click", zipCodeClicked);
+
+                                    z.append("path")
+                                        .datum(topojson.mesh(zipCodeData, zipCodeData.objects.zipcodes, function (a, b) {
+                                            return a !== b;
+                                        }))
+                                        .attr("class", "mesh")
+                                        .attr("d", path)
+                                        .style("opacity", 0)
+                                        .transition()
+                                        .duration(750)
+                                        .style("opacity", 1);
+
+
+                                }, function (error) { //Not a state
+//                                svg.on("click", stopped, true)
+                                    console.log("error", error)
+
+                                    z.selectAll("path").remove();
+                                })
+                            }
+
+                            $timeout(drawZipCodes, 750);
+
+
+
+
 
 
                             if (active.node() === this) return resteState();
-                            active.classed("state-active", false);
-                            active = d3.select(this).classed("state-active", true);
+                            active.classed("active", false);
+                            active = d3.select(this).classed("active", true);
 
                             var bounds = path.bounds(d),
                                 dx = bounds[1][0] - bounds[0][0],
@@ -22542,11 +22621,11 @@ define('d3Map',['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "i
 
 
                         function zipCodeClicked(d) {
-                            console.log("zipCodeClicked", d)
+//                            console.log("zipCodeClicked", d)
 
                             if (active.node() === this) return resetZipCode();
-                            active.classed("zipcode-active", false);
-                            active = d3.select(this).classed("zipcode-active", true);
+                            active.classed("active", false);
+                            active = d3.select(this).classed("active", true);
 
                             var bounds = path.bounds(d),
                                 dx = bounds[1][0] - bounds[0][0],
@@ -22562,7 +22641,7 @@ define('d3Map',['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "i
                         }
 
                         function resetZipCode() {
-                            active.classed("zipcode-active", false);
+                            active.classed("active", false);
                             active = d3.select(null);
 
                             svg.transition()
@@ -22572,7 +22651,7 @@ define('d3Map',['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "i
 
 
                         function resteState() {
-                            active.classed("state-active", false);
+                            active.classed("active", false);
                             active = d3.select(null);
 
                             svg.transition()
@@ -22581,8 +22660,18 @@ define('d3Map',['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "i
                         }
 
                         function zoomed() {
+                            //nation zoom
                             g.style("stroke-width", 1.5 / d3.event.scale + "px");
                             g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+
+                            //zipcodes zoom
+                            z.style("stroke-width", 1.5 / d3.event.scale + "px");
+                            z.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+
+                            //jobs zoom
+                            j.style("stroke-width", 1.5 / d3.event.scale + "px");
+                            j.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+
                         }
 
                         // If the drag behavior prevents the default click,
@@ -22644,8 +22733,8 @@ define('d3Map',['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "i
                         };
 
 
-                        var g = svg.select("g");
-                        g.selectAll("circle").remove();
+                        var j = svg.select("g.jobs-graphic");
+                        j.selectAll("circle").remove();
                         d3.selectAll(".popover-wrapper").remove();
 
                         var len = data.length, i = 0;
@@ -22654,7 +22743,7 @@ define('d3Map',['angular', 'preprocess', 'd3', 'topojson', "factoriesModule", "i
                             if (data[i].longitude && data[i].latitude) {
                                 popoverFactory(data[i], i)
 
-                                g.append("circle")
+                                j.append("circle")
                                     .attr("cx", function (d) {
                                         return $scope.projection([data[i].longitude, data[i].latitude ])[0];
                                     })

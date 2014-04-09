@@ -17,8 +17,16 @@ define(["angular", "preprocess"], function (angular, p) {
     "app.mockApiModule",
     "app.providersModule",
     "app.routesModule",
-    "app.servicesModule"]).
-    config(["$stateProvider", "$urlRouterProvider",
+    "app.servicesModule"]);
+
+    angular.module("app")
+        .constant("zillowApiKey", "X1-ZWz1dshk18nnyj_76gmj")
+        .constant("truliaApiKey", "5kpnkmaued687936qm6y9chc")
+        .constant("indeedApiKey", "4600389599611799")
+        .constant("usaTodayApiKey", "474qrq8eh68cqa4hvw45tqfu")
+        .constant("censusDataApiKey", "f136a395509816b3bda96f6a1375b3960f27cbbb")
+
+    angular.module("app").config(["$stateProvider", "$urlRouterProvider",
       function ($stateProvider, $urlRouterProvider) {
 
 

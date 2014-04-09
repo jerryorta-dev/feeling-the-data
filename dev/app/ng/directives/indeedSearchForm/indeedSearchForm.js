@@ -16,7 +16,7 @@ define(['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "factories
         .provider('indeedData', function ipProvider() {
 
 
-            this.$get = ['$q', '$http', 'ip', function ($q, $http, ip) {
+            this.$get = ['$q', '$http', 'ip', "indeedApiKey", function ($q, $http, ip, indeedApiKey) {
 
                 var parser = new UAParser();
 
@@ -24,7 +24,7 @@ define(['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "factories
 
                 var getParams = function () {
                     if (paramsInstance == null) {
-                        paramsInstance = new Params();
+                        paramsInstance = new Params(indeedApiKey);
 
                         paramsInstance.useragent(parser.getResult().browser.name);
 
@@ -34,13 +34,13 @@ define(['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "factories
                     }
                 }
 
-                var Params = function () {
+                var Params = function (indeedApiKey) {
                     this.baseUrl = "http://api.indeed.com/ads/apisearch";
 
                     this.url = "";
 
                     this.indeedparams = {};
-                    this.indeedparams.publisher = "4600389599611799"; //Jerry Orta
+                    this.indeedparams.publisher = indeedApiKey; //Jerry Orta
                     this.indeedparams.v = 2;
                     this.indeedparams.format = "json";
 //                    this.indeedparams.callback = "JSON_CALLBACK";

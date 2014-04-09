@@ -1,7 +1,7 @@
 /**
  * Created by jerryorta on 3/14/14.
  */
-define(["jquery", "underscore"],function () {
+define(["jquery", "underscore"], function () {
 
 
     var PreProcessor = (function () {
@@ -22,7 +22,6 @@ define(["jquery", "underscore"],function () {
         };
 
     })();
-
 
 
     PreProcessor.prototype.log = function (msg) {
@@ -69,10 +68,24 @@ define(["jquery", "underscore"],function () {
         return '/' + this.getBasePath() + path;
     };
 
+    PreProcessor.prototype.createSearchUrl = function (baseUrl, params) {
+
+        var url = baseUrl + "?";
+        _.each(params, function (value, key, list) {
+            url += key + "=" + value + "&";
+        });
+
+        url = url.substring(0, url.length - 1);
+//                        console.log(this.url);
+        return url;
+
+
+    };
+
 
     var singletonInstance = null;
 
-    var getPreProcessor = function() {
+    var getPreProcessor = function () {
 
         if (singletonInstance === null) {
             singletonInstance = new PreProcessor();
@@ -81,14 +94,15 @@ define(["jquery", "underscore"],function () {
         return singletonInstance;
     }
 
-  //Return API
-  return {
-    log:getPreProcessor().log,
-    loadOrder:getPreProcessor().loadOrder,
-    getBasePath: getPreProcessor().getBasePath,
-    getBaseUrl: getPreProcessor().getBaseUrl,
-    getPathTo: getPreProcessor().getPathTo,
-    getRestangularPath: getPreProcessor().getRestangularPath
-  }
+    //Return API
+    return {
+        log: getPreProcessor().log,
+        loadOrder: getPreProcessor().loadOrder,
+        getBasePath: getPreProcessor().getBasePath,
+        getBaseUrl: getPreProcessor().getBaseUrl,
+        getPathTo: getPreProcessor().getPathTo,
+        getRestangularPath: getPreProcessor().getRestangularPath,
+        createSearchUrl: getPreProcessor().createSearchUrl
+    }
 
 });

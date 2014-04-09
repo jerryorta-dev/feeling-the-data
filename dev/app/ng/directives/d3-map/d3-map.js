@@ -28,7 +28,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
                 templateUrl: "app/ng/directives/d3-map/d3-map.html"
             }
         })
-        .directive('worldMap', ['$filter', 'indeedData', 'd3MapData', '$timeout', function ($filter, indeedData, d3MapData, $timeout) {
+        .directive('worldMap', ['$filter', '$timeout', 'indeedData', 'd3MapData', 'ZillowGetRegionChildren', function ($filter, $timeout, indeedData, d3MapData, ZillowGetRegionChildren) {
             p.loadOrder('d3 directive');
             return {
                 restrict: 'EA',
@@ -77,7 +77,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
 
                     // define render function
                     $scope.render = function (data) {
-// remove all previous items before render
+                        // remove all previous items before render
                         svg.selectAll("*").remove();
 
                         svg.on("click", stopped, true)
@@ -128,7 +128,11 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
                             .on("click", resteState);
 
                         var g = svg.append("g");
+                        g.attr("class", "nation-graphic");
                         var z = svg.append("g"); //zipcodes
+                        z.attr("class", "zipcodes-graphic")
+                        var j = svg.append("g"); //Job circles
+                        j.attr("class", "jobs-graphic");
 
                         svg.call(zoom) // delete this line to disable free zooming
                             .call(zoom.event);
@@ -162,6 +166,14 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
 
 
                         function stateClicked(d) {
+
+                            d3MapData.getStatesAbbr(d.properties.name).then(function(stateAbbr) {
+                                console.log(stateAbbr);
+                                return ZillowGetRegionChildren.getDataByState(stateAbbr);
+
+                            }).then(function(zillowStateData) {
+                                console.log(zillowStateData);
+                            })
 
                             z.selectAll('path')
                                 .transition()
@@ -284,11 +296,17 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
                         }
 
                         function zoomed() {
+                            //nation zoom
                             g.style("stroke-width", 1.5 / d3.event.scale + "px");
                             g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 
+                            //zipcodes zoom
                             z.style("stroke-width", 1.5 / d3.event.scale + "px");
                             z.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+
+                            //jobs zoom
+                            j.style("stroke-width", 1.5 / d3.event.scale + "px");
+                            j.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 
                         }
 
@@ -351,8 +369,8 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
                         };
 
 
-                        var g = svg.select("g");
-                        g.selectAll("circle").remove();
+                        var j = svg.select("g.jobs-graphic");
+                        j.selectAll("circle").remove();
                         d3.selectAll(".popover-wrapper").remove();
 
                         var len = data.length, i = 0;
@@ -361,7 +379,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
                             if (data[i].longitude && data[i].latitude) {
                                 popoverFactory(data[i], i)
 
-                                g.append("circle")
+                                j.append("circle")
                                     .attr("cx", function (d) {
                                         return $scope.projection([data[i].longitude, data[i].latitude ])[0];
                                     })

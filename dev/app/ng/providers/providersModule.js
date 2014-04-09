@@ -85,7 +85,7 @@ define(['angular', 'preprocess'], function (angular, p) {
 
     var D3MapsCache = function () {
         this.usMap = null;
-        this.getStateAbbr = null;
+        this.getStatesAbbr = null;
         this.stateZipCodes = {};
     }
 
@@ -102,9 +102,9 @@ define(['angular', 'preprocess'], function (angular, p) {
                 var getStatesAbbr = function (_state) {
                     var deferred = $q.defer();
 
-                    if (D3MapsCache.getStateAbbr != null) {
-                        if (D3MapsCache.getStateAbbr[_state] != null) {
-                            deferred.resolve(D3MapsCache.getStateAbbr[_state].toLowerCase());
+                    if (D3MapsCache.getStatesAbbr != null) {
+                        if (D3MapsCache.getStatesAbbr[_state] != null) {
+                            deferred.resolve(D3MapsCache.getStatesAbbr[_state].toLowerCase());
                         } else {
                             deferred.reject("nostate");
                         }
@@ -112,7 +112,7 @@ define(['angular', 'preprocess'], function (angular, p) {
                     } else {
                         $http.get('app/data/data-dist-us-states-abbreviations/us-states-name-key.json')
                             .then(function(result) {
-                                D3MapsCache.getStateAbbr = result.data;
+                                D3MapsCache.getStatesAbbr = result.data;
                                 if (_state != null) {
                                     deferred.resolve(result.data[_state].toLowerCase());
                                 }
