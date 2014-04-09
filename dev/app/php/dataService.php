@@ -78,6 +78,24 @@ Modification Date:  2/11/2011
 
 */
 
+//Use this!
+  function Parse ($url) {
+         $fp = file_get_contents($url);
+    if ($fp) {
+      $json = simplexml_load_string($fp);
+     } else {
+      echo "could not fopen";
+    }
+
+        return json_encode($json);
+    }
+  
+$json = Parse("http://www.zillow.com/webservice/GetRegionChildren.htm?zws-id=X1-ZWz1dshk18nnyj_76gmj&state=tx&childtype=zipcode");
+
+print_r($json);
+
+
+
 if ($_GET['params']) {
 	echo "<p>";
 	echo "Sample call url:<br>";
