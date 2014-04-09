@@ -90,19 +90,22 @@ if ($_GET['params']) {
 
 
 //username
-$zws-id = $_GET['zws-id'];
+$rawUsername = ($_POST['un']) ? $_POST['un'] : $_GET['un'];
 
 //Password
-$state = $_GET['state'];
+$rawPassword = ($_POST['pw']) ? $_POST['pw'] : $_GET['pw'];
 
 //Proxy
-$childtype = $_GET['childtype'];
+$rawProxy = ($_POST['proxy']) ? $_POST['proxy'] : $_GET['proxy'];
 
+//Port
+$rawPort = ($_POST['port']) ? $_POST['port'] : $_GET['port'];
 
-$url = 'http://www.zillow.com/webservice/GetRegionChildren.htm?' . 'zws-id=' . $_GET['zws-id'] . '&state=' . $_GET['state'] . '&childtype=' . $_GET['childtype'];
+$usrpwd = $rawUsername . ":" .  $rawPassword;
 
+$url = ($_POST['url']) ? $_POST['url'] : $_GET['url'];
 
-
+echo $url;
 
 /*
 If no username is provided, don't use proxy authentication, else use proxy authentication
@@ -112,7 +115,7 @@ $proxy_auth = ($rawUsername == null) ? false : true;
 
 //Check if HTTP_RAW_POST_DATA is set on server, if not, get from alternate means.
 if (!isset($HTTP_RAW_POST_DATA)) {
-	$post_data = $HTTP_RAW_POST_DATA = file_get_contents("php://input");
+	$post_data = $HTTP_RAW_POST_DATA = file_get_contents("php://input"); 
 } else {
 	$post_data = $HTTP_RAW_POST_DATA;
 }
