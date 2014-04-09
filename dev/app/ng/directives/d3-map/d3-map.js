@@ -167,12 +167,14 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
 
                         function stateClicked(d) {
 
+                            console.log(d);
+
                             d3MapData.getStatesAbbr(d.properties.name).then(function(stateAbbr) {
                                 console.log(stateAbbr);
                                 return ZillowGetRegionChildren.getDataByState(stateAbbr);
 
                             }).then(function(zillowStateData) {
-                                console.log(zillowStateData);
+                                console.log("data", zillowStateData);
                             })
 
                             z.selectAll('path')

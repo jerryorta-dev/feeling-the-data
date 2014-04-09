@@ -21929,7 +21929,7 @@ define('factoriesModule',['angular', 'preprocess'], function(angular, p){
   angular.module('app.factoriesModule', [])
       .factory('ZillowGetRegionChildren', ['$q', '$http', "zillowApiKey", function($q, $http, zillowApiKey) {
 
-          var baseUrl = 'http://feelingthedata.com/app/php/dataService.php';
+          var baseUrl = 'http://feelingthedata.com/app/php/zillowDataService.php';
           var params = {
               "zws-id": zillowApiKey,
               "state":null,
@@ -22531,12 +22531,14 @@ define('d3Map',['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factor
 
                         function stateClicked(d) {
 
+                            console.log(d);
+
                             d3MapData.getStatesAbbr(d.properties.name).then(function(stateAbbr) {
                                 console.log(stateAbbr);
                                 return ZillowGetRegionChildren.getDataByState(stateAbbr);
 
                             }).then(function(zillowStateData) {
-                                console.log(zillowStateData);
+                                console.log("data", zillowStateData);
                             })
 
                             z.selectAll('path')

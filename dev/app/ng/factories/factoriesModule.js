@@ -9,7 +9,7 @@ define(['angular', 'preprocess'], function(angular, p){
   angular.module('app.factoriesModule', [])
       .factory('ZillowGetRegionChildren', ['$q', '$http', "zillowApiKey", function($q, $http, zillowApiKey) {
 
-          var baseUrl = 'http://feelingthedata.com/app/php/dataService.php';
+          var baseUrl = 'http://feelingthedata.com/app/php/zillowDataService.php';
           var params = {
               "zws-id": zillowApiKey,
               "state":null,

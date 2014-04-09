@@ -16,23 +16,24 @@ if ($fp) {
 }
 
 //username
-$zws-id = $_GET['zws-id'];
+//$zwsid = $_GET['zws-id'];
 
 //Password
-$state = $_GET['state'];
+//$state = $_GET['state'];
 
 //Proxy
-$childtype = $_GET['childtype'];
+//$childtype = $_GET['childtype'];
 
 
 $url = 'http://www.zillow.com/webservice/GetRegionChildren.htm?' . 'zws-id=' . $_GET['zws-id'] . '&state=' . $_GET['state'] . '&childtype=' . $_GET['childtype'];
+//$url = 'http://feelingthedata.com/app/php/zillowDataService.php?zws-id=X1-ZWz1dshk18nnyj_76gmj&state=tx&childtype=zipcode';
 
-echo $url;
+//echo $url;
 
-$json = Parse($url);
+echo Parse($url);
 
-print_r($json);
-echo $json;
+//print_r($json);
+//echo $json;
 
 
 ?>
