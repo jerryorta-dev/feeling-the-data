@@ -132,7 +132,7 @@ define(['angular', 'preprocess'], function (angular, p) {
                     } else {
                         $http.get("app/data/data-dist-topojson-us/2013/us/us-states-10m.json")
                             .then(function(result) {
-                                console.log("states", result)
+//                                console.log("states", result)
                                 D3MapsCache.usMap = result.data;
                                 deferred.resolve(result.data);
                             });

@@ -28,7 +28,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
                 templateUrl: "app/ng/directives/d3-map/d3-map.html"
             }
         })
-        .directive('worldMap', ['$filter', '$timeout', 'indeedData', 'd3MapData', 'ZillowGetRegionChildren', function ($filter, $timeout, indeedData, d3MapData, ZillowGetRegionChildren) {
+        .directive('worldMap', ['$filter', '$timeout', 'indeedData', 'd3MapData', 'ZillowMapZipcodeMU', function ($filter, $timeout, indeedData, d3MapData, ZillowMapZipcodeMU) {
             p.loadOrder('d3 directive');
             return {
                 restrict: 'EA',
@@ -45,6 +45,14 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
                     var svg = d3.select($element[0])
                         .append("svg")
                         .attr("width", "100%");
+
+                    var rateById = d3.map();
+
+                    var quantize = d3.scale.quantize()
+                        .domain([0, 1000000]) //0 to 1 million
+                        .range(d3.range(9).map(function (i) {
+                            return "q" + i + "-9";
+                        }));
 
 
                     // on window resize, re-render d3 canvas
@@ -164,97 +172,94 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
                         var stateZoomScale = {};
 
 
-
                         function stateClicked(d) {
 
-                            console.log(d);
+                            ZillowMapZipcodeMU.getMashUpByState(d.properties.name)
+                                .then(function (mashData) {
+                                    console.log("mashed data", mashData);
 
-                            d3MapData.getStatesAbbr(d.properties.name).then(function(stateAbbr) {
-                                console.log(stateAbbr);
-                                return ZillowGetRegionChildren.getDataByState(stateAbbr);
+                                    _.each(mashData.zillow, function (value, index, list) {
+                                        rateById.set(value.name, +value.zindex);
+                                    }, this)
 
-                            }).then(function(zillowStateData) {
-                                console.log("data", zillowStateData);
-                            })
-
-                            z.selectAll('path')
-                                .transition()
-                                .duration(750)
-                                .style("opacity", 0);
-
-
-//                            console.log("evnt", event.pageX, event.pageY);
-
-                            function drawZipCodes() {
-                                z.selectAll('path').remove();
-
-                                d3MapData.getStateZipCodes(d.properties.name).then(function (zipCodeData) {
-
-                                    z.selectAll("path")
-                                        .data(topojson.feature(zipCodeData, zipCodeData.objects.zipcodes).features)
-                                        .enter().append("path")
-                                        .attr("d", path)
-                                        .attr("data", d.properties.name)
-                                        .attr("class", "feature")
-                                        .style("opacity", 0)
+                                    z.selectAll('path')
                                         .transition()
                                         .duration(750)
+                                        .style("opacity", 0);
+
+
+                                    function drawZipCodes() {
+                                        z.selectAll('path').remove();
+
+//                                        d3MapData.getStateZipCodes(d.properties.name).then(function (zipCodeData) {
+
+                                            z.selectAll("path")
+                                                .data(topojson.feature(mashData.map, mashData.map.objects.zipcodes).features)
+                                                .enter().append("path")
+                                                .attr("class", function (d) {
+                                                    return quantize(rateById.get(d.name));
+                                                })
+                                                .attr("d", path)
+                                                .attr("data", d.properties.name)
+                                                .attr("class", "feature")
+                                                .style("opacity", 0)
+                                                .transition()
+                                                .duration(750)
 //                                        .delay(750)
-                                        .style("opacity", 1);
+                                                .style("opacity", 1);
 
-                                    z.selectAll("path")
-                                        .on("click", zipCodeClicked);
+                                            z.selectAll("path")
+                                                .on("click", zipCodeClicked);
 
-                                    z.append("path")
-                                        .datum(topojson.mesh(zipCodeData, zipCodeData.objects.zipcodes, function (a, b) {
-                                            return a !== b;
-                                        }))
-                                        .attr("class", "mesh")
-                                        .attr("d", path)
-                                        .style("opacity", 0)
-                                        .transition()
-                                        .duration(750)
-                                        .style("opacity", 1);
+                                            z.append("path")
+                                                .datum(topojson.mesh(mashData.map, mashData.map.objects.zipcodes, function (a, b) {
+                                                    return a !== b;
+                                                }))
+                                                .attr("class", "mesh")
+                                                .attr("d", path)
+                                                .style("opacity", 0)
+                                                .transition()
+                                                .duration(750)
+                                                .style("opacity", 1);
 
 
-                                }, function (error) { //Not a state
+                                            /* }, function (error) { //Not a state
 //                                svg.on("click", stopped, true)
-                                    console.log("error", error)
+                                            console.log("error", error)
 
-                                    z.selectAll("path").remove();
-                                })
-                            }
+                                            z.selectAll("path").remove();
+                                        })*/
+                                    }
 
-                            $timeout(drawZipCodes, 750);
+                                    $timeout(drawZipCodes, 750);
+
+                                    if (active.node() === this) return resteState();
+                                    active.classed("active", false);
+                                    active = d3.select(this).classed("active", true);
+
+                                    var bounds = path.bounds(d),
+                                        dx = bounds[1][0] - bounds[0][0],
+                                        dy = bounds[1][1] - bounds[0][1],
+                                        x = (bounds[0][0] + bounds[1][0]) / 2,
+                                        y = (bounds[0][1] + bounds[1][1]) / 2,
+                                        scale = .9 / Math.max(dx / width, dy / height),
+                                        translate = [width / 2 - scale * x, height / 2 - scale * y];
+
+                                    stateZoomScale.bounds = bounds;
+                                    stateZoomScale.dx = dx;
+                                    stateZoomScale.dy = dy;
+                                    stateZoomScale.x = x;
+                                    stateZoomScale.y = y;
+                                    stateZoomScale.scale = scale;
+                                    stateZoomScale.translate = translate;
+
+                                    svg.transition()
+                                        .duration(750)
+                                        .call(zoom.translate(translate).scale(scale).event);
+
+                                });
 
 
-
-
-
-
-                            if (active.node() === this) return resteState();
-                            active.classed("active", false);
-                            active = d3.select(this).classed("active", true);
-
-                            var bounds = path.bounds(d),
-                                dx = bounds[1][0] - bounds[0][0],
-                                dy = bounds[1][1] - bounds[0][1],
-                                x = (bounds[0][0] + bounds[1][0]) / 2,
-                                y = (bounds[0][1] + bounds[1][1]) / 2,
-                                scale = .9 / Math.max(dx / width, dy / height),
-                                translate = [width / 2 - scale * x, height / 2 - scale * y];
-
-                            stateZoomScale.bounds = bounds;
-                            stateZoomScale.dx = dx;
-                            stateZoomScale.dy = dy;
-                            stateZoomScale.x = x;
-                            stateZoomScale.y = y;
-                            stateZoomScale.scale = scale;
-                            stateZoomScale.translate = translate;
-
-                            svg.transition()
-                                .duration(750)
-                                .call(zoom.translate(translate).scale(scale).event);
                         }
 
 
