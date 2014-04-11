@@ -1,4 +1,4 @@
-define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState'], function (angular, app, d3, topojson, _) {
+define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', 'zmMashUp'], function (angular, app, d3, topojson, _) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("d3-map directive")
@@ -31,7 +31,8 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState'], 
                 templateUrl: "app/ng/directives/d3-map/d3-map.html"
             }
         })
-        .directive('worldMap', ['$filter', '$timeout', 'indeedData', 'd3MapData', 'MUUSMapGDPByState', function ($filter, $timeout, indeedData, d3MapData, MUUSMapGDPByState) {
+        .directive('worldMap', ['$filter', '$timeout', 'indeedData', 'd3MapData', 'MUUSMapGDPByState', 'ZillowMapZipcodeMU',
+                       function ($filter,   $timeout,   indeedData,   d3MapData,   MUUSMapGDPByState,   ZillowMapZipcodeMU) {
 
             return {
                 restrict: 'EA',
@@ -44,9 +45,7 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState'], 
 
                     //init service call
 //                    d3MapData.getStatesAbbr();
-                    MUUSMapGDPByState.UsGDPByState('2012').then(function(result) {
-                        console.log('MUUSMapGDPByState', result);
-                    })
+
 
                     var svg = d3.select($element[0])
                         .append("svg")
@@ -142,6 +141,15 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState'], 
                         svg.call(zoom) // delete this line to disable free zooming
                             .call(zoom.event);
 
+                        //TODO replace with mashup
+
+                        MUUSMapGDPByState.UsGDPByState('2012').then(function(result) {
+                            console.log('MUUSMapGDPByState', result);
+
+
+
+                        })
+
                         d3MapData.getUsMap().then(function (us) {
 
                                 g.selectAll("path")
@@ -184,7 +192,7 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState'], 
                                     function drawZipCodes() {
                                         z.selectAll('path').remove();
 
-//                                        d3MapData.getStateZipCodes(d.properties.name).then(function (zipCodeData) {
+//                                      //TODO replace with mashup
                                         ZillowMapZipcodeMU.getMashUpByState(d.properties.name)
                                             .then(function (mashData) {
                                                 console.log("mashed data", mashData);

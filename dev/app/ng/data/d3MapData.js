@@ -66,7 +66,7 @@ define(['angular', 'app', 'zmMashUp'], function (angular, app) {
                     if (D3MapsCache.usMap != null) {
                         deferred.resolve(D3MapsCache.usMap);
                     } else {
-                        $http.get("app/data/data-dist-topojson-us/2013/us/us-states-10m.json")
+                        $http.get("app/data/data-dist-topojson-us/2013/us/us-states-10m.json", {cache:true})
                             .then(function(result) {
 //                                console.log("states", result)
                                 D3MapsCache.usMap = result.data;
@@ -81,7 +81,7 @@ define(['angular', 'app', 'zmMashUp'], function (angular, app) {
                 var getStateZipCodes = function (name) {
                     var deferred = $q.defer();
 
-                    if (D3MapsCache.stateZipCodes[name] != null) {
+                    /*if (D3MapsCache.stateZipCodes[name] != null) {
                         deferred.resolve(D3MapsCache.stateZipCodes[name]);
                     } else {
                         getStatesAbbr(name).then(function (result) {
@@ -93,8 +93,16 @@ define(['angular', 'app', 'zmMashUp'], function (angular, app) {
                         }, function(error) {
                             deferred.reject(error);
                         })
-                    }
+                    }*/
 
+                    getStatesAbbr(name).then(function (result) {
+                        var url = urlZipcodePrefix + result + "-zipcodes.json";
+                        $http.get(url, {cache:true}).then(function(result) {
+                            deferred.resolve(result.data);
+                        })
+                    }, function(error) {
+                        deferred.reject(error);
+                    })
                     return deferred.promise;
                 };
 

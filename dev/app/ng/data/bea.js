@@ -53,7 +53,7 @@ define(['angular', 'underscore', 'app'], function (angular, _, app) {
 
                     var deferred = $q.defer();
 
-                    $http.get(app.createSearchUrl(newConfig))
+                    $http.get(app.createSearchUrl(newConfig), {cache:true})
                         .then(function(result) {
 //                            console.log(result);
                             deferred.resolve(result);

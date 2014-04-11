@@ -15,6 +15,7 @@ define(["angular", "app"], function (angular, app) {
             'ftd.indeedModule',
             'ftd.zillowData',
             'ftd.zillowMapMU',
+            'ftd.beaD3Map',
             "ftd.filtersModule",
             'ftd.ip',
             'ftd.topojsonMapData',

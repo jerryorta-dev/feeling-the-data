@@ -58,18 +58,82 @@ define(["jquery", "underscore"], function () {
         return this.getBasePath() + path;
     };
 
-    PreProcessor.prototype.getRestangularPath = function (path) {
-        //remove leading slash if there is one
-        if (path.substr(0, 1) == '/') {
-            path = path.substring(1);
+    PreProcessor.prototype.pluck = function(data, key) {
+        if (key) {
+            return _.pluck(data, key);
         }
 
-        //Restangular will add the4 trailing slash
-        if (path.substr(path.length - 1) == '/') {
-            path = path.substr(0, path.length - 1);
+        return data;
+    }
+
+    PreProcessor.prototype.min = function(data, key) {
+        return _.min(this.pluck(data, key));
+    };
+
+    PreProcessor.prototype.max = function(data, key) {
+         return _.max(this.pluck(data, key));
+    };
+
+    PreProcessor.prototype.sum = function(data, key) {
+        return _.reduce(this.pluck(data, key), function(memo, num){
+            return memo + num;
+        }, 0);
+    };
+
+    PreProcessor.prototype.average = function (data, key) {
+        return this.sum(this.pluck(data, key)) / _data.length;
+    };
+
+    PreProcessor.prototype.median = function (data, key) {
+
+        var values = this.pluck(data, key);
+
+        values.sort( function(a,b) {return a - b;} );
+
+        var half = Math.floor(values.length/2);
+
+        if(values.length % 2)
+            return values[half];
+        else
+            return (values[half-1] + values[half]) / 2.0;
+    };
+
+
+    PreProcessor.prototype.calculate = function(data, key) {
+
+
+        var _data = this.pluck(data, key);
+
+
+        if (typeof _data[0] === 'string') {
+            _data = _.map(_data, function(value) {
+                return Number(value);
+            })
+        };
+
+        var calc = {};
+
+        if (_.contains(arguments, 'min')) {
+            calc.min = this.min(_data);
         }
 
-        return '/' + this.getBasePath() + path;
+        if (_.contains(arguments, 'max')) {
+            calc.max = this.max(_data);
+        }
+
+        if (_.contains(arguments, 'average')) {
+            calc.average = this.average(_data);
+        }
+
+        if (_.contains(arguments, 'median')) {
+            calc.median = this.median(_data);
+        }
+
+        if (_.contains(arguments, 'sum')) {
+            calc.sum = this.sum(_data);
+        }
+
+        return calc;
     };
 
     /**
@@ -116,15 +180,6 @@ define(["jquery", "underscore"], function () {
     }
 
     //Return API
-    return {
-        cons:getPreProcessor().cons,
-        log: getPreProcessor().log,
-        loadOrder: getPreProcessor().loadOrder,
-        getBasePath: getPreProcessor().getBasePath,
-        getBaseUrl: getPreProcessor().getBaseUrl,
-        getPathTo: getPreProcessor().getPathTo,
-        getRestangularPath: getPreProcessor().getRestangularPath,
-        createSearchUrl: getPreProcessor().createSearchUrl
-    }
+    return getPreProcessor();
 
 });

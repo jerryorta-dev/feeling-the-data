@@ -4,12 +4,12 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['angular', 'app', 'd3MapDataJS', 'beaDataJs'], function (angular, app) {
+define(['angular', 'app', 'underscore', 'd3MapDataJS', 'beaDataJs'], function (angular, app, _) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("MU USMapGDPByState")
     }
-    angular.module('ftd.zillowMapMU', [])
+    angular.module('ftd.beaD3Map', [])
 
 
     /**
@@ -25,7 +25,7 @@ define(['angular', 'app', 'd3MapDataJS', 'beaDataJs'], function (angular, app) {
 
             var UsGDPByState = function (year) {
 
-                d3MapData.getStatesAbbr()
+                d3MapData.getStatesAbbr();
 
                 var deferred = $q.defer();
 
@@ -34,16 +34,21 @@ define(['angular', 'app', 'd3MapDataJS', 'beaDataJs'], function (angular, app) {
                     d3MapData.getUsMap()
 
                 ]).then(function (mashedData) {
-                    console.log(mashedData);
+
+                    var dataObject = mashedData[0].data.BEAAPI.Results.Data;
+
                     deferred.resolve({
-                        bea: mashedData[0],
+                        bea: {
+                            data:mashedData[0].data.BEAAPI.Results,
+                            meta:app.calculate(dataObject, "DataValue", "min", "max")
+                        },
                         map: mashedData[1]
                     });
                 }, function(error) {
                     console.log("MUUSMapGDPByState Error", error)
                     deferred.reject(error);
 
-                })
+                });
 
                 return deferred.promise;
             };
