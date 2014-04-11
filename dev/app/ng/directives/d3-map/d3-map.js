@@ -1,4 +1,4 @@
-define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModule", "indeed"], function (angular, p, d3, topojson, _) {
+define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', 'zmMashUp'], function (angular, p, d3, topojson, _) {
     p.loadOrder('d3-map directive');
     p.log("d3 version: " + d3.version);
 
@@ -46,13 +46,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
                         .append("svg")
                         .attr("width", "100%");
 
-                    var rateById = d3.map();
 
-                    var quantize = d3.scale.quantize()
-                        .domain([0, 1000000]) //0 to 1 million
-                        .range(d3.range(9).map(function (i) {
-                            return "q" + i + "-9";
-                        }));
 
 
                     // on window resize, re-render d3 canvas
@@ -88,7 +82,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
                         // remove all previous items before render
                         svg.selectAll("*").remove();
 
-                        svg.on("click", stopped, true)
+                        svg.on("click", stopped, true);
 
                         // setup variables
                         var width, height, max;
@@ -174,13 +168,9 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
 
                         function stateClicked(d) {
 
-                            ZillowMapZipcodeMU.getMashUpByState(d.properties.name)
-                                .then(function (mashData) {
-                                    console.log("mashed data", mashData);
+                            //TODO pull zipcode data when zoomed in
+                            //http://www.zillow.com/webservice/GetDemographics.htm?zws-id=X1-ZWz1dshk18nnyj_76gmj&zip=78723
 
-                                    _.each(mashData.zillow, function (value, index, list) {
-                                        rateById.set(value.name, +value.zindex);
-                                    }, this)
 
                                     z.selectAll('path')
                                         .transition()
@@ -192,16 +182,93 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
                                         z.selectAll('path').remove();
 
 //                                        d3MapData.getStateZipCodes(d.properties.name).then(function (zipCodeData) {
+                                        ZillowMapZipcodeMU.getMashUpByState(d.properties.name)
+                                            .then(function (mashData) {
+                                                console.log("mashed data", mashData);
+
+                                                var min = null, max = null;
+
+                                                var rateById = d3.map();
+
+                                                _.each(mashData.zillow, function (value, index, list) {
+
+
+                                                    if (value.zindex) {
+
+                                                        if (min) {
+                                                            min = Math.min(min, value.zindex);
+                                                        } else {
+                                                            min = value.zindex;
+                                                        }
+
+                                                        if (max) {
+                                                            max = Math.max(max, value.zindex);
+                                                        } else {
+                                                            max = value.zindex;
+                                                        }
+
+
+                                                    } else {
+
+
+                                                        if (!min) {
+                                                            if (max) {
+                                                                min = max;
+                                                            } else {
+                                                                min = 1000000;
+                                                            }
+                                                        }
+
+                                                        if (!max) {
+                                                            if (min) {
+                                                                max = min;
+                                                            } else {
+                                                                max = 0;
+                                                            }
+                                                        }
+
+                                                        value.zindex = min;
+
+
+                                                    }
+
+
+
+                                                    console.log("min", value.zindex, min, max)
+
+
+                                                    value.name = value.name.split(" ")[0].toLowerCase();
+
+//                                                    console.log(value.name);
+
+                                                    rateById.set(value.name, +value.zindex);
+                                                }, this)
+
+
+                                                console.log("min, max", min, max)
+
+                                                var quantize = d3.scale.quantize()
+                                                    .domain([min, max]) //0 to 1 million
+                                                    .range(d3.range(9).map(function (i) {
+//                                                        console.log("q" + i + "-9")
+                                                        return "q" + i + "-9";
+                                                    }));
 
                                             z.selectAll("path")
-                                                .data(topojson.feature(mashData.map, mashData.map.objects.zipcodes).features)
+                                                .data(topojson.feature(mashData.map, mashData.map.objects.counties).features)
                                                 .enter().append("path")
                                                 .attr("class", function (d) {
-                                                    return quantize(rateById.get(d.name));
+                                                    console.log(d);
+                                                    var rate = rateById.get(d.properties.name.split(" ")[0].toLowerCase());
+                                                    console.log(rate);
+                                                    rate = (rate != undefined) ? rate : 0;
+
+                                                    console.log(quantize(rate));
+                                                    return quantize(rate);
                                                 })
                                                 .attr("d", path)
                                                 .attr("data", d.properties.name)
-                                                .attr("class", "feature")
+//                                                .attr("class", "feature")
                                                 .style("opacity", 0)
                                                 .transition()
                                                 .duration(750)
@@ -211,24 +278,24 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
                                             z.selectAll("path")
                                                 .on("click", zipCodeClicked);
 
-                                            z.append("path")
-                                                .datum(topojson.mesh(mashData.map, mashData.map.objects.zipcodes, function (a, b) {
-                                                    return a !== b;
-                                                }))
-                                                .attr("class", "mesh")
-                                                .attr("d", path)
-                                                .style("opacity", 0)
-                                                .transition()
-                                                .duration(750)
-                                                .style("opacity", 1);
+//                                            z.append("path")
+//                                                .datum(topojson.mesh(mashData.map, mashData.map.objects.counties, function (a, b) {
+//                                                    return a !== b;
+//                                                }))
+//                                                .attr("class", "mesh")
+//                                                .attr("d", path)
+//                                                .style("opacity", 0)
+//                                                .transition()
+//                                                .duration(750)
+//                                                .style("opacity", 1);
 
 
-                                            /* }, function (error) { //Not a state
+                                             }, function (error) { //Not a state
 //                                svg.on("click", stopped, true)
                                             console.log("error", error)
 
                                             z.selectAll("path").remove();
-                                        })*/
+                                        })
                                     }
 
                                     $timeout(drawZipCodes, 750);
@@ -257,7 +324,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModul
                                         .duration(750)
                                         .call(zoom.translate(translate).scale(scale).event);
 
-                                });
+
 
 
                         }

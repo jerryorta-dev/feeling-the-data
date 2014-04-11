@@ -4,31 +4,10 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['angular', 'preprocess'], function (angular, p) {
-    p.loadOrder("factoriesModule");
-    angular.module('app.factoriesModule', [])
-        .factory('ZillowGetRegionChildren', ['$q', '$http', "zillowApiKey", function ($q, $http, zillowApiKey) {
+define(['angular', 'preprocess', 'zillowData', 'd3MapDataJS'], function (angular, p) {
+    p.loadOrder("zillowMapMU");
+    angular.module('app.zillowMapMU', [])
 
-            var baseUrl = 'http://feelingthedata.com/app/php/zillowDataService.php';
-
-            var params = {
-                "zws-id": zillowApiKey,
-                "state": null,
-                childtype: "zipcode"
-            };
-
-            var getDataByState = function (state) {
-
-                params.state = state;
-
-                return $http.get(p.createSearchUrl(baseUrl, params));
-            };
-
-            return {
-                getDataByState: getDataByState
-            }
-
-        }])
 
     /**
      *  Get date from:
@@ -47,7 +26,7 @@ define(['angular', 'preprocess'], function (angular, p) {
 
                     return $q.all([
                         ZillowGetRegionChildren.getDataByState(stateAbbr),
-                        d3MapData.getStateZipCodes(state)
+                        d3MapData.getStateCounties(state)
                     ])
 
                 }).then(function (mashedData) {

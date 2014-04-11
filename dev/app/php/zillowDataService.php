@@ -24,9 +24,16 @@ if ($fp) {
 //Proxy
 //$childtype = $_GET['childtype'];
 
+$tmpUrl = $_GET['url'];
 
-$url = 'http://www.zillow.com/webservice/GetRegionChildren.htm?' . 'zws-id=' . $_GET['zws-id'] . '&state=' . $_GET['state'] . '&childtype=' . $_GET['childtype'];
-//$url = 'http://feelingthedata.com/app/php/zillowDataService.php?zws-id=X1-ZWz1dshk18nnyj_76gmj&state=tx&childtype=zipcode';
+if ($tmpUrl == 'GetRegionChildren') {
+    $url = 'http://www.zillow.com/webservice/GetRegionChildren.htm?';
+}
+if ($tmpUrl == 'GetDemographics') {
+    $url = 'http://www.zillow.com/webservice/GetDemographics.htm?';
+}
+
+$url = $url . 'zws-id=' . $_GET['zws-id'] . '&state=' . $_GET['state'] . '&childtype=' . $_GET['childtype'];
 
 //echo $url;
 
