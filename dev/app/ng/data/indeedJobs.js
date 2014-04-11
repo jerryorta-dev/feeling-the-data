@@ -1,5 +1,8 @@
-define(['angular', 'underscore', 'app', 'ua-parser', 'ipData'], function (angular, _, p, UAParser) {
-    p.loadOrder('indeed data');
+define(['angular', 'underscore', 'app', 'ua-parser', 'ipData'], function (angular, _, app, UAParser) {
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("indeed data")
+    }
 
 
     window.INDEED_CALLBACK = function (data) {

@@ -1,10 +1,13 @@
-define(['angular', 'underscore', 'app', 'ua-parser', "jquery", 'ineedjobsData'], function (angular, _, p, UAParser) {
-    p.loadOrder('indeed data');
+define(['angular', 'underscore', 'app', 'ua-parser', "jquery", 'ineedjobsData'], function (angular, _, app, UAParser) {
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("indeed data")
+    }
 
 
     angular.module('ftd.indeedModule', [])
         .directive('indeedJobs', ['$compile', 'indeedData', function ($compile, indeedData) {
-            p.loadOrder('indeed jobs directive');
+
             return {
                 restrict: 'EA',
                 link: function ($scope, $element, $attr) {

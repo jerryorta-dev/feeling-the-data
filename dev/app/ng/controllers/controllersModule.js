@@ -5,10 +5,12 @@
  * directives reference.
  */
 define(['angular', 'app'], function(angular, app){
-    app.loadOrder('controllersModule');
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("controllersModule")
+    }
 
   angular.module('ftd.controllersModule', []).
       controller('MainAppController', ['$scope', function($scope) {
-          app.loadOrder('MainAppController');
+
       }])
 });

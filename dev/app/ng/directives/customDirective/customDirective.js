@@ -1,5 +1,8 @@
 define(['angular', 'app'], function (angular, app) {
-    app.loadOrder('customDirective')
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("customDirective")
+    }
 
     angular.module('ftd.directivesModule')
         .directive('customDirective', function () {

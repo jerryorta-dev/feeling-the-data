@@ -5,7 +5,10 @@
  * directives reference.
  */
 define(['angular', 'app'], function(angular, app){
-    app.loadOrder('directivesModule')
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("directivesModule")
+    }
 
   angular.module('ftd.directivesModule', [])
 

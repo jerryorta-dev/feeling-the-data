@@ -1,7 +1,5 @@
 define(["angular", "app"], function (angular, app) {
 
-    app.cons().SHOW_LOAD_ORDER = false;
-
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("configRoutes")
     }

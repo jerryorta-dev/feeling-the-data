@@ -1,5 +1,8 @@
-define(['angular', 'app', 'd3', 'topojson', 'underscore', 'zmMashUp'], function (angular, app, d3, topojson, _) {
-    app.loadOrder('d3-map directive');
+define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState'], function (angular, app, d3, topojson, _) {
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("d3-map directive")
+    }
     app.log("d3 version: " + d3.version);
 
 
@@ -28,8 +31,8 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'zmMashUp'], function 
                 templateUrl: "app/ng/directives/d3-map/d3-map.html"
             }
         })
-        .directive('worldMap', ['$filter', '$timeout', 'indeedData', 'd3MapData', 'ZillowMapZipcodeMU', function ($filter, $timeout, indeedData, d3MapData, ZillowMapZipcodeMU) {
-            app.loadOrder('d3 directive');
+        .directive('worldMap', ['$filter', '$timeout', 'indeedData', 'd3MapData', 'MUUSMapGDPByState', function ($filter, $timeout, indeedData, d3MapData, MUUSMapGDPByState) {
+
             return {
                 restrict: 'EA',
                 scope: {
@@ -40,14 +43,14 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'zmMashUp'], function 
                 link: function ($scope, $element, $attr) {
 
                     //init service call
-                    d3MapData.getStatesAbbr();
+//                    d3MapData.getStatesAbbr();
+                    MUUSMapGDPByState.UsGDPByState('2012').then(function(result) {
+                        console.log('MUUSMapGDPByState', result);
+                    })
 
                     var svg = d3.select($element[0])
                         .append("svg")
                         .attr("width", "100%");
-
-
-
 
                     // on window resize, re-render d3 canvas
                     window.onresize = function () {

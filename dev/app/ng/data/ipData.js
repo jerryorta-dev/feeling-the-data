@@ -5,7 +5,10 @@
  * directives reference.
  */
 define(['angular', 'app'], function (angular, app) {
-    app.loadOrder("providersModule");
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("ipData")
+    }
 
     angular.module('ftd.ip', [])
 

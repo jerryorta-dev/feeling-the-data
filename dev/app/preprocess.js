@@ -39,11 +39,6 @@ define(["jquery", "underscore"], function () {
         }
     };
 
-    PreProcessor.prototype.loadOrder = function (msg) {
-        if (constant('SHOW_CONSOLE_LOG') && constant('SHOW_LOAD_ORDER')) {
-            console.log(msg);
-        }
-    };
 
     PreProcessor.prototype.getBaseUrl = function () {
         return location.protocol + "//" + location.hostname +

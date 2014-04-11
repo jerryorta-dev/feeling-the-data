@@ -5,7 +5,9 @@
  * directives reference.
  */
 define(['angular', 'app'], function (angular, app) {
-    app.loadOrder("providersModule");
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("providersModule")
+    }
 
     /*angular.module('ftd.providersModule', [])
         .provider('api', function apiProvider() {

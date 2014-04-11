@@ -21,9 +21,10 @@ require.config(
             'ipData': 'ng/data/ipData',
             'd3MapDataJS': 'ng/data/d3MapData',
             'zillowData': 'ng/data/zillowData',
-            'beaData': 'ng/data/bea',
+            'beaDataJs': 'ng/data/bea',
 
             'zmMashUp': 'ng/dataMashUp/zillowMapMU',
+            'MUUSMapGDPByState': 'ng/dataMashUp/MUUSMapGDPByState',
 
 
             'ngConfig': 'ng/configRoutes',
@@ -108,9 +109,10 @@ require([
         'ipData',
         'd3MapDataJS',
         'zillowData',
-        'beaData',
+        'beaDataJs',
 
         'zmMashUp',
+        'MUUSMapGDPByState',
 
         'ngConfig',
         'controllersModule',

@@ -1,6 +1,8 @@
 define(['angular', 'underscore', 'app'], function (angular, _, app) {
-    app.loadOrder('bea');
 
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("bea")
+    }
 
 
     angular.module('ftd.bea', [])
@@ -11,14 +13,14 @@ define(['angular', 'underscore', 'app'], function (angular, _, app) {
 
 
                 var dataSets = {
-                    RegionalData:'RegionalData'
+                    RegionalData: 'RegionalData'
                 }
 
                 var KeyCodes = {
 
-                    //Per capita personal income
-                    PCPI_CI:"PCPI_CI"
-
+                    //PerCapitaPersonalIncome
+                    PerCapitaPersonalIncome: "PCPI_CI",
+                    gdpByState: "GDP_SP"
 
                 }
 
@@ -27,24 +29,45 @@ define(['angular', 'underscore', 'app'], function (angular, _, app) {
                 }
 
 
-                var Params =  {
-                    baseUrl : "http://www.bea.gov/api/data/?",
-                    params:{
+                var config = {
+                    baseUrl: "http://www.bea.gov/api/data/",
+                    params: {
+                        UserId: beaApiKey,
+                        method: 'GetData',
+                        datasetname: dataSets.RegionalData,
+                        KeyCode: KeyCodes.PerCapitaPersonalIncome,
+                        GeoFIPS: GeoFips.state,
+                        ResultFormat: 'json'
+                    }
 
-                    },
-                    UserId : beaApiKey,
-                    method : 'GetData',
-                    datasetname : dataSets.RegionalData,
-                    KeyCode:KeyCodes.PCPI_CI,
-                    GeoFIPS:GeoFips.state,
-                    ResultFormat:'json'
                 }
 
 
+                var gdpByState = function (year) {
+
+                    console.log('gdpByState', year)
+
+                    var newConfig = angular.copy(config);
+                    newConfig.params.year = year;
+                    newConfig.params.KeyCode = KeyCodes.gdpByState;
+
+                    var deferred = $q.defer();
+
+                    $http.get(app.createSearchUrl(newConfig))
+                        .then(function(result) {
+//                            console.log(result);
+                            deferred.resolve(result);
+                        }, function(error) {
+//                            console.log(error);
+                            deferred.reject(error);
+                        });
+
+                    return deferred.promise;
+                };
 
 
                 return {
-                    params: getParams
+                    gdpByState: gdpByState
                 }
 
 

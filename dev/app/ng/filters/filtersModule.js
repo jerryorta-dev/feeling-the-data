@@ -5,6 +5,9 @@
  * directives reference.
  */
 define(['angular', 'app'], function(angular, app){
-    app.loadOrder("filtersModule")
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("filtersModule")
+    }
   angular.module('ftd.filtersModule', [])
 });

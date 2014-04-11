@@ -5,7 +5,10 @@
  * directives reference.
  */
 define(['angular', 'app', 'zmMashUp'], function (angular, app) {
-    app.loadOrder("mapData");
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("mapData")
+    }
 
     angular.module('ftd.topojsonMapData', [])
 
@@ -42,6 +45,8 @@ define(['angular', 'app', 'zmMashUp'], function (angular, app) {
                                 D3MapsCache.getStatesAbbr = result.data;
                                 if (_state != null) {
                                     deferred.resolve(result.data[_state].toLowerCase());
+                                } else {
+                                    deferred.reject('no state argument');
                                 }
                             }, function(error) {
                                 deferred.reject(error);
@@ -51,6 +56,10 @@ define(['angular', 'app', 'zmMashUp'], function (angular, app) {
                     return deferred.promise;
                 };
 
+                /**
+                 * US map with states
+                 * @returns {*}
+                 */
                 var getUsMap = function() {
                     var deferred = $q.defer();
 

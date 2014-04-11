@@ -5,7 +5,10 @@
  * directives reference.
  */
 define(['angular', 'app', 'zillowData', 'd3MapDataJS'], function (angular, app) {
-    app.loadOrder("zillowMapMU");
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("zillowMapMU")
+    }
     angular.module('ftd.zillowMapMU', [])
 
 
