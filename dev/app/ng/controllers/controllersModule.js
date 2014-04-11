@@ -4,11 +4,11 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['angular', 'preprocess'], function(angular, p){
-    p.loadOrder('controllersModule');
+define(['angular', 'app'], function(angular, app){
+    app.loadOrder('controllersModule');
 
-  angular.module('app.controllersModule', []).
+  angular.module('ftd.controllersModule', []).
       controller('MainAppController', ['$scope', function($scope) {
-          p.loadOrder('MainAppController');
+          app.loadOrder('MainAppController');
       }])
 });

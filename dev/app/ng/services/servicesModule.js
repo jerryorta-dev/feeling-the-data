@@ -4,8 +4,8 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['angular', 'preprocess'], function(angular, p){
-    p.loadOrder('servicesModule')
-  angular.module('app.servicesModule', []).
+define(['angular', 'app'], function(angular, app){
+    app.loadOrder('servicesModule')
+  angular.module('ftd.servicesModule', []).
     value('version', '0.1');
 });

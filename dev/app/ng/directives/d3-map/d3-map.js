@@ -1,9 +1,9 @@
-define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', 'zmMashUp'], function (angular, p, d3, topojson, _) {
-    p.loadOrder('d3-map directive');
-    p.log("d3 version: " + d3.version);
+define(['angular', 'app', 'd3', 'topojson', 'underscore', 'zmMashUp'], function (angular, app, d3, topojson, _) {
+    app.loadOrder('d3-map directive');
+    app.log("d3 version: " + d3.version);
 
 
-    angular.module('app.directivesModule')
+    angular.module('ftd.directivesModule')
         .controller('WorldMapController', ['$scope', function ($scope) {
 
 //            console.log("data", $scope.data);
@@ -29,7 +29,7 @@ define(['angular', 'preprocess', 'd3', 'topojson', 'underscore', 'zmMashUp'], fu
             }
         })
         .directive('worldMap', ['$filter', '$timeout', 'indeedData', 'd3MapData', 'ZillowMapZipcodeMU', function ($filter, $timeout, indeedData, d3MapData, ZillowMapZipcodeMU) {
-            p.loadOrder('d3 directive');
+            app.loadOrder('d3 directive');
             return {
                 restrict: 'EA',
                 scope: {

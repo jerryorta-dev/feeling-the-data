@@ -1,8 +1,8 @@
-define(['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", 'ineedjobsData'], function (angular, _, p, UAParser, $) {
+define(['angular', 'underscore', 'app', 'ua-parser', "jquery", 'ineedjobsData'], function (angular, _, p, UAParser) {
     p.loadOrder('indeed data');
 
 
-    angular.module('app.indeedModule', [])
+    angular.module('ftd.indeedModule', [])
         .directive('indeedJobs', ['$compile', 'indeedData', function ($compile, indeedData) {
             p.loadOrder('indeed jobs directive');
             return {

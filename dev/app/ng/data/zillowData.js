@@ -4,9 +4,9 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['angular', 'preprocess'], function (angular, p) {
-    p.loadOrder("zillowData");
-    angular.module('app.zillowData', [])
+define(['angular', 'app'], function (angular, app) {
+    app.loadOrder("zillowData");
+    angular.module('ftd.zillowData', [])
 
 
         .factory('ZillowGetRegionChildren', ['$q', '$http', "zillowApiKey", function ($q, $http, zillowApiKey) {
@@ -33,7 +33,7 @@ define(['angular', 'preprocess'], function (angular, p) {
 
                 config.params.state = state;
 
-                return $http.get(p.createSearchUrl(config));
+                return $http.get(app.createSearchUrl(config));
             };
 
             return {

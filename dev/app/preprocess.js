@@ -23,6 +23,15 @@ define(["jquery", "underscore"], function () {
 
     })();
 
+    PreProcessor.prototype.cons = function() {
+      return {
+          SHOW_CONSOLE_LOG: constant('SHOW_CONSOLE_LOG'), //Turn off all console.logs
+          SHOW_LOAD_ORDER: constant('SHOW_LOAD_ORDER'), //Turn off all console.logs
+          VERSION: constant('VERSION'),
+          TYPE: constant('TYPE')
+      }
+    };
+
 
     PreProcessor.prototype.log = function (msg) {
         if (constant('SHOW_CONSOLE_LOG')) {
@@ -68,18 +77,35 @@ define(["jquery", "underscore"], function () {
         return '/' + this.getBasePath() + path;
     };
 
+    /**
+     * Takes a config object, returns a url with search
+     *
+     * argument example:
+     *
+     * config = {
+     *      baseUrl:'http://www.someApiService.com',
+     *      params:{
+     *          api-key:'fookey',
+     *          state:'texas',
+     *          format:'json'
+     *      }
+     * }
+     *
+     * returns:
+     * http://www.someApiService.com?api-key=fookey&state=texas&format=json
+     *
+     * @param config
+     * @returns {string}
+     */
     PreProcessor.prototype.createSearchUrl = function (config) {
 
         var url = config.baseUrl + "?";
         _.each(config.params, function (value, key, list) {
             url += key + "=" + value + "&";
         });
-
         url = url.substring(0, url.length - 1);
-//                        console.log(this.url);
+
         return url;
-
-
     };
 
 
@@ -96,6 +122,7 @@ define(["jquery", "underscore"], function () {
 
     //Return API
     return {
+        cons:getPreProcessor().cons,
         log: getPreProcessor().log,
         loadOrder: getPreProcessor().loadOrder,
         getBasePath: getPreProcessor().getBasePath,

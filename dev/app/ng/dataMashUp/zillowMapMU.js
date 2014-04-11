@@ -4,9 +4,9 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['angular', 'preprocess', 'zillowData', 'd3MapDataJS'], function (angular, p) {
-    p.loadOrder("zillowMapMU");
-    angular.module('app.zillowMapMU', [])
+define(['angular', 'app', 'zillowData', 'd3MapDataJS'], function (angular, app) {
+    app.loadOrder("zillowMapMU");
+    angular.module('ftd.zillowMapMU', [])
 
 
     /**

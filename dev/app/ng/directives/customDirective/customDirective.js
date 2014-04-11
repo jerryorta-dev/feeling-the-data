@@ -1,9 +1,9 @@
-define(['angular', 'preprocess'], function (angular, p) {
-    p.loadOrder('customDirective')
+define(['angular', 'app'], function (angular, app) {
+    app.loadOrder('customDirective')
 
-    angular.module('app.directivesModule')
+    angular.module('ftd.directivesModule')
         .directive('customDirective', function () {
-            p.loadOrder('customDirective directive');
+            app.loadOrder('customDirective directive');
             return {
 //                require: '^AnswerController',
                 restrict: 'AE',

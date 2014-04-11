@@ -2,7 +2,7 @@ require.config(
     {'baseUrl': 'app/',
         'paths': {
 
-            'preprocess': 'preprocess',
+            'app': 'preprocess',
 
             'angular': 'vendors/angular-1.2.14/angular',
             'angularanimate': 'vendors/angular-1.2.14/angular-animate.min',
@@ -37,7 +37,7 @@ require.config(
         'shim': {
 
 
-            'preprocess': {
+            'app': {
                 'exports': 'p',
                 'deps': ['d3']
             },
@@ -77,7 +77,8 @@ require.config(
 
             'ngConfig': {
                 'deps': [
-                    'uibootstrap'
+                    'uibootstrap',
+                    'app'
                 ]
             }
 
@@ -121,6 +122,6 @@ require([
     ],
     function (document, angular) {
 
-        angular.bootstrap(document, ['app']);
+        angular.bootstrap(document, ['ftd']);
 
     });

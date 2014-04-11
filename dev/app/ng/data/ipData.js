@@ -4,10 +4,10 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['angular', 'preprocess'], function (angular, p) {
-    p.loadOrder("providersModule");
+define(['angular', 'app'], function (angular, app) {
+    app.loadOrder("providersModule");
 
-    angular.module('app.ip', [])
+    angular.module('ftd.ip', [])
 
         .provider('ip', function ipProvider() {
 

@@ -1,25 +1,29 @@
-define(["angular", "preprocess"], function (angular, p) {
+define(["angular", "app"], function (angular, app) {
 
-    p.loadOrder("configRoutes");
+    app.cons().SHOW_LOAD_ORDER = false;
 
-    angular.module("app", [
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("configRoutes")
+    }
+
+    angular.module("ftd", [
             "ngRoute",
             "ui.router",
             "ngAnimate",
             "ui.bootstrap",
-            "app.indeedJobsData",
-            "app.controllersModule",
-            "app.directivesModule",
-            'app.indeedModule',
-            'app.zillowData',
-            'app.zillowMapMU',
-            "app.filtersModule",
-            'app.ip',
-            'app.topojsonMapData',
-            'app.bea']
+            "ftd.indeedJobsData",
+            "ftd.controllersModule",
+            "ftd.directivesModule",
+            'ftd.indeedModule',
+            'ftd.zillowData',
+            'ftd.zillowMapMU',
+            "ftd.filtersModule",
+            'ftd.ip',
+            'ftd.topojsonMapData',
+            'ftd.bea']
     );
 
-    angular.module("app")
+    angular.module("ftd")
         .constant("zillowApiKey", "X1-ZWz1dshk18nnyj_76gmj")
         .constant("truliaApiKey", "5kpnkmaued687936qm6y9chc")
         .constant("indeedApiKey", "4600389599611799")
@@ -27,7 +31,7 @@ define(["angular", "preprocess"], function (angular, p) {
         .constant("censusDataApiKey", "f136a395509816b3bda96f6a1375b3960f27cbbb")
         .constant("beaApiKey", "E5311C0F-5662-4934-B043-69BA533F9959")
 
-    angular.module("app").config(["$stateProvider", "$urlRouterProvider",
+    angular.module("ftd").config(["$stateProvider", "$urlRouterProvider",
         function ($stateProvider, $urlRouterProvider) {
 
 

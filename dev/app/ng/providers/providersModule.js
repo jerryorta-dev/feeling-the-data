@@ -4,10 +4,10 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['angular', 'preprocess'], function (angular, p) {
-    p.loadOrder("providersModule");
+define(['angular', 'app'], function (angular, app) {
+    app.loadOrder("providersModule");
 
-    /*angular.module('app.providersModule', [])
+    /*angular.module('ftd.providersModule', [])
         .provider('api', function apiProvider() {
 
             var api;
@@ -93,7 +93,7 @@ define(['angular', 'preprocess'], function (angular, p) {
         constructor:D3MapsCache
     }
 
-    angular.module('app.providersModule')
+    angular.module('ftd.providersModule')
         .service('D3MapsCache', D3MapsCache)
         .provider('d3MapData', function () {
 

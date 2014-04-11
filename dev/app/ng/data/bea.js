@@ -1,9 +1,9 @@
-define(['angular', 'underscore', 'preprocess'], function (angular, _, p) {
-    p.loadOrder('bea');
+define(['angular', 'underscore', 'app'], function (angular, _, app) {
+    app.loadOrder('bea');
 
 
 
-    angular.module('app.bea', [])
+    angular.module('ftd.bea', [])
         .provider('beaData', function ipProvider() {
 
 
@@ -29,6 +29,9 @@ define(['angular', 'underscore', 'preprocess'], function (angular, _, p) {
 
                 var Params =  {
                     baseUrl : "http://www.bea.gov/api/data/?",
+                    params:{
+
+                    },
                     UserId : beaApiKey,
                     method : 'GetData',
                     datasetname : dataSets.RegionalData,

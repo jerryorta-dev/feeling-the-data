@@ -1,4 +1,4 @@
-define(['angular', 'underscore', 'preprocess', 'ua-parser', 'ipData'], function (angular, _, p, UAParser, $) {
+define(['angular', 'underscore', 'app', 'ua-parser', 'ipData'], function (angular, _, p, UAParser) {
     p.loadOrder('indeed data');
 
 
@@ -12,7 +12,7 @@ define(['angular', 'underscore', 'preprocess', 'ua-parser', 'ipData'], function 
     };
 
 
-    angular.module('app.indeedJobsData', [])
+    angular.module('ftd.indeedJobsData', [])
         .provider('indeedData', function ipProvider() {
 
 

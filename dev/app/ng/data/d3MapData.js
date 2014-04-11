@@ -4,10 +4,10 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['angular', 'preprocess', 'zmMashUp'], function (angular, p) {
-    p.loadOrder("mapData");
+define(['angular', 'app', 'zmMashUp'], function (angular, app) {
+    app.loadOrder("mapData");
 
-    angular.module('app.topojsonMapData', [])
+    angular.module('ftd.topojsonMapData', [])
 
 
     var D3MapsCache = function () {
@@ -20,7 +20,7 @@ define(['angular', 'preprocess', 'zmMashUp'], function (angular, p) {
         constructor:D3MapsCache
     }
 
-    angular.module('app.topojsonMapData')
+    angular.module('ftd.topojsonMapData')
         .service('D3MapsCache', D3MapsCache)
         .provider('d3MapData', function () {
 
