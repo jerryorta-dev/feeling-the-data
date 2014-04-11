@@ -17,12 +17,13 @@ require.config(
             'd3': 'vendors/d3-3.4.4/d3.min',
             'topojson': 'vendors/d3-3.4.4/topojson',
 
-            'ineedjobsData':'ng/data/indeedJobs',
-            'ipData':'ng/data/ipData',
-            'd3MapDataJS':'ng/data/d3MapData',
-            'zillowData':'ng/data/zillowData',
+            'ineedjobsData': 'ng/data/indeedJobs',
+            'ipData': 'ng/data/ipData',
+            'd3MapDataJS': 'ng/data/d3MapData',
+            'zillowData': 'ng/data/zillowData',
+            'beaData': 'ng/data/bea',
 
-            'zmMashUp':'ng/dataMashUp/zillowMapMU',
+            'zmMashUp': 'ng/dataMashUp/zillowMapMU',
 
 
             'ngConfig': 'ng/configRoutes',
@@ -38,7 +39,7 @@ require.config(
 
             'preprocess': {
                 'exports': 'p',
-                'deps':['d3']
+                'deps': ['d3']
             },
             'domReady': {
                 'deps': ['ngConfig']
@@ -90,33 +91,33 @@ require.config(
  */
 require([
         'domReady',
-    'angular',
-    'angularanimate',
-    'uirouter',
-    'angular-route',
-    'underscore',
+        'angular',
+        'angularanimate',
+        'uirouter',
+        'angular-route',
+        'underscore',
 
-    'ua-parser',
-    'jquery',
-//    'bootstrap',
-    'uibootstrap',
-    'd3',
-    'topojson',
+        'ua-parser',
+        'jquery',
+        'uibootstrap',
+        'd3',
+        'topojson',
 
-    'ineedjobsData',
-    'ipData',
-    'd3MapDataJS',
-    'zillowData',
+        'ineedjobsData',
+        'ipData',
+        'd3MapDataJS',
+        'zillowData',
+        'beaData',
 
-    'zmMashUp',
+        'zmMashUp',
 
-    'ngConfig',
-    'controllersModule',
-    'directivesModule',
-    'filtersModule',
+        'ngConfig',
+        'controllersModule',
+        'directivesModule',
+        'filtersModule',
 //    'customDirective',
-    'indeed',
-    'd3Map'
+        'indeed',
+        'd3Map'
     ],
     function (document, angular) {
 

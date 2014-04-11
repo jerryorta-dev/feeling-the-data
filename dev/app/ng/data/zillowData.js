@@ -11,7 +11,6 @@ define(['angular', 'preprocess'], function (angular, p) {
 
         .factory('ZillowGetRegionChildren', ['$q', '$http', "zillowApiKey", function ($q, $http, zillowApiKey) {
 
-            var baseUrl = 'http://feelingthedata.com/app/php/zillowDataService.php';
 
 
             /**
@@ -20,18 +19,21 @@ define(['angular', 'preprocess'], function (angular, p) {
              * childtype = county, zipcode
              * @type {{zws-id: *, state: null, childtype: string}}
              */
-            var params = {
-                "url":"GetRegionChildren",
-                "zws-id": zillowApiKey,
-                "state": null,
-                childtype: "county"
-            };
+            var config = {
+                baseUrl:'http://feelingthedata.com/app/php/zillowDataService.php',
+                params: {
+                    "url": "GetRegionChildren",
+                    "zws-id": zillowApiKey,
+                    "state": null,
+                    childtype: "county"
+                }
+            }
 
             var getDataByState = function (state) {
 
-                params.state = state;
+                config.params.state = state;
 
-                return $http.get(p.createSearchUrl(baseUrl, params));
+                return $http.get(p.createSearchUrl(config));
             };
 
             return {

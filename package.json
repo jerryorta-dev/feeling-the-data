@@ -1,0 +1,37 @@
+{
+  "name": "indeedjobs-geo-census-housing",
+  "version": "0.0.1",
+  "description": "indeed and map mashup",
+  "main": "dev/index.html",
+  "dependencies": {
+    "express": "~3.5.1",
+    "gulp": "~3.6.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jerryorta/indeedjobs-geo-census-housing.git"
+  },
+  "keywords": [
+    "indeed",
+    "mashup",
+    "topojson",
+    "d3",
+    "bea",
+    "census",
+    "zipcode",
+    "state",
+    "us",
+    "map"
+  ],
+  "author": "Jerry Orta",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jerryorta/indeedjobs-geo-census-housing/issues"
+  },
+  "homepage": "https://github.com/jerryorta/indeedjobs-geo-census-housing"
+}

@@ -68,10 +68,10 @@ define(["jquery", "underscore"], function () {
         return '/' + this.getBasePath() + path;
     };
 
-    PreProcessor.prototype.createSearchUrl = function (baseUrl, params) {
+    PreProcessor.prototype.createSearchUrl = function (config) {
 
-        var url = baseUrl + "?";
-        _.each(params, function (value, key, list) {
+        var url = config.baseUrl + "?";
+        _.each(config.params, function (value, key, list) {
             url += key + "=" + value + "&";
         });
 

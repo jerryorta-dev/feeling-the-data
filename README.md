@@ -9,7 +9,8 @@ Seed project for Angularjs, Requirejs, Twitter Bootstrap, Less.
 
 # Install
 
-    npm install express
+    npm install
+    bower install
 
 # Optimisation
 

@@ -15,7 +15,8 @@ define(["angular", "preprocess"], function (angular, p) {
             'app.zillowMapMU',
             "app.filtersModule",
             'app.ip',
-            'app.topojsonMapData']
+            'app.topojsonMapData',
+            'app.bea']
     );
 
     angular.module("app")
