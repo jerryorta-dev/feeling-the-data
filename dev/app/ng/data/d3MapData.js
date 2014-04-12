@@ -4,45 +4,23 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['angular', 'app', 'zmMashUp'], function (angular, app) {
+define(['angular', 'app', 'd3', 'zmMashUp'], function (angular, app, d3) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("mapData")
-    }
+    };
 
     angular.module('ftd.topojsonMapData', [])
-
-
-    var D3MapsCache = function () {
-        this.usMap = null;
-        this.getStatesAbbr = null;
-        this.stateZipCodes = {};
-    }
-
-    D3MapsCache.prototype = {
-        constructor:D3MapsCache
-    }
-
-    angular.module('ftd.topojsonMapData')
-        .service('D3MapsCache', D3MapsCache)
         .provider('d3MapData', function () {
 
-            this.$get = ['$q', '$http', 'D3MapsCache', function ($q, $http, D3MapsCache) {
+            this.$get = ['$q', '$http', function ($q, $http) {
 
                 var getStatesAbbr = function (_state) {
                     var deferred = $q.defer();
 
-                    if (D3MapsCache.getStatesAbbr != null) {
-                        if (D3MapsCache.getStatesAbbr[_state] != null) {
-                            deferred.resolve(D3MapsCache.getStatesAbbr[_state].toLowerCase());
-                        } else {
-                            deferred.reject("nostate");
-                        }
-
-                    } else {
-                        $http.get('app/data/data-dist-us-states-abbreviations/us-states-name-key.json')
+                        $http.get('app/data/data-dist-us-states-abbreviations/us-states-name-key.json', {cache:true})
                             .then(function(result) {
-                                D3MapsCache.getStatesAbbr = result.data;
+
                                 if (_state != null) {
                                     deferred.resolve(result.data[_state].toLowerCase());
                                 } else {
@@ -51,10 +29,25 @@ define(['angular', 'app', 'zmMashUp'], function (angular, app) {
                             }, function(error) {
                                 deferred.reject(error);
                             });
-                    }
+
 
                     return deferred.promise;
                 };
+
+                //TODO get state list to use underscore to prune other list
+                var getStates = function() {
+                    var deferred = $q.defer();
+
+                    $http.get('app/data/data-dist-us-states-abbreviations/us-states-name-key.json', {cache:true})
+                        .then(function(result) {
+                            deferred.resolve(result.data);
+                        }, function(error) {
+                            deferred.reject(error);
+                        });
+
+
+                    return deferred.promise;
+                }
 
                 /**
                  * US map with states
@@ -63,41 +56,27 @@ define(['angular', 'app', 'zmMashUp'], function (angular, app) {
                 var getUsMap = function() {
                     var deferred = $q.defer();
 
-                    if (D3MapsCache.usMap != null) {
-                        deferred.resolve(D3MapsCache.usMap);
-                    } else {
-                        $http.get("app/data/data-dist-topojson-us/2013/us/us-states-10m.json", {cache:true})
-                            .then(function(result) {
-//                                console.log("states", result)
-                                D3MapsCache.usMap = result.data;
-                                deferred.resolve(result.data);
-                            });
-                    }
+                    $http.get("app/data/data-dist-topojson-us/2013/us/us-states-10m.json", {cache:true})
+                        .then(function(result) {
+                            deferred.resolve(result.data);
+                        }, function(error) {
+                            deferred.reject(error);
+                        });
+
 
                     return deferred.promise;
                 }
 
+                /**
+                 * Zip Codes by state
+                 * @type {string}
+                 */
                 var urlZipcodePrefix = "app/data/data-dist-topojson-us/2013/us/states/zipcodes/";
                 var getStateZipCodes = function (name) {
                     var deferred = $q.defer();
 
-                    /*if (D3MapsCache.stateZipCodes[name] != null) {
-                        deferred.resolve(D3MapsCache.stateZipCodes[name]);
-                    } else {
-                        getStatesAbbr(name).then(function (result) {
-                            var url = urlZipcodePrefix + result + "-zipcodes.json";
-                            $http.get(url).then(function(result) {
-                                D3MapsCache.stateZipCodes[name] = result.data;
-                                deferred.resolve(result.data);
-                            })
-                        }, function(error) {
-                            deferred.reject(error);
-                        })
-                    }*/
-
                     getStatesAbbr(name).then(function (result) {
-                        var url = urlZipcodePrefix + result + "-zipcodes.json";
-                        $http.get(url, {cache:true}).then(function(result) {
+                        $http.get(urlZipcodePrefix + result + "-zipcodes.json", {cache:true}).then(function(result) {
                             deferred.resolve(result.data);
                         })
                     }, function(error) {
@@ -106,23 +85,24 @@ define(['angular', 'app', 'zmMashUp'], function (angular, app) {
                     return deferred.promise;
                 };
 
+
+                /**
+                 * Counties
+                 * @type {string}
+                 */
                 var urlCountyPrefix = "app/data/data-dist-topojson-us/2013/us/states/counties/";
                 var getStateCounties = function (name) {
                     var deferred = $q.defer();
 
-                    if (D3MapsCache.stateZipCodes[name] != null) {
-                        deferred.resolve(D3MapsCache.stateZipCodes[name]);
-                    } else {
-                        getStatesAbbr(name).then(function (result) {
-                            var url = urlCountyPrefix + result + "-counties.json";
-                            $http.get(url).then(function(result) {
-                                D3MapsCache.stateZipCodes[name] = result.data;
-                                deferred.resolve(result.data);
-                            })
+                    getStatesAbbr(name).then(function (result) {
+                        $http.get(urlCountyPrefix + result + "-counties.json", {cache:true}).then(function(result) {
+                            deferred.resolve(result.data);
                         }, function(error) {
                             deferred.reject(error);
                         })
-                    }
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
 
                     return deferred.promise;
                 };
@@ -132,7 +112,8 @@ define(['angular', 'app', 'zmMashUp'], function (angular, app) {
                     getStatesAbbr: getStatesAbbr,
                     getUsMap:getUsMap,
                     getStateZipCodes:getStateZipCodes,
-                    getStateCounties:getStateCounties
+                    getStateCounties:getStateCounties,
+                    getStates:getStates
                 }
 
             }]

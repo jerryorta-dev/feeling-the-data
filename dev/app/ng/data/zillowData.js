@@ -36,7 +36,13 @@ define(['angular', 'app'], function (angular, app) {
 
                 config.params.state = state;
 
-                return $http.get(app.createSearchUrl(config));
+                return $http.get(app.createSearchUrl(config), {cache:true})
+                    .then(function(result) {
+
+                        result.meta = app.calculate(result.data.response.list.region, "zindex", "min", "max");
+
+                        return result
+                    });
             };
 
             return {

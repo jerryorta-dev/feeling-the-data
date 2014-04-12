@@ -8,7 +8,7 @@ define(["jquery", "underscore"], function () {
 
         var constants = {
             SHOW_CONSOLE_LOG: true, //Turn off all console.logs
-            SHOW_LOAD_ORDER: true, //Turn off all console.logs
+            SHOW_LOAD_ORDER: false, //Turn off all console.logs
             VERSION: 1.0,
             TYPE: 'app'
         };
@@ -102,14 +102,29 @@ define(["jquery", "underscore"], function () {
     PreProcessor.prototype.calculate = function(data, key) {
 
 
-        var _data = this.pluck(data, key);
+        var _rawData = this.pluck(data, key);
+
+        var _data = [];
+
+        /**
+         * Clean up data.
+         *
+         * remove undefined and null values
+         *
+         * if number is a string, convert to a number
+         */
+        _.each(_rawData, function(value, index, list) {
+            if (value != null && value != undefined) {
+                if (typeof value === 'string') {
+                    this.push(Number(value));
+                } else {
+                    this.push(value);
+                }
+            }
 
 
-        if (typeof _data[0] === 'string') {
-            _data = _.map(_data, function(value) {
-                return Number(value);
-            })
-        };
+        }, _data);
+
 
         var calc = {};
 

@@ -24,27 +24,35 @@ define(['angular', 'app', 'underscore', 'd3MapDataJS', 'beaDataJs'], function (a
         .factory('MUUSMapGDPByState', ['$q', 'd3MapData', 'beaData', function ($q, d3MapData, beaData) {
 
             var UsGDPByState = function (year) {
-
-                d3MapData.getStatesAbbr();
-
                 var deferred = $q.defer();
 
                 $q.all([
                     beaData.gdpByState(year),
-                    d3MapData.getUsMap()
+                    d3MapData.getUsMap(),
+                    d3MapData.getStates()
 
                 ]).then(function (mashedData) {
 
                     var dataObject = mashedData[0].data.BEAAPI.Results.Data;
 
+                    //TODO include only states
+
+                    console.log("dataObject", dataObject);
+                    var bea = {
+                        data: {}
+                    };
+                    _.each(dataObject, function (value, index, list) {
+                        this[value.GeoName] = value.DataValue
+                    }, bea.data);
+
+                    bea.meta = app.calculate(dataObject, "DataValue", "min", "max");
+
+
                     deferred.resolve({
-                        bea: {
-                            data:mashedData[0].data.BEAAPI.Results,
-                            meta:app.calculate(dataObject, "DataValue", "min", "max")
-                        },
+                        bea: bea,
                         map: mashedData[1]
                     });
-                }, function(error) {
+                }, function (error) {
                     console.log("MUUSMapGDPByState Error", error)
                     deferred.reject(error);
 

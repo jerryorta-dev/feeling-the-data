@@ -18,7 +18,7 @@ define(['angular', 'app'], function (angular, app) {
 
                 var deferred = $q.defer();
 
-                $http.jsonp('http://ipinfo.io/?callback=JSON_CALLBACK')
+                $http.jsonp('http://ipinfo.io/?callback=JSON_CALLBACK', {cache:true})
                     .success(function (data) {
                         var ip = {};
                         ip.ip = data.ip;

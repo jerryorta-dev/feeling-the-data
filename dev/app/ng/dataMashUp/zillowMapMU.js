@@ -35,7 +35,10 @@ define(['angular', 'app', 'zillowData', 'd3MapDataJS'], function (angular, app) 
                 }).then(function (mashedData) {
 
                     return {
-                        zillow:mashedData[0].data.response.list.region,
+                        zillow:{
+                            data:mashedData[0].data.response.list.region,
+                            meta:mashedData[0].meta
+                        },
                         map:mashedData[1]
                     }
 
