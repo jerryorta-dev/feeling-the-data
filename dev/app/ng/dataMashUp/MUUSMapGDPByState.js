@@ -35,7 +35,6 @@ define(['angular', 'app', 'underscore', 'd3MapDataJS', 'beaDataJs'], function (a
 
                     var dataObject = mashedData[0].data.BEAAPI.Results.Data;
 
-                    //TODO include only states
 //                    console.log(mashedData);
 //                    console.log("dataObject", dataObject);
                     var bea = {
@@ -50,7 +49,7 @@ define(['angular', 'app', 'underscore', 'd3MapDataJS', 'beaDataJs'], function (a
                         }
                     }, bea.data);
 
-                    console.log(bea, valueRange);
+//                    console.log(bea, valueRange);
 
                     bea.meta = app.calculate(valueRange, null, "min", "max");
 

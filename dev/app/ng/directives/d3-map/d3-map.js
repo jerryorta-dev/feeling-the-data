@@ -205,7 +205,7 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
 //                                      //TODO replace with mashup
                                     ZillowMapZipcodeMU.getMashUpByState(d.properties.name)
                                         .then(function (mashData) {
-                                            console.log("mashed data", mashData);
+//                                            console.log("mashed data", mashData);
 
 
                                             var rateById = d3.map();

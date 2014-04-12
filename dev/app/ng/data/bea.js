@@ -45,7 +45,7 @@ define(['angular', 'underscore', 'app'], function (angular, _, app) {
 
                 var gdpByState = function (year) {
 
-                    console.log('gdpByState', year)
+//                    console.log('gdpByState', year)
 
                     var newConfig = angular.copy(config);
                     newConfig.params.year = year;
