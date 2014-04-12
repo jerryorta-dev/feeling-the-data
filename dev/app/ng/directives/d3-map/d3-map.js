@@ -143,13 +143,13 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
 
 
                             MUUSMapGDPByState.UsGDPByState('2012').then(function (result) {
-                                    console.log('MUUSMapGDPByState', result);
+//                                    console.log('MUUSMapGDPByState', result);
 
 
                                     var stateQantize = d3.scale.quantize()
                                         .domain([result.bea.meta.min, result.bea.meta.max])
-                                        .range(d3.range(9).map(function (i) {
-                                            return 'q' + i + "-9";
+                                        .range(d3.range(49).map(function (i) {
+                                            return 'q' + i + "-49";
                                         }));
 
                                     g.selectAll("path")
@@ -162,8 +162,8 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
                                             } else {
                                                 value = result.bea.data[d.properties.name]
                                             }
-                                            console.log(Number(value));
-                                            return stateQantize(Number(value));
+//                                            console.log(Number(value));
+                                            return stateQantize(Number(value)) + " state";
                                         })
                                         .attr("d", path);
 //                                    .attr("class", "feature state")

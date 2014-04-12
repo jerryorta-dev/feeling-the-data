@@ -6114,10 +6114,10 @@ button.close {
 }
 body {
   color: white;
-  background-image: -webkit-linear-gradient(top, #4c4c4c 0%, #131313 100%);
-  background-image: linear-gradient(to bottom, #4c4c4c 0%, #131313 100%);
+  background-image: -webkit-linear-gradient(top, #005b86 0%, #002f57 100%);
+  background-image: linear-gradient(to bottom, #005b86 0%, #002f57 100%);
   background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff4c4c4c', endColorstr='#ff131313', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff005b86', endColorstr='#ff002f57', GradientType=0);
   background-color: #131313;
 }
 input[type="text"] {
@@ -6202,38 +6202,6 @@ input[type="text"] {
   cursor: pointer;
 }
 */
-.states {
-  fill: none;
-  stroke: #fff;
-  stroke-linejoin: round;
-}
-.q0-9 {
-  fill: #f7fbff;
-}
-.q1-9 {
-  fill: #deebf7;
-}
-.q2-9 {
-  fill: #c6dbef;
-}
-.q3-9 {
-  fill: #9ecae1;
-}
-.q4-9 {
-  fill: #6baed6;
-}
-.q5-9 {
-  fill: #4292c6;
-}
-.q6-9 {
-  fill: #2171b5;
-}
-.q7-9 {
-  fill: #08519c;
-}
-.q8-9 {
-  fill: #08306b;
-}
 circle {
   fill: #ccc;
   fill-opacity: 0.6;
@@ -6253,5 +6221,155 @@ circle.clickable:hover {
   shape-rendering: crispedges;
 }
 .test {
-  color: blue;
+  color: greem;
+}
+.q0-49 {
+  fill: #b09b0b;
+}
+.q1-49 {
+  fill: #a7930b;
+}
+.q2-49 {
+  fill: #9d8b0a;
+}
+.q3-49 {
+  fill: #94820a;
+}
+.q4-49 {
+  fill: #8a7a09;
+}
+.q5-49 {
+  fill: #817208;
+}
+.q6-49 {
+  fill: #776a08;
+}
+.q7-49 {
+  fill: #6d6107;
+}
+.q8-49 {
+  fill: #645906;
+}
+.q9-49 {
+  fill: #5a5006;
+}
+.q10-49 {
+  fill: #514805;
+}
+.q11-49 {
+  fill: #474005;
+}
+.q12-49 {
+  fill: #3d3704;
+}
+.q13-49 {
+  fill: #342f03;
+}
+.q14-49 {
+  fill: #2a2603;
+}
+.q15-49 {
+  fill: #211d02;
+}
+.q16-49 {
+  fill: #171501;
+}
+.q17-49 {
+  fill: #0e0c01;
+}
+.q18-49 {
+  fill: #040400;
+}
+.q19-49 {
+  fill: #000000;
+}
+.q20-49 {
+  fill: #000000;
+}
+.q21-49 {
+  fill: #000000;
+}
+.q22-49 {
+  fill: #000000;
+}
+.q23-49 {
+  fill: #000000;
+}
+.q24-49 {
+  fill: #000000;
+}
+.q25-49 {
+  fill: #000000;
+}
+.q26-49 {
+  fill: #000000;
+}
+.q27-49 {
+  fill: #000000;
+}
+.q28-49 {
+  fill: #000000;
+}
+.q29-49 {
+  fill: #000000;
+}
+.q30-49 {
+  fill: #000000;
+}
+.q31-49 {
+  fill: #000000;
+}
+.q32-49 {
+  fill: #000000;
+}
+.q33-49 {
+  fill: #000000;
+}
+.q34-49 {
+  fill: #000000;
+}
+.q35-49 {
+  fill: #000000;
+}
+.q36-49 {
+  fill: #000000;
+}
+.q37-49 {
+  fill: #000000;
+}
+.q38-49 {
+  fill: #000000;
+}
+.q39-49 {
+  fill: #000000;
+}
+.q40-49 {
+  fill: #000000;
+}
+.q41-49 {
+  fill: #000000;
+}
+.q42-49 {
+  fill: #000000;
+}
+.q43-49 {
+  fill: #000000;
+}
+.q44-49 {
+  fill: #000000;
+}
+.q45-49 {
+  fill: #000000;
+}
+.q46-49 {
+  fill: #000000;
+}
+.q47-49 {
+  fill: #000000;
+}
+.q48-49 {
+  fill: #000000;
+}
+.q49-49 {
+  fill: #000000;
 }

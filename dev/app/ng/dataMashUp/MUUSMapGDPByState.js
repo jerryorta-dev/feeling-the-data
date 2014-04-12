@@ -36,16 +36,23 @@ define(['angular', 'app', 'underscore', 'd3MapDataJS', 'beaDataJs'], function (a
                     var dataObject = mashedData[0].data.BEAAPI.Results.Data;
 
                     //TODO include only states
-
-                    console.log("dataObject", dataObject);
+//                    console.log(mashedData);
+//                    console.log("dataObject", dataObject);
                     var bea = {
                         data: {}
                     };
+
+                    var valueRange = [];
                     _.each(dataObject, function (value, index, list) {
-                        this[value.GeoName] = value.DataValue
+                        if (mashedData[2].hasOwnProperty(value.GeoName)) {
+                            valueRange.push(value.DataValue);
+                            this[value.GeoName] = value.DataValue
+                        }
                     }, bea.data);
 
-                    bea.meta = app.calculate(dataObject, "DataValue", "min", "max");
+                    console.log(bea, valueRange);
+
+                    bea.meta = app.calculate(valueRange, null, "min", "max");
 
 
                     deferred.resolve({
