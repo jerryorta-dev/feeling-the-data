@@ -6114,10 +6114,10 @@ button.close {
 }
 body {
   color: white;
-  background-image: -webkit-linear-gradient(top, #005b86 0%, #002f57 100%);
-  background-image: linear-gradient(to bottom, #005b86 0%, #002f57 100%);
+  background-image: -webkit-linear-gradient(top, #004d73 0%, #001b37 100%);
+  background-image: linear-gradient(to bottom, #004d73 0%, #001b37 100%);
   background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff005b86', endColorstr='#ff002f57', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff004d73', endColorstr='#ff001b37', GradientType=0);
   background-color: #131313;
 }
 input[type="text"] {
