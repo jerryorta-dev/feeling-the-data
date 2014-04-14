@@ -2,49 +2,16 @@
     <div class="row">
         <div class="col-md-12">
             <h5 class="indeed-title">what</h5>
-            <input class="indeed-input" name='q' value='' size='15' ng-model="indeed.what">
+            <input type="text" class="indeed-input form-control" name='q' value='' size='15' placeholder="what" ng-model="indeedWhat">
             <p class="indeed-description">job title, keywords</p>
         </div>
     </div>
     <div class="row">
         <div class="col-md-12">
             <h5 class="indeed-title">where</h5>
-            <input class="indeed-input" name='l' value='' size='15' ng-model="indeed.where">
+            <input type="text" class="indeed-input form-control" name='l' value='' size='15' placeholder="where" ng-model="indeedWhere">
+
             <p class="indeed-description">city, state, zip</p>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-12">
-            <input type='submit' value='Find Jobs' ng-click="findJobs()">
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <div id=indeed_at>
-                <a href="http://www.indeed.com/?indpubnum=4600389599611799">jobs</a> by
-                <a href="http://www.indeed.com/?indpubnum=4600389599611799" title="Job Search">
-                    <img src="http://www.indeed.com/p/jobsearch.gif" style="border: 0; vertical-align: middle" alt="job search">
-                </a>
-            </div>
-        </div>
-    </div>
 </div>
-
-
-<!--
-<form action='http://www.indeed.com/jobs' METHOD='GET'>
-    <input type="hidden" name="indpubnum" value="4600389599611799">
-
-    <table cellspacing='0' style='font-family: arial'>
-
-        <tr><td style='font-size: 16px; color:#F60'><b>where</b></td></tr>
-        <tr><td><input name='l' value='' size='15'></td></tr>
-        <tr><td style='font-size: 10px'>city, state, zip</td></tr>
-        <tr><td><input type='submit' value='Find Jobs'></tr>
-        <tr><td style='font-size: 13px'>
-            
-
-        </td></tr>
-    </table>
-</form>
-          -->

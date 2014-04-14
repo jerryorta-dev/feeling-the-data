@@ -21088,13 +21088,13 @@ return i==js.length?[t.year,Yi(n.map(function(n){return n/31536e6}),e)[2]]:i?t[u
 /**
  * Created by jerryorta on 3/14/14.
  */
-define('preprocess',["jquery", "underscore"], function () {
+define('app',["jquery", "underscore"], function () {
 
 
     var PreProcessor = (function () {
 
         var constants = {
-            SHOW_CONSOLE_LOG: false, //Turn off all console.logs
+            SHOW_CONSOLE_LOG: true, //Turn off all console.logs
             SHOW_LOAD_ORDER: false, //Turn off all console.logs
             VERSION: 1.0,
             TYPE: 'app'
@@ -21110,6 +21110,15 @@ define('preprocess',["jquery", "underscore"], function () {
 
     })();
 
+    PreProcessor.prototype.cons = function () {
+        return {
+            SHOW_CONSOLE_LOG: constant('SHOW_CONSOLE_LOG'), //Turn off all console.logs
+            SHOW_LOAD_ORDER: constant('SHOW_LOAD_ORDER'), //Turn off all console.logs
+            VERSION: constant('VERSION'),
+            TYPE: constant('TYPE')
+        }
+    };
+
 
     PreProcessor.prototype.log = function (msg) {
         if (constant('SHOW_CONSOLE_LOG')) {
@@ -21117,11 +21126,6 @@ define('preprocess',["jquery", "underscore"], function () {
         }
     };
 
-    PreProcessor.prototype.loadOrder = function (msg) {
-        if (constant('SHOW_CONSOLE_LOG') && constant('SHOW_LOAD_ORDER')) {
-            console.log(msg);
-        }
-    };
 
     PreProcessor.prototype.getBaseUrl = function () {
         return location.protocol + "//" + location.hostname +
@@ -21141,32 +21145,143 @@ define('preprocess',["jquery", "underscore"], function () {
         return this.getBasePath() + path;
     };
 
-    PreProcessor.prototype.getRestangularPath = function (path) {
-        //remove leading slash if there is one
-        if (path.substr(0, 1) == '/') {
-            path = path.substring(1);
+    PreProcessor.prototype.pluck = function (data, key) {
+        if (key) {
+            return _.pluck(data, key);
         }
 
-        //Restangular will add the4 trailing slash
-        if (path.substr(path.length - 1) == '/') {
-            path = path.substr(0, path.length - 1);
-        }
+        return data;
+    }
 
-        return '/' + this.getBasePath() + path;
+    PreProcessor.prototype.min = function (data, key) {
+        return _.min(this.pluck(data, key));
     };
 
-    PreProcessor.prototype.createSearchUrl = function (baseUrl, params) {
+    PreProcessor.prototype.max = function (data, key) {
+        return _.max(this.pluck(data, key));
+    };
 
-        var url = baseUrl + "?";
-        _.each(params, function (value, key, list) {
-            url += key + "=" + value + "&";
+    PreProcessor.prototype.sum = function (data, key) {
+        return _.reduce(this.pluck(data, key), function (memo, num) {
+            return memo + num;
+        }, 0);
+    };
+
+    PreProcessor.prototype.average = function (data, key) {
+        return this.sum(this.pluck(data, key)) / _data.length;
+    };
+
+    PreProcessor.prototype.median = function (data, key) {
+
+        var values = this.pluck(data, key);
+
+        values.sort(function (a, b) {
+            return a - b;
         });
 
+        var half = Math.floor(values.length / 2);
+
+        if (values.length % 2)
+            return values[half];
+        else
+            return (values[half - 1] + values[half]) / 2.0;
+    };
+
+
+    PreProcessor.prototype.calculate = function (data, config) {
+
+
+        var _rawData = this.pluck(data, config.key);
+
+        var _data = [];
+
+
+        /**
+         * Clean up data.
+         *
+         * remove undefined and null values
+         *
+         * if number is a string, convert to a number
+         */
+        _.each(_rawData, function (value, index, list) {
+            if (value != null && value != undefined) {
+
+                if (typeof value === 'string') {
+                    this.push(Number(value));
+                } else {
+                    this.push(value);
+                }
+            } else {
+                if (config.zeroData) {
+                    list[index] = 0;
+                }
+            }
+
+
+        }, _data);
+
+
+        var calc = {};
+
+        if (config.min) {
+            calc.min = this.min(_data);
+        }
+
+        if (config.max) {
+            calc.max = this.max(_data);
+        }
+
+        if (config.average) {
+            calc.average = this.average(_data);
+        }
+
+        if (config.median) {
+            calc.median = this.median(_data);
+        }
+
+        if (config.sum) {
+            calc.sum = this.sum(_data);
+        }
+
+        if (config.zeroData) {
+           return {
+               data:_rawData,
+               meta:calc
+           }
+        }
+
+        return calc;
+    };
+
+    /**
+     * Takes a config object, returns a url with search
+     *
+     * argument example:
+     *
+     * config = {
+     *      baseUrl:'http://www.someApiService.com',
+     *      params:{
+     *          api-key:'fookey',
+     *          state:'texas',
+     *          format:'json'
+     *      }
+     * }
+     *
+     * returns:
+     * http://www.someApiService.com?api-key=fookey&state=texas&format=json
+     *
+     * @param config
+     * @returns {string}
+     */
+    PreProcessor.prototype.createSearchUrl = function (config) {
+
+        var url = config.baseUrl + "?";
+        _.each(config.params, function (value, key, list) {
+            url += key + "=" + value + "&";
+        });
         url = url.substring(0, url.length - 1);
-//                        console.log(this.url);
+
         return url;
-
-
     };
 
 
@@ -21181,97 +21296,94 @@ define('preprocess',["jquery", "underscore"], function () {
         return singletonInstance;
     }
 
-    //Return API
-    return {
-        log: getPreProcessor().log,
-        loadOrder: getPreProcessor().loadOrder,
-        getBasePath: getPreProcessor().getBasePath,
-        getBaseUrl: getPreProcessor().getBaseUrl,
-        getPathTo: getPreProcessor().getPathTo,
-        getRestangularPath: getPreProcessor().getRestangularPath,
-        createSearchUrl: getPreProcessor().createSearchUrl
+//Return API
+    return getPreProcessor();
+
+})
+;
+define('ngConfig',["angular", "app"], function (angular, app) {
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("configRoutes")
     }
 
-});
-define('ngConfig',["angular", "preprocess"], function (angular, p) {
+    angular.module("ftd", [
+            "ngRoute",
+            "ui.router",
+            "ngAnimate",
+            "ui.bootstrap",
+            "ftd.indeedJobsData",
+            "ftd.controllersModule",
+            "ftd.directivesModule",
+            'ftd.indeedModule',
+            'ftd.zillowData',
+            'ftd.zillowMapMU',
+            'ftd.beaD3Map',
+            "ftd.filtersModule",
+            'ftd.ip',
+            'ftd.topojsonMapData',
+            'ftd.bea']
+    );
 
-  p.loadOrder("configRoutes");
-
-  angular.module("app", [
-    "ngRoute",
-    "ui.router",
-    "ngAnimate",
-    "ui.bootstrap",
-//    "restangular",
-    "app.apiModule",
-    "app.constantsModule",
-    "app.controllersModule",
-    "app.directivesModule",
-    "app.factoriesModule",
-    "app.filtersModule",
-    "app.mockApiModule",
-    "app.providersModule",
-    "app.routesModule",
-    "app.servicesModule"]);
-
-    angular.module("app")
+    angular.module("ftd")
         .constant("zillowApiKey", "X1-ZWz1dshk18nnyj_76gmj")
         .constant("truliaApiKey", "5kpnkmaued687936qm6y9chc")
         .constant("indeedApiKey", "4600389599611799")
         .constant("usaTodayApiKey", "474qrq8eh68cqa4hvw45tqfu")
         .constant("censusDataApiKey", "f136a395509816b3bda96f6a1375b3960f27cbbb")
+        .constant("beaApiKey", "E5311C0F-5662-4934-B043-69BA533F9959")
 
-    angular.module("app").config(["$stateProvider", "$urlRouterProvider",
-      function ($stateProvider, $urlRouterProvider) {
+    angular.module("ftd").config(["$stateProvider", "$urlRouterProvider",
+        function ($stateProvider, $urlRouterProvider) {
 
 
-        $urlRouterProvider.otherwise("/indeed");
+            $urlRouterProvider.otherwise("/indeed");
 
-        $stateProvider
-          .state("indeed", {
-            url: "/indeed",
-            views: {
-              "@": {templateUrl: "app/partials/indeed.html",
-                controller: "MainAppController"}
-            }
-          })
-        /*.state("quiz.questions", {
-         url: "", //do not deep link the actual quiz
-         views: {
-         "@": {templateUrl: "app/partials/quiz.questions.html",
-         controller: "AnswerController"},
-         "controls@quiz.questions": {templateUrl: "app/partials/quiz.questions.controls.html"},
-         "question@quiz.questions": {templateUrl: "app/partials/quiz.questions.question.html"}
-         }
+            $stateProvider
+                .state("indeed", {
+                    url: "/indeed",
+                    views: {
+                        "@": {templateUrl: "app/partials/indeed.html",
+                            controller: "MainAppController"}
+                    }
+                })
+            /*.state("quiz.questions", {
+             url: "", //do not deep link the actual quiz
+             views: {
+             "@": {templateUrl: "app/partials/quiz.questions.html",
+             controller: "AnswerController"},
+             "controls@quiz.questions": {templateUrl: "app/partials/quiz.questions.controls.html"},
+             "question@quiz.questions": {templateUrl: "app/partials/quiz.questions.question.html"}
+             }
 
-         }).state("quiz.result", {
-         url: "/result",
-         views: {
-         "@": {templateUrl: "app/partials/quiz.result.html",
-         controller: "ResultController"},
-         "controls@quiz.result": {templateUrl: "app/partials/quiz.result.controls.html"},
-         "result@quiz.result": {templateUrl: "app/partials/quiz.result.current.html"}
-         }
-         })*/
+             }).state("quiz.result", {
+             url: "/result",
+             views: {
+             "@": {templateUrl: "app/partials/quiz.result.html",
+             controller: "ResultController"},
+             "controls@quiz.result": {templateUrl: "app/partials/quiz.result.controls.html"},
+             "result@quiz.result": {templateUrl: "app/partials/quiz.result.current.html"}
+             }
+             })*/
 
-      }
+        }
 
     ])
-    .run(["$rootScope", "$state", "$stateParams",
-      function ($rootScope, $state, $stateParams) {
+        .run(["$rootScope", "$state", "$stateParams",
+            function ($rootScope, $state, $stateParams) {
 
-        // It"s very handy to add references to $state and $stateParams to the $rootScope
-        // so that you can access them from any scope within your applications.For example,
-        // <li ng-class="{ active: $state.includes("contacts.list") }"> will set the <li>
-        // to active whenever "contacts.list" or one of its decendents is active.
-        $rootScope.$state = $state;
-        $rootScope.$stateParams = $stateParams;
-      }]);
+                // It"s very handy to add references to $state and $stateParams to the $rootScope
+                // so that you can access them from any scope within your applications.For example,
+                // <li ng-class="{ active: $state.includes("contacts.list") }"> will set the <li>
+                // to active whenever "contacts.list" or one of its decendents is active.
+                $rootScope.$state = $state;
+                $rootScope.$stateParams = $stateParams;
+            }]);
 
-  /**
-   * Return root angular app to bootstrap in requirejs-config
-   */
-  return angular;
+    /**
+     * Return root angular app to bootstrap in requirejs-config
+     */
+    return angular;
 });
 /**
  * @license RequireJS domReady 2.0.1 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
@@ -21408,23 +21520,6 @@ define('domReady',[],function () {
  (c) 2010-2014 Google, Inc. http://angularjs.org
  License: MIT
 */
-(function(n,e,A){function x(s,g,k){return{restrict:"ECA",terminal:!0,priority:400,transclude:"element",link:function(a,c,b,f,w){function y(){p&&(p.remove(),p=null);h&&(h.$destroy(),h=null);l&&(k.leave(l,function(){p=null}),p=l,l=null)}function v(){var b=s.current&&s.current.locals;if(e.isDefined(b&&b.$template)){var b=a.$new(),d=s.current;l=w(b,function(d){k.enter(d,null,l||c,function(){!e.isDefined(t)||t&&!a.$eval(t)||g()});y()});h=d.scope=b;h.$emit("$viewContentLoaded");h.$eval(u)}else y()}
-var h,l,p,t=b.autoscroll,u=b.onload||"";a.$on("$routeChangeSuccess",v);v()}}}function z(e,g,k){return{restrict:"ECA",priority:-400,link:function(a,c){var b=k.current,f=b.locals;c.html(f.$template);var w=e(c.contents());b.controller&&(f.$scope=a,f=g(b.controller,f),b.controllerAs&&(a[b.controllerAs]=f),c.data("$ngControllerController",f),c.children().data("$ngControllerController",f));w(a)}}}n=e.module("ngRoute",["ng"]).provider("$route",function(){function s(a,c){return e.extend(new (e.extend(function(){},
-{prototype:a})),c)}function g(a,e){var b=e.caseInsensitiveMatch,f={originalPath:a,regexp:a},k=f.keys=[];a=a.replace(/([().])/g,"\\$1").replace(/(\/)?:(\w+)([\?\*])?/g,function(a,e,b,c){a="?"===c?c:null;c="*"===c?c:null;k.push({name:b,optional:!!a});e=e||"";return""+(a?"":e)+"(?:"+(a?e:"")+(c&&"(.+?)"||"([^/]+)")+(a||"")+")"+(a||"")}).replace(/([\/$\*])/g,"\\$1");f.regexp=RegExp("^"+a+"$",b?"i":"");return f}var k={};this.when=function(a,c){k[a]=e.extend({reloadOnSearch:!0},c,a&&g(a,c));if(a){var b=
-"/"==a[a.length-1]?a.substr(0,a.length-1):a+"/";k[b]=e.extend({redirectTo:a},g(b,c))}return this};this.otherwise=function(a){this.when(null,a);return this};this.$get=["$rootScope","$location","$routeParams","$q","$injector","$http","$templateCache","$sce",function(a,c,b,f,g,n,v,h){function l(){var d=p(),m=r.current;if(d&&m&&d.$$route===m.$$route&&e.equals(d.pathParams,m.pathParams)&&!d.reloadOnSearch&&!u)m.params=d.params,e.copy(m.params,b),a.$broadcast("$routeUpdate",m);else if(d||m)u=!1,a.$broadcast("$routeChangeStart",
-d,m),(r.current=d)&&d.redirectTo&&(e.isString(d.redirectTo)?c.path(t(d.redirectTo,d.params)).search(d.params).replace():c.url(d.redirectTo(d.pathParams,c.path(),c.search())).replace()),f.when(d).then(function(){if(d){var a=e.extend({},d.resolve),c,b;e.forEach(a,function(d,c){a[c]=e.isString(d)?g.get(d):g.invoke(d)});e.isDefined(c=d.template)?e.isFunction(c)&&(c=c(d.params)):e.isDefined(b=d.templateUrl)&&(e.isFunction(b)&&(b=b(d.params)),b=h.getTrustedResourceUrl(b),e.isDefined(b)&&(d.loadedTemplateUrl=
-b,c=n.get(b,{cache:v}).then(function(a){return a.data})));e.isDefined(c)&&(a.$template=c);return f.all(a)}}).then(function(c){d==r.current&&(d&&(d.locals=c,e.copy(d.params,b)),a.$broadcast("$routeChangeSuccess",d,m))},function(c){d==r.current&&a.$broadcast("$routeChangeError",d,m,c)})}function p(){var a,b;e.forEach(k,function(f,k){var q;if(q=!b){var g=c.path();q=f.keys;var l={};if(f.regexp)if(g=f.regexp.exec(g)){for(var h=1,p=g.length;h<p;++h){var n=q[h-1],r="string"==typeof g[h]?decodeURIComponent(g[h]):
-g[h];n&&r&&(l[n.name]=r)}q=l}else q=null;else q=null;q=a=q}q&&(b=s(f,{params:e.extend({},c.search(),a),pathParams:a}),b.$$route=f)});return b||k[null]&&s(k[null],{params:{},pathParams:{}})}function t(a,c){var b=[];e.forEach((a||"").split(":"),function(a,d){if(0===d)b.push(a);else{var e=a.match(/(\w+)(.*)/),f=e[1];b.push(c[f]);b.push(e[2]||"");delete c[f]}});return b.join("")}var u=!1,r={routes:k,reload:function(){u=!0;a.$evalAsync(l)}};a.$on("$locationChangeSuccess",l);return r}]});n.provider("$routeParams",
-function(){this.$get=function(){return{}}});n.directive("ngView",x);n.directive("ngView",z);x.$inject=["$route","$anchorScroll","$animate"];z.$inject=["$compile","$controller","$route"]})(window,window.angular);
-//# sourceMappingURL=angular-route.min.js.map
-;
-define("angular-route", ["angular"], function(){});
-
-/*
- AngularJS v1.2.14
- (c) 2010-2014 Google, Inc. http://angularjs.org
- License: MIT
-*/
 (function(G,g,Q){g.module("ngAnimate",["ng"]).factory("$$animateReflow",["$$rAF","$document",function(g,G){return function(e){return g(function(){e()})}}]).config(["$provide","$animateProvider",function(W,H){function e(e){for(var m=0;m<e.length;m++){var g=e[m];if(g.nodeType==ba)return g}}function B(m){return g.element(e(m))}var r=g.noop,m=g.forEach,ga=H.$$selectors,ba=1,h="$$ngAnimateState",K="ng-animate",q={running:!0};W.decorator("$animate",["$delegate","$injector","$sniffer","$rootElement",
 "$$asyncCallback","$rootScope","$document",function(x,G,aa,L,F,I,Q){function R(a){if(a){var b=[],c={};a=a.substr(1).split(".");(aa.transitions||aa.animations)&&a.push("");for(var d=0;d<a.length;d++){var f=a[d],e=ga[f];e&&!c[f]&&(b.push(G.get(e)),c[f]=!0)}return b}}function M(a,b,c){function d(a,b){var c=a[b],d=a["before"+b.charAt(0).toUpperCase()+b.substr(1)];if(c||d)return"leave"==b&&(d=c,c=null),u.push({event:b,fn:c}),p.push({event:b,fn:d}),!0}function f(b,d,e){var f=[];m(b,function(a){a.fn&&f.push(a)});
 var l=0;m(f,function(b,m){var C=function(){a:{if(d){(d[m]||r)();if(++l<f.length)break a;d=null}e()}};switch(b.event){case "setClass":d.push(b.fn(a,n,A,C));break;case "addClass":d.push(b.fn(a,n||c,C));break;case "removeClass":d.push(b.fn(a,A||c,C));break;default:d.push(b.fn(a,C))}});d&&0===d.length&&e()}var e=a[0];if(e){var h="setClass"==b,q=h||"addClass"==b||"removeClass"==b,n,A;g.isArray(c)&&(n=c[0],A=c[1],c=n+" "+A);var y=a.attr("class")+" "+c;if(T(y)){var v=r,z=[],p=[],w=r,l=[],u=[],y=(" "+y).replace(/\s+/g,
@@ -21459,6 +21554,24 @@ define("angularanimate", ["angular"], function(){});
 "undefined"!=typeof module&&"undefined"!=typeof exports&&module.exports===exports&&(module.exports="ui.router"),function(a,b,c){function d(a,b){return H(new(H(function(){},{prototype:a})),b)}function e(a){return G(arguments,function(b){b!==a&&G(b,function(b,c){a.hasOwnProperty(c)||(a[c]=b)})}),a}function f(a,b){var c=[];for(var d in a.path){if(a.path[d]!==b.path[d])break;c.push(a.path[d])}return c}function g(a,b){if(Array.prototype.indexOf)return a.indexOf(b,Number(arguments[2])||0);var c=a.length>>>0,d=Number(arguments[2])||0;for(d=0>d?Math.ceil(d):Math.floor(d),0>d&&(d+=c);c>d;d++)if(d in a&&a[d]===b)return d;return-1}function h(a,b,c,d){var e,h=f(c,d),i={},j=[];for(var k in h)if(h[k].params&&h[k].params.length){e=h[k].params;for(var l in e)g(j,e[l])>=0||(j.push(e[l]),i[e[l]]=a[e[l]])}return H({},i,b)}function i(a,b){var c={};return G(a,function(a){var d=b[a];c[a]=null!=d?String(d):null}),c}function j(a,b,c){if(!c){c=[];for(var d in a)c.push(d)}for(var e=0;e<c.length;e++){var f=c[e];if(a[f]!=b[f])return!1}return!0}function k(a,b){var c={};return G(a,function(a){c[a]=b[a]}),c}function l(a,b){var d=1,f=2,g={},h=[],i=g,j=H(a.when(g),{$$promises:g,$$values:g});this.study=function(g){function k(a,c){if(o[c]!==f){if(n.push(c),o[c]===d)throw n.splice(0,n.indexOf(c)),new Error("Cyclic dependency: "+n.join(" -> "));if(o[c]=d,D(a))m.push(c,[function(){return b.get(a)}],h);else{var e=b.annotate(a);G(e,function(a){a!==c&&g.hasOwnProperty(a)&&k(g[a],a)}),m.push(c,a,e)}n.pop(),o[c]=f}}function l(a){return E(a)&&a.then&&a.$$promises}if(!E(g))throw new Error("'invocables' must be an object");var m=[],n=[],o={};return G(g,k),g=n=o=null,function(d,f,g){function h(){--s||(t||e(r,f.$$values),p.$$values=r,p.$$promises=!0,o.resolve(r))}function k(a){p.$$failure=a,o.reject(a)}function n(c,e,f){function i(a){l.reject(a),k(a)}function j(){if(!B(p.$$failure))try{l.resolve(b.invoke(e,g,r)),l.promise.then(function(a){r[c]=a,h()},i)}catch(a){i(a)}}var l=a.defer(),m=0;G(f,function(a){q.hasOwnProperty(a)&&!d.hasOwnProperty(a)&&(m++,q[a].then(function(b){r[a]=b,--m||j()},i))}),m||j(),q[c]=l.promise}if(l(d)&&g===c&&(g=f,f=d,d=null),d){if(!E(d))throw new Error("'locals' must be an object")}else d=i;if(f){if(!l(f))throw new Error("'parent' must be a promise returned by $resolve.resolve()")}else f=j;var o=a.defer(),p=o.promise,q=p.$$promises={},r=H({},d),s=1+m.length/3,t=!1;if(B(f.$$failure))return k(f.$$failure),p;f.$$values?(t=e(r,f.$$values),h()):(H(q,f.$$promises),f.then(h,k));for(var u=0,v=m.length;v>u;u+=3)d.hasOwnProperty(m[u])?h():n(m[u],m[u+1],m[u+2]);return p}},this.resolve=function(a,b,c,d){return this.study(a)(b,c,d)}}function m(a,b,c){this.fromConfig=function(a,b,c){return B(a.template)?this.fromString(a.template,b):B(a.templateUrl)?this.fromUrl(a.templateUrl,b):B(a.templateProvider)?this.fromProvider(a.templateProvider,b,c):null},this.fromString=function(a,b){return C(a)?a(b):a},this.fromUrl=function(c,d){return C(c)&&(c=c(d)),null==c?null:a.get(c,{cache:b}).then(function(a){return a.data})},this.fromProvider=function(a,b,d){return c.invoke(a,null,d||{params:b})}}function n(a){function b(b){if(!/^\w+(-+\w+)*$/.test(b))throw new Error("Invalid parameter name '"+b+"' in pattern '"+a+"'");if(f[b])throw new Error("Duplicate parameter name '"+b+"' in pattern '"+a+"'");f[b]=!0,j.push(b)}function c(a){return a.replace(/[\\\[\]\^$*+?.()|{}]/g,"\\$&")}var d,e=/([:*])(\w+)|\{(\w+)(?:\:((?:[^{}\\]+|\\.|\{(?:[^{}\\]+|\\.)*\})+))?\}/g,f={},g="^",h=0,i=this.segments=[],j=this.params=[];this.source=a;for(var k,l,m;(d=e.exec(a))&&(k=d[2]||d[3],l=d[4]||("*"==d[1]?".*":"[^/]*"),m=a.substring(h,d.index),!(m.indexOf("?")>=0));)g+=c(m)+"("+l+")",b(k),i.push(m),h=e.lastIndex;m=a.substring(h);var n=m.indexOf("?");if(n>=0){var o=this.sourceSearch=m.substring(n);m=m.substring(0,n),this.sourcePath=a.substring(0,h+n),G(o.substring(1).split(/[&?]/),b)}else this.sourcePath=a,this.sourceSearch="";g+=c(m)+"$",i.push(m),this.regexp=new RegExp(g),this.prefix=i[0]}function o(){this.compile=function(a){return new n(a)},this.isMatcher=function(a){return E(a)&&C(a.exec)&&C(a.format)&&C(a.concat)},this.$get=function(){return this}}function p(a){function b(a){var b=/^\^((?:\\[^a-zA-Z0-9]|[^\\\[\]\^$*+?.()|{}]+)*)/.exec(a.source);return null!=b?b[1].replace(/\\(.)/g,"$1"):""}function c(a,b){return a.replace(/\$(\$|\d{1,2})/,function(a,c){return b["$"===c?0:Number(c)]})}function d(a,b,c){if(!c)return!1;var d=a.invoke(b,b,{$match:c});return B(d)?d:!0}var e=[],f=null;this.rule=function(a){if(!C(a))throw new Error("'rule' must be a function");return e.push(a),this},this.otherwise=function(a){if(D(a)){var b=a;a=function(){return b}}else if(!C(a))throw new Error("'rule' must be a function");return f=a,this},this.when=function(e,f){var g,h=D(f);if(D(e)&&(e=a.compile(e)),!h&&!C(f)&&!F(f))throw new Error("invalid 'handler' in when()");var i={matcher:function(b,c){return h&&(g=a.compile(c),c=["$match",function(a){return g.format(a)}]),H(function(a,e){return d(a,c,b.exec(e.path(),e.search()))},{prefix:D(b.prefix)?b.prefix:""})},regex:function(a,e){if(a.global||a.sticky)throw new Error("when() RegExp must not be global or sticky");return h&&(g=e,e=["$match",function(a){return c(g,a)}]),H(function(b,c){return d(b,e,a.exec(c.path()))},{prefix:b(a)})}},j={matcher:a.isMatcher(e),regex:e instanceof RegExp};for(var k in j)if(j[k])return this.rule(i[k](e,f));throw new Error("invalid 'what' in when()")},this.$get=["$location","$rootScope","$injector",function(a,b,c){function d(b){function d(b){var d=b(c,a);return d?(D(d)&&a.replace().url(d),!0):!1}if(!b||!b.defaultPrevented){var g,h=e.length;for(g=0;h>g;g++)if(d(e[g]))return;f&&d(f)}}return b.$on("$locationChangeSuccess",d),{sync:function(){d()}}}]}function q(a,e,f){function g(a){return 0===a.indexOf(".")||0===a.indexOf("^")}function l(a,b){var d=D(a),e=d?a:a.name,f=g(e);if(f){if(!b)throw new Error("No reference point given for path '"+e+"'");for(var h=e.split("."),i=0,j=h.length,k=b;j>i;i++)if(""!==h[i]||0!==i){if("^"!==h[i])break;if(!k.parent)throw new Error("Path '"+e+"' not valid for state '"+b.name+"'");k=k.parent}else k=b;h=h.slice(i).join("."),e=k.name+(k.name&&h?".":"")+h}var l=u[e];return!l||!d&&(d||l!==a&&l.self!==a)?c:l}function m(a,b){v[a]||(v[a]=[]),v[a].push(b)}function n(b){b=d(b,{self:b,resolve:b.resolve||{},toString:function(){return this.name}});var c=b.name;if(!D(c)||c.indexOf("@")>=0)throw new Error("State must have a valid name");if(u.hasOwnProperty(c))throw new Error("State '"+c+"'' is already defined");var e=-1!==c.indexOf(".")?c.substring(0,c.lastIndexOf(".")):D(b.parent)?b.parent:"";if(e&&!u[e])return m(e,b.self);for(var f in x)C(x[f])&&(b[f]=x[f](b,x.$delegates[f]));if(u[c]=b,!b[w]&&b.url&&a.when(b.url,["$match","$stateParams",function(a,c){t.$current.navigable==b&&j(a,c)||t.transitionTo(b,a,{location:!1})}]),v[c])for(var g=0;g<v[c].length;g++)n(v[c][g]);return b}function o(a,b){return D(a)&&!B(b)?x[a]:C(b)&&D(a)?(x[a]&&!x.$delegates[a]&&(x.$delegates[a]=x[a]),x[a]=b,this):this}function p(a,b){return E(a)?b=a:b.name=a,n(b),this}function q(a,e,g,m,n,o,p){function q(){p.url()!==D&&(p.url(D),p.replace())}function v(a,c,d,f,h){var i=d?c:k(a.params,c),j={$stateParams:i};h.resolve=n.resolve(a.resolve,j,h.resolve,a);var l=[h.resolve.then(function(a){h.globals=a})];return f&&l.push(f),G(a.views,function(c,d){var e=c.resolve&&c.resolve!==a.resolve?c.resolve:{};e.$template=[function(){return g.load(d,{view:c,locals:j,params:i,notify:!1})||""}],l.push(n.resolve(e,j,h.resolve,a).then(function(f){if(C(c.controllerProvider)||F(c.controllerProvider)){var g=b.extend({},e,j);f.$$controller=m.invoke(c.controllerProvider,null,g)}else f.$$controller=c.controller;f.$$state=a,h[d]=f}))}),e.all(l).then(function(){return h})}var x=e.reject(new Error("transition superseded")),y=e.reject(new Error("transition prevented")),z=e.reject(new Error("transition aborted")),A=e.reject(new Error("transition failed")),D=p.url();return s.locals={resolve:null,globals:{$stateParams:{}}},t={params:{},current:s.self,$current:s,transition:null},t.reload=function(){t.transitionTo(t.current,o,{reload:!0,inherit:!1,notify:!1})},t.go=function(a,b,c){return this.transitionTo(a,b,H({inherit:!0,relative:t.$current},c))},t.transitionTo=function(b,c,f){c=c||{},f=H({location:!0,inherit:!1,relative:null,notify:!0,reload:!1,$retry:!1},f||{});var g,k=t.$current,n=t.params,u=k.path,C=l(b,f.relative);if(!B(C)){var E={to:b,toParams:c,options:f};if(g=a.$broadcast("$stateNotFound",E,k.self,n),g.defaultPrevented)return q(),z;if(g.retry){if(f.$retry)return q(),A;var F=t.transition=e.when(g.retry);return F.then(function(){return F!==t.transition?x:(E.options.$retry=!0,t.transitionTo(E.to,E.toParams,E.options))},function(){return z}),q(),F}if(b=E.to,c=E.toParams,f=E.options,C=l(b,f.relative),!B(C)){if(f.relative)throw new Error("Could not resolve '"+b+"' from state '"+f.relative+"'");throw new Error("No such state '"+b+"'")}}if(C[w])throw new Error("Cannot transition to abstract state '"+b+"'");f.inherit&&(c=h(o,c||{},t.$current,C)),b=C;var G,J,K=b.path,L=s.locals,M=[];for(G=0,J=K[G];J&&J===u[G]&&j(c,n,J.ownParams)&&!f.reload;G++,J=K[G])L=M[G]=J.locals;if(r(b,k,L,f))return b.self.reloadOnSearch!==!1&&q(),t.transition=null,e.when(t.current);if(c=i(b.params,c||{}),f.notify&&(g=a.$broadcast("$stateChangeStart",b.self,c,k.self,n),g.defaultPrevented))return q(),y;for(var N=e.when(L),O=G;O<K.length;O++,J=K[O])L=M[O]=d(L),N=v(J,c,J===b,N,L);var P=t.transition=N.then(function(){var d,e,g;if(t.transition!==P)return x;for(d=u.length-1;d>=G;d--)g=u[d],g.self.onExit&&m.invoke(g.self.onExit,g.self,g.locals.globals),g.locals=null;for(d=G;d<K.length;d++)e=K[d],e.locals=M[d],e.self.onEnter&&m.invoke(e.self.onEnter,e.self,e.locals.globals);if(t.transition!==P)return x;t.$current=b,t.current=b.self,t.params=c,I(t.params,o),t.transition=null;var h=b.navigable;return f.location&&h&&(p.url(h.url.format(h.locals.globals.$stateParams)),"replace"===f.location&&p.replace()),f.notify&&a.$broadcast("$stateChangeSuccess",b.self,c,k.self,n),D=p.url(),t.current},function(d){return t.transition!==P?x:(t.transition=null,a.$broadcast("$stateChangeError",b.self,c,k.self,n,d),q(),e.reject(d))});return P},t.is=function(a,d){var e=l(a);return B(e)?t.$current!==e?!1:B(d)&&null!==d?b.equals(o,d):!0:c},t.includes=function(a,d){var e=l(a);if(!B(e))return c;if(!B(t.$current.includes[e.name]))return!1;var f=!0;return b.forEach(d,function(a,b){B(o[b])&&o[b]===a||(f=!1)}),f},t.href=function(a,b,c){c=H({lossy:!0,inherit:!1,absolute:!1,relative:t.$current},c||{});var d=l(a,c.relative);if(!B(d))return null;b=h(o,b||{},t.$current,d);var e=d&&c.lossy?d.navigable:d,g=e&&e.url?e.url.format(i(d.params,b||{})):null;return!f.html5Mode()&&g&&(g="#"+f.hashPrefix()+g),c.absolute&&g&&(g=p.protocol()+"://"+p.host()+(80==p.port()||443==p.port()?"":":"+p.port())+(!f.html5Mode()&&g?"/":"")+g),g},t.get=function(a,b){if(!B(a)){var c=[];return G(u,function(a){c.push(a.self)}),c}var d=l(a,b);return d&&d.self?d.self:null},t}function r(a,b,c,d){return a!==b||(c!==b.locals||d.reload)&&a.self.reloadOnSearch!==!1?void 0:!0}var s,t,u={},v={},w="abstract",x={parent:function(a){if(B(a.parent)&&a.parent)return l(a.parent);var b=/^(.+)\.[^.]+$/.exec(a.name);return b?l(b[1]):s},data:function(a){return a.parent&&a.parent.data&&(a.data=a.self.data=H({},a.parent.data,a.data)),a.data},url:function(a){var b=a.url;if(D(b))return"^"==b.charAt(0)?e.compile(b.substring(1)):(a.parent.navigable||s).url.concat(b);if(e.isMatcher(b)||null==b)return b;throw new Error("Invalid url '"+b+"' in state '"+a+"'")},navigable:function(a){return a.url?a:a.parent?a.parent.navigable:null},params:function(a){if(!a.params)return a.url?a.url.parameters():a.parent.params;if(!F(a.params))throw new Error("Invalid params in state '"+a+"'");if(a.url)throw new Error("Both params and url specicified in state '"+a+"'");return a.params},views:function(a){var b={};return G(B(a.views)?a.views:{"":a},function(c,d){d.indexOf("@")<0&&(d+="@"+a.parent.name),b[d]=c}),b},ownParams:function(a){if(!a.parent)return a.params;var b={};G(a.params,function(a){b[a]=!0}),G(a.parent.params,function(c){if(!b[c])throw new Error("Missing required parameter '"+c+"' in state '"+a.name+"'");b[c]=!1});var c=[];return G(b,function(a,b){a&&c.push(b)}),c},path:function(a){return a.parent?a.parent.path.concat(a):[]},includes:function(a){var b=a.parent?H({},a.parent.includes):{};return b[a.name]=!0,b},$delegates:{}};s=n({name:"",url:"^",views:null,"abstract":!0}),s.navigable=null,this.decorator=o,this.state=p,this.$get=q,q.$inject=["$rootScope","$q","$view","$injector","$resolve","$stateParams","$location","$urlRouter"]}function r(){function a(a,b){return{load:function(c,d){var e,f={template:null,controller:null,view:null,locals:null,notify:!0,async:!0,params:{}};return d=H(f,d),d.view&&(e=b.fromConfig(d.view,d.params,d.locals)),e&&d.notify&&a.$broadcast("$viewContentLoading",d),e}}}this.$get=a,a.$inject=["$rootScope","$templateFactory"]}function s(){var a=!1;this.useAnchorScroll=function(){a=!0},this.$get=["$anchorScroll","$timeout",function(b,c){return a?b:function(a){c(function(){a[0].scrollIntoView()},0,!1)}}]}function t(a,c,d,e,f,g){function h(){return e.has?function(a){return e.has(a)?e.get(a):null}:function(a){try{return e.get(a)}catch(b){return null}}}function i(a,b,c){var d=function(){return{leave:function(a){a.remove()},enter:function(a,b,c){c.after(a)}}};if(m)return function(a){return a?{enter:function(a,b,c){m.enter(a,null,c)},leave:function(a){m.leave(a,function(){a.remove()})}}:d()};if(l){var e=l&&l(c,b);return function(a){return a?{enter:function(a,b){e.enter(a,b)},leave:function(a){e.leave(a.contents(),a)}}:d()}}return d}var j=!1,k=h(),l=k("$animator"),m=k("$animate"),n={restrict:"ECA",compile:function(e,h){var k=e.html(),l=!0,m=b.element(g[0].createComment(" ui-view-anchor ")),o=e.parent();return e.prepend(m),function(g){function p(){s&&(y(!0).leave(s),s=null),r&&(r.$destroy(),r=null)}function q(h){var i=a.$current&&a.$current.locals[v];if(l&&(l=!1,e.replaceWith(m)),!i)return p(),s=e.clone(),s.html(k),y(h).enter(s,o,m),r=g.$new(),c(s.contents())(r),void 0;if(i!==t){p(),s=e.clone(),s.html(i.$template?i.$template:k),y(!0).enter(s,o,m),s.data("$uiView",z),t=i,z.state=i.$$state;var j=c(s.contents());if(r=g.$new(),i.$$controller){i.$scope=r;var n=d(i.$$controller,i);s.children().data("$ngControllerController",n)}j(r),r.$emit("$viewContentLoaded"),w&&r.$eval(w),b.isDefined(x)&&x&&!g.$eval(x)||f(s)}}var r,s,t,u=o.inheritedData("$uiView"),v=h[n.name]||h.name||"",w=h.onload||"",x=h.autoscroll,y=i(e,h,g);v.indexOf("@")<0&&(v=v+"@"+(u?u.state.name:""));var z={name:v,state:null},A=function(){if(!j){j=!0;try{q(!0)}catch(a){throw j=!1,a}j=!1}};g.$on("$stateChangeSuccess",A),g.$on("$viewContentLoading",A),q(!1)}}};return n}function u(a){var b=a.replace(/\n/g," ").match(/^([^(]+?)\s*(\((.*)\))?$/);if(!b||4!==b.length)throw new Error("Invalid state ref '"+a+"'");return{state:b[1],paramExpr:b[3]||null}}function v(a){var b=a.parent().inheritedData("$uiView");return b&&b.state&&b.state.name?b.state:void 0}function w(a,b){return{restrict:"A",require:"?^uiSrefActive",link:function(c,d,e,f){var g=u(e.uiSref),h=null,i=v(d)||a.$current,j="FORM"===d[0].nodeName,k=j?"action":"href",l=!0,m=function(b){if(b&&(h=b),l){var c=a.href(g.state,h,{relative:i});return f&&f.$$setStateInfo(g.state,h),c?(d[0][k]=c,void 0):(l=!1,!1)}};g.paramExpr&&(c.$watch(g.paramExpr,function(a){a!==h&&m(a)},!0),h=c.$eval(g.paramExpr)),m(),j||d.bind("click",function(c){var e=c.which||c.button;0!==e&&1!=e||c.ctrlKey||c.metaKey||c.shiftKey||d.attr("target")||(b(function(){a.go(g.state,h,{relative:i})}),c.preventDefault())})}}}function x(a,b,c){return{restrict:"A",controller:["$scope","$element","$attrs",function(d,e,f){function g(){a.$current.self===i&&h()?e.addClass(l):e.removeClass(l)}function h(){return!k||j(k,b)}var i,k,l;l=c(f.uiSrefActive||"",!1)(d),this.$$setStateInfo=function(b,c){i=a.get(b,v(e)),k=c,g()},d.$on("$stateChangeSuccess",g)}]}}function y(a){return function(b){return a.is(b)}}function z(a){return function(b){return a.includes(b)}}function A(a,b){function e(a){this.locals=a.locals.globals,this.params=this.locals.$stateParams}function f(){this.locals=null,this.params=null}function g(c,g){if(null!=g.redirectTo){var h,j=g.redirectTo;if(D(j))h=j;else{if(!C(j))throw new Error("Invalid 'redirectTo' in when()");h=function(a,b){return j(a,b.path(),b.search())}}b.when(c,h)}else a.state(d(g,{parent:null,name:"route:"+encodeURIComponent(c),url:c,onEnter:e,onExit:f}));return i.push(g),this}function h(a,b,d){function e(a){return""!==a.name?a:c}var f={routes:i,params:d,current:c};return b.$on("$stateChangeStart",function(a,c,d,f){b.$broadcast("$routeChangeStart",e(c),e(f))}),b.$on("$stateChangeSuccess",function(a,c,d,g){f.current=e(c),b.$broadcast("$routeChangeSuccess",e(c),e(g)),I(d,f.params)}),b.$on("$stateChangeError",function(a,c,d,f,g,h){b.$broadcast("$routeChangeError",e(c),e(f),h)}),f}var i=[];e.$inject=["$$state"],this.when=g,this.$get=h,h.$inject=["$state","$rootScope","$routeParams"]}var B=b.isDefined,C=b.isFunction,D=b.isString,E=b.isObject,F=b.isArray,G=b.forEach,H=b.extend,I=b.copy;b.module("ui.router.util",["ng"]),b.module("ui.router.router",["ui.router.util"]),b.module("ui.router.state",["ui.router.router","ui.router.util"]),b.module("ui.router",["ui.router.state"]),b.module("ui.router.compat",["ui.router"]),l.$inject=["$q","$injector"],b.module("ui.router.util").service("$resolve",l),m.$inject=["$http","$templateCache","$injector"],b.module("ui.router.util").service("$templateFactory",m),n.prototype.concat=function(a){return new n(this.sourcePath+a+this.sourceSearch)},n.prototype.toString=function(){return this.source},n.prototype.exec=function(a,b){var c=this.regexp.exec(a);if(!c)return null;var d,e=this.params,f=e.length,g=this.segments.length-1,h={};if(g!==c.length-1)throw new Error("Unbalanced capture group in route '"+this.source+"'");for(d=0;g>d;d++)h[e[d]]=c[d+1];for(;f>d;d++)h[e[d]]=b[e[d]];return h},n.prototype.parameters=function(){return this.params},n.prototype.format=function(a){var b=this.segments,c=this.params;if(!a)return b.join("");var d,e,f,g=b.length-1,h=c.length,i=b[0];for(d=0;g>d;d++)f=a[c[d]],null!=f&&(i+=encodeURIComponent(f)),i+=b[d+1];for(;h>d;d++)f=a[c[d]],null!=f&&(i+=(e?"&":"?")+c[d]+"="+encodeURIComponent(f),e=!0);return i},b.module("ui.router.util").provider("$urlMatcherFactory",o),p.$inject=["$urlMatcherFactoryProvider"],b.module("ui.router.router").provider("$urlRouter",p),q.$inject=["$urlRouterProvider","$urlMatcherFactoryProvider","$locationProvider"],b.module("ui.router.state").value("$stateParams",{}).provider("$state",q),r.$inject=[],b.module("ui.router.state").provider("$view",r),b.module("ui.router.state").provider("$uiViewScroll",s),t.$inject=["$state","$compile","$controller","$injector","$uiViewScroll","$document"],b.module("ui.router.state").directive("uiView",t),w.$inject=["$state","$timeout"],x.$inject=["$state","$stateParams","$interpolate"],b.module("ui.router.state").directive("uiSref",w).directive("uiSrefActive",x),y.$inject=["$state"],z.$inject=["$state"],b.module("ui.router.state").filter("isState",y).filter("includedByState",z),A.$inject=["$stateProvider","$urlRouterProvider"],b.module("ui.router.compat").provider("$route",A).directive("ngView",t)}(window,window.angular);
 define("uirouter", ["angular"], function(){});
 
+/*
+ AngularJS v1.2.14
+ (c) 2010-2014 Google, Inc. http://angularjs.org
+ License: MIT
+*/
+(function(n,e,A){function x(s,g,k){return{restrict:"ECA",terminal:!0,priority:400,transclude:"element",link:function(a,c,b,f,w){function y(){p&&(p.remove(),p=null);h&&(h.$destroy(),h=null);l&&(k.leave(l,function(){p=null}),p=l,l=null)}function v(){var b=s.current&&s.current.locals;if(e.isDefined(b&&b.$template)){var b=a.$new(),d=s.current;l=w(b,function(d){k.enter(d,null,l||c,function(){!e.isDefined(t)||t&&!a.$eval(t)||g()});y()});h=d.scope=b;h.$emit("$viewContentLoaded");h.$eval(u)}else y()}
+var h,l,p,t=b.autoscroll,u=b.onload||"";a.$on("$routeChangeSuccess",v);v()}}}function z(e,g,k){return{restrict:"ECA",priority:-400,link:function(a,c){var b=k.current,f=b.locals;c.html(f.$template);var w=e(c.contents());b.controller&&(f.$scope=a,f=g(b.controller,f),b.controllerAs&&(a[b.controllerAs]=f),c.data("$ngControllerController",f),c.children().data("$ngControllerController",f));w(a)}}}n=e.module("ngRoute",["ng"]).provider("$route",function(){function s(a,c){return e.extend(new (e.extend(function(){},
+{prototype:a})),c)}function g(a,e){var b=e.caseInsensitiveMatch,f={originalPath:a,regexp:a},k=f.keys=[];a=a.replace(/([().])/g,"\\$1").replace(/(\/)?:(\w+)([\?\*])?/g,function(a,e,b,c){a="?"===c?c:null;c="*"===c?c:null;k.push({name:b,optional:!!a});e=e||"";return""+(a?"":e)+"(?:"+(a?e:"")+(c&&"(.+?)"||"([^/]+)")+(a||"")+")"+(a||"")}).replace(/([\/$\*])/g,"\\$1");f.regexp=RegExp("^"+a+"$",b?"i":"");return f}var k={};this.when=function(a,c){k[a]=e.extend({reloadOnSearch:!0},c,a&&g(a,c));if(a){var b=
+"/"==a[a.length-1]?a.substr(0,a.length-1):a+"/";k[b]=e.extend({redirectTo:a},g(b,c))}return this};this.otherwise=function(a){this.when(null,a);return this};this.$get=["$rootScope","$location","$routeParams","$q","$injector","$http","$templateCache","$sce",function(a,c,b,f,g,n,v,h){function l(){var d=p(),m=r.current;if(d&&m&&d.$$route===m.$$route&&e.equals(d.pathParams,m.pathParams)&&!d.reloadOnSearch&&!u)m.params=d.params,e.copy(m.params,b),a.$broadcast("$routeUpdate",m);else if(d||m)u=!1,a.$broadcast("$routeChangeStart",
+d,m),(r.current=d)&&d.redirectTo&&(e.isString(d.redirectTo)?c.path(t(d.redirectTo,d.params)).search(d.params).replace():c.url(d.redirectTo(d.pathParams,c.path(),c.search())).replace()),f.when(d).then(function(){if(d){var a=e.extend({},d.resolve),c,b;e.forEach(a,function(d,c){a[c]=e.isString(d)?g.get(d):g.invoke(d)});e.isDefined(c=d.template)?e.isFunction(c)&&(c=c(d.params)):e.isDefined(b=d.templateUrl)&&(e.isFunction(b)&&(b=b(d.params)),b=h.getTrustedResourceUrl(b),e.isDefined(b)&&(d.loadedTemplateUrl=
+b,c=n.get(b,{cache:v}).then(function(a){return a.data})));e.isDefined(c)&&(a.$template=c);return f.all(a)}}).then(function(c){d==r.current&&(d&&(d.locals=c,e.copy(d.params,b)),a.$broadcast("$routeChangeSuccess",d,m))},function(c){d==r.current&&a.$broadcast("$routeChangeError",d,m,c)})}function p(){var a,b;e.forEach(k,function(f,k){var q;if(q=!b){var g=c.path();q=f.keys;var l={};if(f.regexp)if(g=f.regexp.exec(g)){for(var h=1,p=g.length;h<p;++h){var n=q[h-1],r="string"==typeof g[h]?decodeURIComponent(g[h]):
+g[h];n&&r&&(l[n.name]=r)}q=l}else q=null;else q=null;q=a=q}q&&(b=s(f,{params:e.extend({},c.search(),a),pathParams:a}),b.$$route=f)});return b||k[null]&&s(k[null],{params:{},pathParams:{}})}function t(a,c){var b=[];e.forEach((a||"").split(":"),function(a,d){if(0===d)b.push(a);else{var e=a.match(/(\w+)(.*)/),f=e[1];b.push(c[f]);b.push(e[2]||"");delete c[f]}});return b.join("")}var u=!1,r={routes:k,reload:function(){u=!0;a.$evalAsync(l)}};a.$on("$locationChangeSuccess",l);return r}]});n.provider("$routeParams",
+function(){this.$get=function(){return{}}});n.directive("ngView",x);n.directive("ngView",z);x.$inject=["$route","$anchorScroll","$animate"];z.$inject=["$compile","$controller","$route"]})(window,window.angular);
+//# sourceMappingURL=angular-route.min.js.map
+;
+define("angular-route", ["angular"], function(){});
+
+(function(window,undefined){var EMPTY="",UNKNOWN="?",FUNC_TYPE="function",UNDEF_TYPE="undefined",OBJ_TYPE="object",MAJOR="major",MODEL="model",NAME="name",TYPE="type",VENDOR="vendor",VERSION="version",ARCHITECTURE="architecture",CONSOLE="console",MOBILE="mobile",TABLET="tablet";var util={has:function(str1,str2){return str2.toLowerCase().indexOf(str1.toLowerCase())!==-1},lowerize:function(str){return str.toLowerCase()}};var mapper={rgx:function(){for(var result,i=0,j,k,p,q,matches,match,args=arguments;i<args.length;i+=2){var regex=args[i],props=args[i+1];if(typeof result===UNDEF_TYPE){result={};for(p in props){q=props[p];if(typeof q===OBJ_TYPE){result[q[0]]=undefined}else{result[q]=undefined}}}for(j=k=0;j<regex.length;j++){matches=regex[j].exec(this.getUA());if(!!matches){for(p in props){match=matches[++k];q=props[p];if(typeof q===OBJ_TYPE&&q.length>0){if(q.length==2){if(typeof q[1]==FUNC_TYPE){result[q[0]]=q[1].call(this,match)}else{result[q[0]]=q[1]}}else if(q.length==3){if(typeof q[1]===FUNC_TYPE&&!(q[1].exec&&q[1].test)){result[q[0]]=match?q[1].call(this,match,q[2]):undefined}else{result[q[0]]=match?match.replace(q[1],q[2]):undefined}}else if(q.length==4){result[q[0]]=match?q[3].call(this,match.replace(q[1],q[2])):undefined}}else{result[q]=match?match:undefined}}break}}if(!!matches)break}return result},str:function(str,map){for(var i in map){if(typeof map[i]===OBJ_TYPE&&map[i].length>0){for(var j=0;j<map[i].length;j++){if(util.has(map[i][j],str)){return i===UNKNOWN?undefined:i}}}else if(util.has(map[i],str)){return i===UNKNOWN?undefined:i}}return str}};var maps={browser:{oldsafari:{major:{1:["/8","/1","/3"],2:"/4","?":"/"},version:{"1.0":"/8",1.2:"/1",1.3:"/3","2.0":"/412","2.0.2":"/416","2.0.3":"/417","2.0.4":"/419","?":"/"}}},device:{sprint:{model:{"Evo Shift 4G":"7373KT"},vendor:{HTC:"APA",Sprint:"Sprint"}}},os:{windows:{version:{ME:"4.90","NT 3.11":"NT3.51","NT 4.0":"NT4.0",2000:"NT 5.0",XP:["NT 5.1","NT 5.2"],Vista:"NT 6.0",7:"NT 6.1",8:"NT 6.2",RT:"ARM"}}}};var regexes={browser:[[/(opera\smini)\/((\d+)?[\w\.-]+)/i,/(opera\s[mobiletab]+).+version\/((\d+)?[\w\.-]+)/i,/(opera).+version\/((\d+)?[\w\.]+)/i,/(opera)[\/\s]+((\d+)?[\w\.]+)/i],[NAME,VERSION,MAJOR],[/\s(opr)\/((\d+)?[\w\.]+)/i],[[NAME,"Opera"],VERSION,MAJOR],[/(kindle)\/((\d+)?[\w\.]+)/i,/(lunascape|maxthon|netfront|jasmine|blazer)[\/\s]?((\d+)?[\w\.]+)*/i,/(avant\s|iemobile|slim|baidu)(?:browser)?[\/\s]?((\d+)?[\w\.]*)/i,/(?:ms|\()(ie)\s((\d+)?[\w\.]+)/i,/(rekonq)((?:\/)[\w\.]+)*/i,/(chromium|flock|rockmelt|midori|epiphany|silk|skyfire|ovibrowser|bolt|iron)\/((\d+)?[\w\.-]+)/i],[NAME,VERSION,MAJOR],[/(trident).+rv[:\s]((\d+)?[\w\.]+).+like\sgecko/i],[[NAME,"IE"],VERSION,MAJOR],[/(yabrowser)\/((\d+)?[\w\.]+)/i],[[NAME,"Yandex"],VERSION,MAJOR],[/(comodo_dragon)\/((\d+)?[\w\.]+)/i],[[NAME,/_/g," "],VERSION,MAJOR],[/(chrome|omniweb|arora|[tizenoka]{5}\s?browser)\/v?((\d+)?[\w\.]+)/i],[NAME,VERSION,MAJOR],[/(dolfin)\/((\d+)?[\w\.]+)/i],[[NAME,"Dolphin"],VERSION,MAJOR],[/((?:android.+)crmo|crios)\/((\d+)?[\w\.]+)/i],[[NAME,"Chrome"],VERSION,MAJOR],[/version\/((\d+)?[\w\.]+).+?mobile\/\w+\s(safari)/i],[VERSION,MAJOR,[NAME,"Mobile Safari"]],[/version\/((\d+)?[\w\.]+).+?(mobile\s?safari|safari)/i],[VERSION,MAJOR,NAME],[/webkit.+?(mobile\s?safari|safari)((\/[\w\.]+))/i],[NAME,[MAJOR,mapper.str,maps.browser.oldsafari.major],[VERSION,mapper.str,maps.browser.oldsafari.version]],[/(konqueror)\/((\d+)?[\w\.]+)/i,/(webkit|khtml)\/((\d+)?[\w\.]+)/i],[NAME,VERSION,MAJOR],[/(navigator|netscape)\/((\d+)?[\w\.-]+)/i],[[NAME,"Netscape"],VERSION,MAJOR],[/(swiftfox)/i,/(icedragon|iceweasel|camino|chimera|fennec|maemo\sbrowser|minimo|conkeror)[\/\s]?((\d+)?[\w\.\+]+)/i,/(firefox|seamonkey|k-meleon|icecat|iceape|firebird|phoenix)\/((\d+)?[\w\.-]+)/i,/(mozilla)\/((\d+)?[\w\.]+).+rv\:.+gecko\/\d+/i,/(uc\s?browser|polaris|lynx|dillo|icab|doris|amaya|w3m|netsurf|qqbrowser)[\/\s]?((\d+)?[\w\.]+)/i,/(links)\s\(((\d+)?[\w\.]+)/i,/(gobrowser)\/?((\d+)?[\w\.]+)*/i,/(ice\s?browser)\/v?((\d+)?[\w\._]+)/i,/(mosaic)[\/\s]((\d+)?[\w\.]+)/i],[NAME,VERSION,MAJOR]],cpu:[[/(?:(amd|x(?:(?:86|64)[_-])?|wow|win)64)[;\)]/i],[[ARCHITECTURE,"amd64"]],[/((?:i[346]|x)86)[;\)]/i],[[ARCHITECTURE,"ia32"]],[/windows\s(ce|mobile);\sppc;/i],[[ARCHITECTURE,"arm"]],[/((?:ppc|powerpc)(?:64)?)(?:\smac|;|\))/i],[[ARCHITECTURE,/ower/,"",util.lowerize]],[/(sun4\w)[;\)]/i],[[ARCHITECTURE,"sparc"]],[/(ia64(?=;)|68k(?=\))|arm(?=v\d+;)|(?:irix|mips|sparc)(?:64)?(?=;)|pa-risc)/i],[ARCHITECTURE,util.lowerize]],device:[[/\((ipad|playbook);[\w\s\);-]+(rim|apple)/i],[MODEL,VENDOR,[TYPE,TABLET]],[/(hp).+(touchpad)/i,/(kindle)\/([\w\.]+)/i,/\s(nook)[\w\s]+build\/(\w+)/i,/(dell)\s(strea[kpr\s\d]*[\dko])/i],[VENDOR,MODEL,[TYPE,TABLET]],[/\((ip[honed]+);.+(apple)/i],[MODEL,VENDOR,[TYPE,MOBILE]],[/(blackberry)[\s-]?(\w+)/i,/(blackberry|benq|palm(?=\-)|sonyericsson|acer|asus|dell|huawei|meizu|motorola)[\s_-]?([\w-]+)*/i,/(hp)\s([\w\s]+\w)/i,/(asus)-?(\w+)/i],[VENDOR,MODEL,[TYPE,MOBILE]],[/\((bb10);\s(\w+)/i],[[VENDOR,"BlackBerry"],MODEL,[TYPE,MOBILE]],[/android.+((transfo[prime\s]{4,10}\s\w+|eeepc|slider\s\w+))/i],[[VENDOR,"Asus"],MODEL,[TYPE,TABLET]],[/(sony)\s(tablet\s[ps])/i],[VENDOR,MODEL,[TYPE,TABLET]],[/(nintendo)\s([wids3u]+)/i],[VENDOR,MODEL,[TYPE,CONSOLE]],[/((playstation)\s[3portablevi]+)/i],[[VENDOR,"Sony"],MODEL,[TYPE,CONSOLE]],[/(sprint\s(\w+))/i],[[VENDOR,mapper.str,maps.device.sprint.vendor],[MODEL,mapper.str,maps.device.sprint.model],[TYPE,MOBILE]],[/(htc)[;_\s-]+([\w\s]+(?=\))|\w+)*/i,/(zte)-(\w+)*/i,/(alcatel|geeksphone|huawei|lenovo|nexian|panasonic|(?=;\s)sony)[_\s-]?([\w-]+)*/i],[VENDOR,[MODEL,/_/g," "],[TYPE,MOBILE]],[/\s((milestone|droid(?:[2-4x]|\s(?:bionic|x2|pro|razr))?(:?\s4g)?))[\w\s]+build\//i,/(mot)[\s-]?(\w+)*/i],[[VENDOR,"Motorola"],MODEL,[TYPE,MOBILE]],[/android.+\s((mz60\d|xoom[\s2]{0,2}))\sbuild\//i],[[VENDOR,"Motorola"],MODEL,[TYPE,TABLET]],[/android.+((sch-i[89]0\d|shw-m380s|gt-p\d{4}|gt-n8000|sgh-t8[56]9))/i],[[VENDOR,"Samsung"],MODEL,[TYPE,TABLET]],[/((s[cgp]h-\w+|gt-\w+|galaxy\snexus))/i,/(sam[sung]*)[\s-]*(\w+-?[\w-]*)*/i,/sec-((sgh\w+))/i],[[VENDOR,"Samsung"],MODEL,[TYPE,MOBILE]],[/(sie)-(\w+)*/i],[[VENDOR,"Siemens"],MODEL,[TYPE,MOBILE]],[/(maemo|nokia).*(n900|lumia\s\d+)/i,/(nokia)[\s_-]?([\w-]+)*/i],[[VENDOR,"Nokia"],MODEL,[TYPE,MOBILE]],[/android\s3\.[\s\w-;]{10}((a\d{3}))/i],[[VENDOR,"Acer"],MODEL,[TYPE,TABLET]],[/android\s3\.[\s\w-;]{10}(lg?)-([06cv9]{3,4})/i],[[VENDOR,"LG"],MODEL,[TYPE,TABLET]],[/((nexus\s4))/i,/(lg)[e;\s-\/]+(\w+)*/i],[[VENDOR,"LG"],MODEL,[TYPE,MOBILE]],[/(mobile|tablet);.+rv\:.+gecko\//i],[TYPE,VENDOR,MODEL]],engine:[[/(presto)\/([\w\.]+)/i,/(webkit|trident|netfront|netsurf|amaya|lynx|w3m)\/([\w\.]+)/i,/(khtml|tasman|links)[\/\s]\(?([\w\.]+)/i,/(icab)[\/\s]([23]\.[\d\.]+)/i],[NAME,VERSION],[/rv\:([\w\.]+).*(gecko)/i],[VERSION,NAME]],os:[[/(windows)\snt\s6\.2;\s(arm)/i,/(windows\sphone(?:\sos)*|windows\smobile|windows)[\s\/]?([ntce\d\.\s]+\w)/i],[NAME,[VERSION,mapper.str,maps.os.windows.version]],[/(win(?=3|9|n)|win\s9x\s)([nt\d\.]+)/i],[[NAME,"Windows"],[VERSION,mapper.str,maps.os.windows.version]],[/\((bb)(10);/i],[[NAME,"BlackBerry"],VERSION],[/(blackberry)\w*\/?([\w\.]+)*/i,/(tizen)\/([\w\.]+)/i,/(android|webos|palm\os|qnx|bada|rim\stablet\sos|meego)[\/\s-]?([\w\.]+)*/i],[NAME,VERSION],[/(symbian\s?os|symbos|s60(?=;))[\/\s-]?([\w\.]+)*/i],[[NAME,"Symbian"],VERSION],[/mozilla.+\(mobile;.+gecko.+firefox/i],[[NAME,"Firefox OS"],VERSION],[/(nintendo|playstation)\s([wids3portablevu]+)/i,/(mint)[\/\s\(]?(\w+)*/i,/(joli|[kxln]?ubuntu|debian|[open]*suse|gentoo|arch|slackware|fedora|mandriva|centos|pclinuxos|redhat|zenwalk)[\/\s-]?([\w\.-]+)*/i,/(hurd|linux)\s?([\w\.]+)*/i,/(gnu)\s?([\w\.]+)*/i],[NAME,VERSION],[/(cros)\s[\w]+\s([\w\.]+\w)/i],[[NAME,"Chromium OS"],VERSION],[/(sunos)\s?([\w\.]+\d)*/i],[[NAME,"Solaris"],VERSION],[/\s([frentopc-]{0,4}bsd|dragonfly)\s?([\w\.]+)*/i],[NAME,VERSION],[/(ip[honead]+)(?:.*os\s*([\w]+)*\slike\smac|;\sopera)/i],[[NAME,"iOS"],[VERSION,/_/g,"."]],[/(mac\sos\sx)\s?([\w\s\.]+\w)*/i],[NAME,[VERSION,/_/g,"."]],[/(haiku)\s(\w+)/i,/(aix)\s((\d)(?=\.|\)|\s)[\w\.]*)*/i,/(macintosh|mac(?=_powerpc)|plan\s9|minix|beos|os\/2|amigaos|morphos|risc\sos)/i,/(unix)\s?([\w\.]+)*/i],[NAME,VERSION]]};var UAParser=function(uastring){var ua=uastring||(window&&window.navigator&&window.navigator.userAgent?window.navigator.userAgent:EMPTY);if(!(this instanceof UAParser)){return new UAParser(uastring).getResult()}this.getBrowser=function(){return mapper.rgx.apply(this,regexes.browser)};this.getCPU=function(){return mapper.rgx.apply(this,regexes.cpu)};this.getDevice=function(){return mapper.rgx.apply(this,regexes.device)};this.getEngine=function(){return mapper.rgx.apply(this,regexes.engine)};this.getOS=function(){return mapper.rgx.apply(this,regexes.os)};this.getResult=function(){return{ua:this.getUA(),browser:this.getBrowser(),engine:this.getEngine(),os:this.getOS(),device:this.getDevice(),cpu:this.getCPU()}};this.getUA=function(){return ua};this.setUA=function(uastring){ua=uastring;return this};this.setUA(ua)};if(typeof exports!==UNDEF_TYPE){if(typeof module!==UNDEF_TYPE&&module.exports){exports=module.exports=UAParser}exports.UAParser=UAParser}else{window.UAParser=UAParser;if(typeof define===FUNC_TYPE&&define.amd){define('ua-parser',[],function(){return UAParser})}if(typeof window.jQuery!==UNDEF_TYPE){var $=window.jQuery;var parser=new UAParser;$.ua=parser.getResult();$.ua.get=function(){return parser.getUA()};$.ua.set=function(uastring){parser.setUA(uastring);var result=parser.getResult();for(var prop in result){$.ua[prop]=result[prop]}}}}})(this);
 !function() {
   var topojson = {
     version: "1.5.2",
@@ -21919,119 +22032,26 @@ define("uirouter", ["angular"], function(){});
 }();
 
 /**
- * %%templateName factoriesModuleTemplate.js %% Module.
- *
- * This is the directives angular module which
- * directives reference.
- */
-define('factoriesModule',['angular', 'preprocess'], function(angular, p){
-    p.loadOrder("factoriesModule");
-  angular.module('app.factoriesModule', [])
-      .factory('ZillowGetRegionChildren', ['$q', '$http', "zillowApiKey", function($q, $http, zillowApiKey) {
-
-          var baseUrl = 'http://feelingthedata.com/app/php/zillowDataService.php';
-          var params = {
-              "zws-id": zillowApiKey,
-              "state":null,
-              childtype:"zipcode"
-          }
-
-          var getDataByState = function(state) {
-
-              params.state = state;
-
-              return $http.get(p.createSearchUrl(baseUrl, params));
-          }
-
-          return {
-              getDataByState:getDataByState
-          }
-
-      }])
-
-
-
-
-});
-(function(window,undefined){var EMPTY="",UNKNOWN="?",FUNC_TYPE="function",UNDEF_TYPE="undefined",OBJ_TYPE="object",MAJOR="major",MODEL="model",NAME="name",TYPE="type",VENDOR="vendor",VERSION="version",ARCHITECTURE="architecture",CONSOLE="console",MOBILE="mobile",TABLET="tablet";var util={has:function(str1,str2){return str2.toLowerCase().indexOf(str1.toLowerCase())!==-1},lowerize:function(str){return str.toLowerCase()}};var mapper={rgx:function(){for(var result,i=0,j,k,p,q,matches,match,args=arguments;i<args.length;i+=2){var regex=args[i],props=args[i+1];if(typeof result===UNDEF_TYPE){result={};for(p in props){q=props[p];if(typeof q===OBJ_TYPE){result[q[0]]=undefined}else{result[q]=undefined}}}for(j=k=0;j<regex.length;j++){matches=regex[j].exec(this.getUA());if(!!matches){for(p in props){match=matches[++k];q=props[p];if(typeof q===OBJ_TYPE&&q.length>0){if(q.length==2){if(typeof q[1]==FUNC_TYPE){result[q[0]]=q[1].call(this,match)}else{result[q[0]]=q[1]}}else if(q.length==3){if(typeof q[1]===FUNC_TYPE&&!(q[1].exec&&q[1].test)){result[q[0]]=match?q[1].call(this,match,q[2]):undefined}else{result[q[0]]=match?match.replace(q[1],q[2]):undefined}}else if(q.length==4){result[q[0]]=match?q[3].call(this,match.replace(q[1],q[2])):undefined}}else{result[q]=match?match:undefined}}break}}if(!!matches)break}return result},str:function(str,map){for(var i in map){if(typeof map[i]===OBJ_TYPE&&map[i].length>0){for(var j=0;j<map[i].length;j++){if(util.has(map[i][j],str)){return i===UNKNOWN?undefined:i}}}else if(util.has(map[i],str)){return i===UNKNOWN?undefined:i}}return str}};var maps={browser:{oldsafari:{major:{1:["/8","/1","/3"],2:"/4","?":"/"},version:{"1.0":"/8",1.2:"/1",1.3:"/3","2.0":"/412","2.0.2":"/416","2.0.3":"/417","2.0.4":"/419","?":"/"}}},device:{sprint:{model:{"Evo Shift 4G":"7373KT"},vendor:{HTC:"APA",Sprint:"Sprint"}}},os:{windows:{version:{ME:"4.90","NT 3.11":"NT3.51","NT 4.0":"NT4.0",2000:"NT 5.0",XP:["NT 5.1","NT 5.2"],Vista:"NT 6.0",7:"NT 6.1",8:"NT 6.2",RT:"ARM"}}}};var regexes={browser:[[/(opera\smini)\/((\d+)?[\w\.-]+)/i,/(opera\s[mobiletab]+).+version\/((\d+)?[\w\.-]+)/i,/(opera).+version\/((\d+)?[\w\.]+)/i,/(opera)[\/\s]+((\d+)?[\w\.]+)/i],[NAME,VERSION,MAJOR],[/\s(opr)\/((\d+)?[\w\.]+)/i],[[NAME,"Opera"],VERSION,MAJOR],[/(kindle)\/((\d+)?[\w\.]+)/i,/(lunascape|maxthon|netfront|jasmine|blazer)[\/\s]?((\d+)?[\w\.]+)*/i,/(avant\s|iemobile|slim|baidu)(?:browser)?[\/\s]?((\d+)?[\w\.]*)/i,/(?:ms|\()(ie)\s((\d+)?[\w\.]+)/i,/(rekonq)((?:\/)[\w\.]+)*/i,/(chromium|flock|rockmelt|midori|epiphany|silk|skyfire|ovibrowser|bolt|iron)\/((\d+)?[\w\.-]+)/i],[NAME,VERSION,MAJOR],[/(trident).+rv[:\s]((\d+)?[\w\.]+).+like\sgecko/i],[[NAME,"IE"],VERSION,MAJOR],[/(yabrowser)\/((\d+)?[\w\.]+)/i],[[NAME,"Yandex"],VERSION,MAJOR],[/(comodo_dragon)\/((\d+)?[\w\.]+)/i],[[NAME,/_/g," "],VERSION,MAJOR],[/(chrome|omniweb|arora|[tizenoka]{5}\s?browser)\/v?((\d+)?[\w\.]+)/i],[NAME,VERSION,MAJOR],[/(dolfin)\/((\d+)?[\w\.]+)/i],[[NAME,"Dolphin"],VERSION,MAJOR],[/((?:android.+)crmo|crios)\/((\d+)?[\w\.]+)/i],[[NAME,"Chrome"],VERSION,MAJOR],[/version\/((\d+)?[\w\.]+).+?mobile\/\w+\s(safari)/i],[VERSION,MAJOR,[NAME,"Mobile Safari"]],[/version\/((\d+)?[\w\.]+).+?(mobile\s?safari|safari)/i],[VERSION,MAJOR,NAME],[/webkit.+?(mobile\s?safari|safari)((\/[\w\.]+))/i],[NAME,[MAJOR,mapper.str,maps.browser.oldsafari.major],[VERSION,mapper.str,maps.browser.oldsafari.version]],[/(konqueror)\/((\d+)?[\w\.]+)/i,/(webkit|khtml)\/((\d+)?[\w\.]+)/i],[NAME,VERSION,MAJOR],[/(navigator|netscape)\/((\d+)?[\w\.-]+)/i],[[NAME,"Netscape"],VERSION,MAJOR],[/(swiftfox)/i,/(icedragon|iceweasel|camino|chimera|fennec|maemo\sbrowser|minimo|conkeror)[\/\s]?((\d+)?[\w\.\+]+)/i,/(firefox|seamonkey|k-meleon|icecat|iceape|firebird|phoenix)\/((\d+)?[\w\.-]+)/i,/(mozilla)\/((\d+)?[\w\.]+).+rv\:.+gecko\/\d+/i,/(uc\s?browser|polaris|lynx|dillo|icab|doris|amaya|w3m|netsurf|qqbrowser)[\/\s]?((\d+)?[\w\.]+)/i,/(links)\s\(((\d+)?[\w\.]+)/i,/(gobrowser)\/?((\d+)?[\w\.]+)*/i,/(ice\s?browser)\/v?((\d+)?[\w\._]+)/i,/(mosaic)[\/\s]((\d+)?[\w\.]+)/i],[NAME,VERSION,MAJOR]],cpu:[[/(?:(amd|x(?:(?:86|64)[_-])?|wow|win)64)[;\)]/i],[[ARCHITECTURE,"amd64"]],[/((?:i[346]|x)86)[;\)]/i],[[ARCHITECTURE,"ia32"]],[/windows\s(ce|mobile);\sppc;/i],[[ARCHITECTURE,"arm"]],[/((?:ppc|powerpc)(?:64)?)(?:\smac|;|\))/i],[[ARCHITECTURE,/ower/,"",util.lowerize]],[/(sun4\w)[;\)]/i],[[ARCHITECTURE,"sparc"]],[/(ia64(?=;)|68k(?=\))|arm(?=v\d+;)|(?:irix|mips|sparc)(?:64)?(?=;)|pa-risc)/i],[ARCHITECTURE,util.lowerize]],device:[[/\((ipad|playbook);[\w\s\);-]+(rim|apple)/i],[MODEL,VENDOR,[TYPE,TABLET]],[/(hp).+(touchpad)/i,/(kindle)\/([\w\.]+)/i,/\s(nook)[\w\s]+build\/(\w+)/i,/(dell)\s(strea[kpr\s\d]*[\dko])/i],[VENDOR,MODEL,[TYPE,TABLET]],[/\((ip[honed]+);.+(apple)/i],[MODEL,VENDOR,[TYPE,MOBILE]],[/(blackberry)[\s-]?(\w+)/i,/(blackberry|benq|palm(?=\-)|sonyericsson|acer|asus|dell|huawei|meizu|motorola)[\s_-]?([\w-]+)*/i,/(hp)\s([\w\s]+\w)/i,/(asus)-?(\w+)/i],[VENDOR,MODEL,[TYPE,MOBILE]],[/\((bb10);\s(\w+)/i],[[VENDOR,"BlackBerry"],MODEL,[TYPE,MOBILE]],[/android.+((transfo[prime\s]{4,10}\s\w+|eeepc|slider\s\w+))/i],[[VENDOR,"Asus"],MODEL,[TYPE,TABLET]],[/(sony)\s(tablet\s[ps])/i],[VENDOR,MODEL,[TYPE,TABLET]],[/(nintendo)\s([wids3u]+)/i],[VENDOR,MODEL,[TYPE,CONSOLE]],[/((playstation)\s[3portablevi]+)/i],[[VENDOR,"Sony"],MODEL,[TYPE,CONSOLE]],[/(sprint\s(\w+))/i],[[VENDOR,mapper.str,maps.device.sprint.vendor],[MODEL,mapper.str,maps.device.sprint.model],[TYPE,MOBILE]],[/(htc)[;_\s-]+([\w\s]+(?=\))|\w+)*/i,/(zte)-(\w+)*/i,/(alcatel|geeksphone|huawei|lenovo|nexian|panasonic|(?=;\s)sony)[_\s-]?([\w-]+)*/i],[VENDOR,[MODEL,/_/g," "],[TYPE,MOBILE]],[/\s((milestone|droid(?:[2-4x]|\s(?:bionic|x2|pro|razr))?(:?\s4g)?))[\w\s]+build\//i,/(mot)[\s-]?(\w+)*/i],[[VENDOR,"Motorola"],MODEL,[TYPE,MOBILE]],[/android.+\s((mz60\d|xoom[\s2]{0,2}))\sbuild\//i],[[VENDOR,"Motorola"],MODEL,[TYPE,TABLET]],[/android.+((sch-i[89]0\d|shw-m380s|gt-p\d{4}|gt-n8000|sgh-t8[56]9))/i],[[VENDOR,"Samsung"],MODEL,[TYPE,TABLET]],[/((s[cgp]h-\w+|gt-\w+|galaxy\snexus))/i,/(sam[sung]*)[\s-]*(\w+-?[\w-]*)*/i,/sec-((sgh\w+))/i],[[VENDOR,"Samsung"],MODEL,[TYPE,MOBILE]],[/(sie)-(\w+)*/i],[[VENDOR,"Siemens"],MODEL,[TYPE,MOBILE]],[/(maemo|nokia).*(n900|lumia\s\d+)/i,/(nokia)[\s_-]?([\w-]+)*/i],[[VENDOR,"Nokia"],MODEL,[TYPE,MOBILE]],[/android\s3\.[\s\w-;]{10}((a\d{3}))/i],[[VENDOR,"Acer"],MODEL,[TYPE,TABLET]],[/android\s3\.[\s\w-;]{10}(lg?)-([06cv9]{3,4})/i],[[VENDOR,"LG"],MODEL,[TYPE,TABLET]],[/((nexus\s4))/i,/(lg)[e;\s-\/]+(\w+)*/i],[[VENDOR,"LG"],MODEL,[TYPE,MOBILE]],[/(mobile|tablet);.+rv\:.+gecko\//i],[TYPE,VENDOR,MODEL]],engine:[[/(presto)\/([\w\.]+)/i,/(webkit|trident|netfront|netsurf|amaya|lynx|w3m)\/([\w\.]+)/i,/(khtml|tasman|links)[\/\s]\(?([\w\.]+)/i,/(icab)[\/\s]([23]\.[\d\.]+)/i],[NAME,VERSION],[/rv\:([\w\.]+).*(gecko)/i],[VERSION,NAME]],os:[[/(windows)\snt\s6\.2;\s(arm)/i,/(windows\sphone(?:\sos)*|windows\smobile|windows)[\s\/]?([ntce\d\.\s]+\w)/i],[NAME,[VERSION,mapper.str,maps.os.windows.version]],[/(win(?=3|9|n)|win\s9x\s)([nt\d\.]+)/i],[[NAME,"Windows"],[VERSION,mapper.str,maps.os.windows.version]],[/\((bb)(10);/i],[[NAME,"BlackBerry"],VERSION],[/(blackberry)\w*\/?([\w\.]+)*/i,/(tizen)\/([\w\.]+)/i,/(android|webos|palm\os|qnx|bada|rim\stablet\sos|meego)[\/\s-]?([\w\.]+)*/i],[NAME,VERSION],[/(symbian\s?os|symbos|s60(?=;))[\/\s-]?([\w\.]+)*/i],[[NAME,"Symbian"],VERSION],[/mozilla.+\(mobile;.+gecko.+firefox/i],[[NAME,"Firefox OS"],VERSION],[/(nintendo|playstation)\s([wids3portablevu]+)/i,/(mint)[\/\s\(]?(\w+)*/i,/(joli|[kxln]?ubuntu|debian|[open]*suse|gentoo|arch|slackware|fedora|mandriva|centos|pclinuxos|redhat|zenwalk)[\/\s-]?([\w\.-]+)*/i,/(hurd|linux)\s?([\w\.]+)*/i,/(gnu)\s?([\w\.]+)*/i],[NAME,VERSION],[/(cros)\s[\w]+\s([\w\.]+\w)/i],[[NAME,"Chromium OS"],VERSION],[/(sunos)\s?([\w\.]+\d)*/i],[[NAME,"Solaris"],VERSION],[/\s([frentopc-]{0,4}bsd|dragonfly)\s?([\w\.]+)*/i],[NAME,VERSION],[/(ip[honead]+)(?:.*os\s*([\w]+)*\slike\smac|;\sopera)/i],[[NAME,"iOS"],[VERSION,/_/g,"."]],[/(mac\sos\sx)\s?([\w\s\.]+\w)*/i],[NAME,[VERSION,/_/g,"."]],[/(haiku)\s(\w+)/i,/(aix)\s((\d)(?=\.|\)|\s)[\w\.]*)*/i,/(macintosh|mac(?=_powerpc)|plan\s9|minix|beos|os\/2|amigaos|morphos|risc\sos)/i,/(unix)\s?([\w\.]+)*/i],[NAME,VERSION]]};var UAParser=function(uastring){var ua=uastring||(window&&window.navigator&&window.navigator.userAgent?window.navigator.userAgent:EMPTY);if(!(this instanceof UAParser)){return new UAParser(uastring).getResult()}this.getBrowser=function(){return mapper.rgx.apply(this,regexes.browser)};this.getCPU=function(){return mapper.rgx.apply(this,regexes.cpu)};this.getDevice=function(){return mapper.rgx.apply(this,regexes.device)};this.getEngine=function(){return mapper.rgx.apply(this,regexes.engine)};this.getOS=function(){return mapper.rgx.apply(this,regexes.os)};this.getResult=function(){return{ua:this.getUA(),browser:this.getBrowser(),engine:this.getEngine(),os:this.getOS(),device:this.getDevice(),cpu:this.getCPU()}};this.getUA=function(){return ua};this.setUA=function(uastring){ua=uastring;return this};this.setUA(ua)};if(typeof exports!==UNDEF_TYPE){if(typeof module!==UNDEF_TYPE&&module.exports){exports=module.exports=UAParser}exports.UAParser=UAParser}else{window.UAParser=UAParser;if(typeof define===FUNC_TYPE&&define.amd){define('ua-parser',[],function(){return UAParser})}if(typeof window.jQuery!==UNDEF_TYPE){var $=window.jQuery;var parser=new UAParser;$.ua=parser.getResult();$.ua.get=function(){return parser.getUA()};$.ua.set=function(uastring){parser.setUA(uastring);var result=parser.getResult();for(var prop in result){$.ua[prop]=result[prop]}}}}})(this);
-/**
- * %%templateName directivesModuleTemplate.js %% Module.
- *
- * This is the directives angular module which
- * directives reference.
- */
-define('directivesModule',['angular', 'preprocess'], function(angular, p){
-    p.loadOrder('directivesModule')
-
-  angular.module('app.directivesModule', [])
-
-});
-/**
  * %%templateName providersModuleTemplate.js %% Module.
  *
  * This is the directives angular module which
  * directives reference.
  */
-define('providersModule',['angular', 'preprocess'], function (angular, p) {
-    p.loadOrder("providersModule");
+define('ipData',['angular', 'app'], function (angular, app) {
 
-    angular.module('app.providersModule', [])
-        .provider('api', function apiProvider() {
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("ipData")
+    }
 
-            var api;
+    angular.module('ftd.ip', [])
 
-            this.initApiService = function (config) {
-
-                console.log("initting Api Service")
-
-                var API = function (config) {
-                    this.initialConfig = config;
-                    this.somethingToDo;
-                }
-
-                API.prototype = {
-                    constructor: API,
-
-                    doSomething: function (somethingToDo) {
-                        this.somethingToDo = this.initialConfig + " Bar does " + somethingToDo;
-                        return this.initialConfig + "Bar does " + somethingToDo;
-                    },
-
-                    getSomething: function () {
-                        return this.somethingToDo;
-                    }
-
-
-                }
-
-                api = new API(config);
-
-            }
-
-            this.getApiService = function () {
-                return api;
-            }
-
-
-            this.$get = function ($q, $http) {
-                var self = this;
-                return {
-                    doSomething: function (somethingToDo) {
-                        return self.getApiService().doSomething(somethingToDo);
-                    },
-                    getSomething: function () {
-                        return self.getApiService().getSomething();
-                    }
-                }
-            }
-        })
         .provider('ip', function ipProvider() {
 
             this.$get = ['$q', '$http', function ($q, $http) {
 
                 var deferred = $q.defer();
 
-                $http.jsonp('http://ipinfo.io/?callback=JSON_CALLBACK')
+                $http.jsonp('http://ipinfo.io/?callback=JSON_CALLBACK', {cache:true})
                     .success(function (data) {
                         var ip = {};
                         ip.ip = data.ip;
@@ -22051,111 +22071,26 @@ define('providersModule',['angular', 'preprocess'], function (angular, p) {
             }]
         })
 
-    var D3MapsCache = function () {
-        this.usMap = null;
-        this.getStatesAbbr = null;
-        this.stateZipCodes = {};
-    }
-
-    D3MapsCache.prototype = {
-        constructor:D3MapsCache
-    }
-
-    angular.module('app.providersModule')
-        .service('D3MapsCache', D3MapsCache)
-        .provider('d3MapData', function () {
-
-            this.$get = ['$q', '$http', 'D3MapsCache', function ($q, $http, D3MapsCache) {
-
-                var getStatesAbbr = function (_state) {
-                    var deferred = $q.defer();
-
-                    if (D3MapsCache.getStatesAbbr != null) {
-                        if (D3MapsCache.getStatesAbbr[_state] != null) {
-                            deferred.resolve(D3MapsCache.getStatesAbbr[_state].toLowerCase());
-                        } else {
-                            deferred.reject("nostate");
-                        }
-
-                    } else {
-                        $http.get('app/data/data-dist-us-states-abbreviations/us-states-name-key.json')
-                            .then(function(result) {
-                                D3MapsCache.getStatesAbbr = result.data;
-                                if (_state != null) {
-                                    deferred.resolve(result.data[_state].toLowerCase());
-                                }
-                            }, function(error) {
-                                deferred.reject(error);
-                            });
-                    }
-
-                    return deferred.promise;
-                };
-
-                var getUsMap = function() {
-                    var deferred = $q.defer();
-
-                    if (D3MapsCache.usMap != null) {
-                        deferred.resolve(D3MapsCache.usMap);
-                    } else {
-                        $http.get("app/data/data-dist-topojson-us/2013/us/us-states-10m.json")
-                            .then(function(result) {
-                                console.log("states", result)
-                                D3MapsCache.usMap = result.data;
-                                deferred.resolve(result.data);
-                            });
-                    }
-
-                    return deferred.promise;
-                }
-
-                var urlPrefix = "app/data/data-dist-topojson-us/2013/us/states/zipcodes/";
-                var getStateZipCodes = function (name) {
-                    var deferred = $q.defer();
-
-                    if (D3MapsCache.stateZipCodes[name] != null) {
-                        deferred.resolve(D3MapsCache.stateZipCodes[name]);
-                    } else {
-                        getStatesAbbr(name).then(function (result) {
-                            var url = urlPrefix + result + "-zipcodes.json";
-                            $http.get(url).then(function(result) {
-                                D3MapsCache.stateZipCodes[name] = result.data;
-                                deferred.resolve(result.data);
-                            })
-                        }, function(error) {
-                            deferred.reject(error);
-                        })
-                    }
-
-                    return deferred.promise;
-                };
-
-
-                return {
-                    getStatesAbbr: getStatesAbbr,
-                    getUsMap:getUsMap,
-                    getStateZipCodes:getStateZipCodes
-                }
-
-            }]
-        })
 
 });
-define('indeed',['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "factoriesModule", "directivesModule", "providersModule"], function (angular, _, p, UAParser, $) {
-    p.loadOrder('indeed directive');
+define('ineedjobsData',['angular', 'underscore', 'app', 'ua-parser', 'ipData'], function (angular, _, app, UAParser) {
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("indeed data")
+    }
 
 
     window.INDEED_CALLBACK = function (data) {
         console.log("INDEED_CALLBACK NOT OVERWRITTEN BY FUNCTION");
-    }
+    };
 
 
     window.INDEED_DATA = function (data) {
         window.INDEED_CALLBACK.call(null, data);
-    }
+    };
 
 
-    angular.module('app.directivesModule')
+    angular.module('ftd.indeedJobsData', [])
         .provider('indeedData', function ipProvider() {
 
 
@@ -22175,7 +22110,7 @@ define('indeed',['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "
                     } else {
                         return paramsInstance;
                     }
-                }
+                };
 
                 var Params = function (indeedApiKey) {
                     this.baseUrl = "http://api.indeed.com/ads/apisearch";
@@ -22333,12 +22268,539 @@ define('indeed',['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "
 
             }]
         })
+
+});
+
+
+/**
+ * %%templateName factoriesModuleTemplate.js %% Module.
+ *
+ * This is the directives angular module which
+ * directives reference.
+ */
+define('zillowData',['angular', 'app'], function (angular, app) {
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("zillowData")
+    }
+    angular.module('ftd.zillowData', [])
+
+
+        .factory('ZillowGetRegionChildren', ['$q', '$http', "zillowApiKey", function ($q, $http, zillowApiKey) {
+
+
+            /**
+             * http://www.zillow.com/howto/api/GetRegionChildren.htm
+             *
+             * childtype = county, zipcode
+             * @type {{zws-id: *, state: null, childtype: string}}
+             */
+            var config = {
+                baseUrl: 'http://feelingthedata.com/app/php/zillowDataService.php',
+                params: {
+                    "url": "GetRegionChildren",
+                    "zws-id": zillowApiKey,
+                    "state": null,
+                    childtype: "county"
+                }
+            }
+
+            var getDataByState = function (state) {
+
+                config.params.state = state;
+
+                return $http.get(app.createSearchUrl(config), {cache: true});
+            };
+
+            return {
+                getDataByState: getDataByState
+            }
+
+        }])
+
+
+});
+/**
+ * %%templateName factoriesModuleTemplate.js %% Module.
+ *
+ * This is the directives angular module which
+ * directives reference.
+ */
+define('zmMashUp',['angular', 'app', 'underscore', 'zillowData', 'd3MapDataJS'], function (angular, app, _) {
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("zillowMapMU")
+    }
+    angular.module('ftd.zillowMapMU', [])
+
+
+    /**
+     *  Get date from:
+     *
+     *  ZillowGetRegionChildren factory
+     *  d3MapData.getStatesAbbr provider
+     *
+     *  returns promise
+     *
+     */
+        .factory('ZillowMapZipcodeMU', ['$q', 'ZillowGetRegionChildren', 'd3MapData', function ($q, ZillowGetRegionChildren, d3MapData) {
+
+            var getMashUpByState = function (state) {
+
+                return d3MapData.getStatesAbbr(state).then(function (stateAbbr) {
+
+                    return $q.all([
+                        ZillowGetRegionChildren.getDataByState(stateAbbr),
+                        d3MapData.getStateCounties(state)
+                    ])
+
+                }).then(function (mashedData) {
+
+                    var zillowMeta = app.calculate(mashedData[0].data.response.list.region,
+                        {
+//                            zeroData:true,
+                            key: "zindex",
+                            min: true,
+                            max: true
+                        });
+
+
+
+                    /**
+                     * Create reference object with keys as county name,
+                     * value as zindex
+                     */
+                    var zillowArrayToObject = {};
+                    _.each(mashedData[0].data.response.list.region, function(value, index, list) {
+
+                        if (value.zindex != undefined && value.zindex != null) {
+                            this[value.name.toString()] = value.zindex;
+                        } else {
+                            this[value.name.toString()] = 0;
+                        }
+
+
+                    }, zillowArrayToObject);
+
+                    return {
+                        zillow:{
+                            data:zillowArrayToObject,
+                            meta:zillowMeta
+                        },
+                        map:mashedData[1]
+                    }
+
+                })
+
+
+
+
+            };
+
+            return {
+                getMashUpByState: getMashUpByState
+            }
+
+        }])
+
+
+});
+/**
+ * %%templateName providersModuleTemplate.js %% Module.
+ *
+ * This is the directives angular module which
+ * directives reference.
+ */
+define('d3MapDataJS',['angular', 'app', 'd3', 'zmMashUp'], function (angular, app, d3) {
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("mapData")
+    };
+
+    angular.module('ftd.topojsonMapData', [])
+        .provider('d3MapData', function () {
+
+            this.$get = ['$q', '$http', function ($q, $http) {
+
+                var getStatesAbbr = function (_state) {
+                    var deferred = $q.defer();
+
+                        $http.get('app/data/data-dist-us-states-abbreviations/us-states-name-key.json', {cache:true})
+                            .then(function(result) {
+
+                                if (_state != null) {
+                                    deferred.resolve(result.data[_state].toLowerCase());
+                                } else {
+                                    deferred.reject('no state argument');
+                                }
+                            }, function(error) {
+                                deferred.reject(error);
+                            });
+
+
+                    return deferred.promise;
+                };
+
+                //TODO get state list to use underscore to prune other list
+                var getStates = function() {
+                    var deferred = $q.defer();
+
+                    $http.get('app/data/data-dist-us-states-abbreviations/us-states-name-key.json', {cache:true})
+                        .then(function(result) {
+                            deferred.resolve(result.data);
+                        }, function(error) {
+                            deferred.reject(error);
+                        });
+
+
+                    return deferred.promise;
+                }
+
+                /**
+                 * US map with states
+                 * @returns {*}
+                 */
+                var getUsMap = function() {
+                    var deferred = $q.defer();
+
+                    $http.get("app/data/data-dist-topojson-us/2013/us/us-states-10m.json", {cache:true})
+                        .then(function(result) {
+                            deferred.resolve(result.data);
+                        }, function(error) {
+                            deferred.reject(error);
+                        });
+
+
+                    return deferred.promise;
+                }
+
+                /**
+                 * Zip Codes by state
+                 * @type {string}
+                 */
+                var urlZipcodePrefix = "app/data/data-dist-topojson-us/2013/us/states/zipcodes/";
+                var getStateZipCodes = function (name) {
+                    var deferred = $q.defer();
+
+                    getStatesAbbr(name).then(function (result) {
+                        $http.get(urlZipcodePrefix + result + "-zipcodes.json", {cache:true}).then(function(result) {
+                            deferred.resolve(result.data);
+                        })
+                    }, function(error) {
+                        deferred.reject(error);
+                    })
+                    return deferred.promise;
+                };
+
+
+                /**
+                 * Counties
+                 * @type {string}
+                 */
+                var urlCountyPrefix = "app/data/data-dist-topojson-us/2013/us/states/counties/";
+                var getStateCounties = function (name) {
+                    var deferred = $q.defer();
+
+                    getStatesAbbr(name).then(function (result) {
+                        $http.get(urlCountyPrefix + result + "-counties.json", {cache:true}).then(function(result) {
+                            deferred.resolve(result.data);
+                        }, function(error) {
+                            deferred.reject(error);
+                        })
+                    }, function(error) {
+                        deferred.reject(error);
+                    });
+
+                    return deferred.promise;
+                };
+
+
+                return {
+                    getStatesAbbr: getStatesAbbr,
+                    getUsMap:getUsMap,
+                    getStateZipCodes:getStateZipCodes,
+                    getStateCounties:getStateCounties,
+                    getStates:getStates
+                }
+
+            }]
+        })
+
+});
+define('beaDataJs',['angular', 'underscore', 'app'], function (angular, _, app) {
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("bea")
+    }
+
+
+    angular.module('ftd.bea', [])
+        .provider('beaData', function ipProvider() {
+
+
+            this.$get = ['$q', '$http', "beaApiKey", function ($q, $http, beaApiKey) {
+
+
+                var dataSets = {
+                    RegionalData: 'RegionalData'
+                }
+
+                var KeyCodes = {
+
+                    //PerCapitaPersonalIncome
+                    PerCapitaPersonalIncome: "PCPI_CI",
+                    gdpByState: "GDP_SP"
+
+                }
+
+                var GeoFips = {
+                    state: 'STATE'
+                }
+
+
+                var config = {
+                    baseUrl: "http://www.bea.gov/api/data/",
+                    params: {
+                        UserId: beaApiKey,
+                        method: 'GetData',
+                        datasetname: dataSets.RegionalData,
+                        KeyCode: KeyCodes.PerCapitaPersonalIncome,
+                        GeoFIPS: GeoFips.state,
+                        ResultFormat: 'json'
+                    }
+
+                }
+
+
+                var gdpByState = function (year) {
+
+//                    console.log('gdpByState', year)
+
+                    var newConfig = angular.copy(config);
+                    newConfig.params.year = year;
+                    newConfig.params.KeyCode = KeyCodes.gdpByState;
+
+                    var deferred = $q.defer();
+
+                    $http.get(app.createSearchUrl(newConfig), {cache:true})
+                        .then(function(result) {
+//                            console.log(result);
+                            deferred.resolve(result);
+                        }, function(error) {
+//                            console.log(error);
+                            deferred.reject(error);
+                        });
+
+                    return deferred.promise;
+                };
+
+
+                return {
+                    gdpByState: gdpByState
+                }
+
+
+            }]
+        })
+
+});
+
+
+/**
+ * %%templateName factoriesModuleTemplate.js %% Module.
+ *
+ * This is the directives angular module which
+ * directives reference.
+ */
+define('MUUSMapGDPByState',['angular', 'app', 'underscore', 'd3MapDataJS', 'beaDataJs'], function (angular, app, _) {
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("MU USMapGDPByState")
+    }
+    angular.module('ftd.beaD3Map', [])
+
+
+    /**
+     *  Get date from:
+     *
+     *  ZillowGetRegionChildren factory
+     *  d3MapData.getStatesAbbr provider
+     *
+     *  returns promise
+     *
+     */
+        .factory('MUUSMapGDPByState', ['$q', 'd3MapData', 'beaData', function ($q, d3MapData, beaData) {
+
+            var UsGDPByState = function (year) {
+                var deferred = $q.defer();
+
+                $q.all([
+                    beaData.gdpByState(year),
+                    d3MapData.getUsMap(),
+                    d3MapData.getStates()
+
+                ]).then(function (mashedData) {
+
+                    var dataObject = mashedData[0].data.BEAAPI.Results.Data;
+
+                    var bea = {
+                        data: {}
+                    };
+
+                    /**
+                     * Get array of states only, dataset contains more than just states
+                     * @type {Array}
+                     */
+                    var valueRange = [];
+                    _.each(dataObject, function (value, index, list) {
+                        if (mashedData[2].hasOwnProperty(value.GeoName)) {
+                            valueRange.push(value.DataValue);
+                            this[value.GeoName] = value.DataValue
+                        }
+                    }, bea.data);
+
+
+                    bea.meta = app.calculate(valueRange, {
+                        min: true,
+                        max: true
+                    });
+
+
+                    deferred.resolve({
+                        bea: bea,
+                        map: mashedData[1]
+                    });
+                }, function (error) {
+                    console.log("MUUSMapGDPByState Error", error)
+                    deferred.reject(error);
+
+                });
+
+                return deferred.promise;
+            };
+
+            return {
+                UsGDPByState: UsGDPByState
+            }
+
+        }])
+
+
+});
+/**
+ * %%templateName controllersModuleTemplate.js %% Module.
+ *
+ * This is the directives angular module which
+ * directives reference.
+ */
+define('controllersModule',['angular', 'app'], function(angular, app){
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("controllersModule")
+    }
+
+  angular.module('ftd.controllersModule', []).
+      controller('MainAppController', ['$scope', function($scope) {
+
+      }])
+});
+/**
+ * %%templateName directivesModuleTemplate.js %% Module.
+ *
+ * This is the directives angular module which
+ * directives reference.
+ */
+define('directivesModule',['angular', 'app'], function(angular, app){
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("directivesModule")
+    }
+
+  angular.module('ftd.directivesModule', [])
+
+});
+/**
+ * %%templateName filtersModuleTemplate.js %% Module.
+ *
+ * This is the directives angular module which
+ * directives reference.
+ */
+define('filtersModule',['angular', 'app'], function(angular, app){
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("filtersModule")
+    }
+  angular.module('ftd.filtersModule', [])
+});
+define('indeed',['angular', 'underscore', 'app', 'ua-parser', "jquery", 'ineedjobsData'], function (angular, _, app, UAParser) {
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("indeed data")
+    }
+
+
+    // Please note that $modalInstance represents a modal window (instance) dependency.
+    // It is not the same as the $modal service used above.
+
+    var IndeedSearchModalInstanceCtrl = function ($scope, $modalInstance, indeedData) {
+
+
+        var parser = new UAParser();
+        $scope.ua = parser.getResult().browser.name;
+
+        $scope.ok = function () {
+//            $modalInstance.close($scope.selected.item);
+            if ($scope.indeedWhere == undefined || $scope.indeedWhere == null) {
+                $scope.indeedWhere = "";
+            }
+
+            indeedData.params().query($scope.indeedWhat);
+            indeedData.params().location($scope.indeedWhere);
+            indeedData.getData().then(function (results) {
+                console.log("results from indeed: ", results);
+            });
+
+            $modalInstance.close();
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    };
+
+
+
+    angular.module('ftd.indeedModule', [])
+        .controller('IndeedModalSearchCtrl', ['$scope', '$modal', '$log', 'indeedData', function($scope, $modal, $log, indeedData) {
+
+            $scope.open = function () {
+
+                var modalInstance = $modal.open({
+
+                    templateUrl: 'IndeedSearchModalContent.html',
+                    controller: IndeedSearchModalInstanceCtrl,
+                    resolve: {
+                        indeedData:function() {
+                            return indeedData;
+                        }
+
+                    }
+                });
+
+                modalInstance.result.then(function (selectedItem) {
+                    $scope.selected = selectedItem;
+                }, function () {
+                    $log.info('Modal dismissed at: ' + new Date());
+                });
+            };
+        }])
+
         .directive('indeedJobs', ['$compile', 'indeedData', function ($compile, indeedData) {
-            p.loadOrder('indeed jobs directive');
+
             return {
                 restrict: 'EA',
                 link: function ($scope, $element, $attr) {
-                    $scope.indeed = {what: "what", where: "where"};
+
+
 
                     var parser = new UAParser();
                     $scope.ua = parser.getResult().browser.name;
@@ -22346,11 +22808,20 @@ define('indeed',['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "
 
                     $scope.findJobs = function () {
 
-                        indeedData.params().query($scope.indeed.what);
-                        indeedData.params().location($scope.indeed.where);
-                        indeedData.getData().then(function (results) {
+
+
+//                        if ($scope.indeedWhere == undefined || $scope.indeedWhere == null) {
+//                            $scope.indeedWhere = "";
+//                        }
+//
+//                        console.log("what", $scope.indeedWhat)
+//                        console.log("where", $scope.indeedWhere);
+//
+//                        indeedData.params().query($scope.indeedWhat);
+//                        indeedData.params().location($scope.indeedWhere);
+//                        indeedData.getData().then(function (results) {
 //                            console.log("results from indeed: ", results);
-                        });
+//                        });
 
                     }
 
@@ -22359,15 +22830,42 @@ define('indeed',['angular', 'underscore', 'preprocess', 'ua-parser', "jquery", "
             };
 
         }])
-});
+ });
 
 
-define('d3Map',['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factoriesModule", "indeed"], function (angular, p, d3, topojson, _) {
-    p.loadOrder('d3-map directive');
-    p.log("d3 version: " + d3.version);
+define('d3Map',['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', 'zmMashUp'], function (angular, app, d3, topojson, _) {
+
+    if (app.cons().SHOW_LOAD_ORDER) {
+        console.log("d3-map directive")
+    }
+
+    var MapControlsService = function () {
+        this.zoomReset = false;
+        this.reset = function() {
+            this.zoomReset = true;
+        }
+
+        this.hideIndeedIconsToggle = false;
+        this.hideIndeedIcons = function() {
+            this.hideIndeedIconsToggle = true;
+        }
+    };
+
+    angular.module('ftd.directivesModule')
 
 
-    angular.module('app.directivesModule')
+        .service("MapControls", MapControlsService)
+
+        .controller('mapControlsController', ['$scope', "MapControls", function($scope, MapControls) {
+            $scope.reset = function() {
+                MapControls.reset();
+            }
+
+            $scope.hideIndeedIcons = function() {
+                MapControls.hideIndeedIcons();
+            }
+
+        }])
         .controller('WorldMapController', ['$scope', function ($scope) {
 
 //            console.log("data", $scope.data);
@@ -22389,378 +22887,470 @@ define('d3Map',['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factor
                 scope: {
                     geoData: '='
                 },
-                templateUrl: "app/ng/directives/d3-map/d3-map.html"
+                templateUrl: "app/ng/directives/d3-map/d3-map.html",
+                transclude:true
             }
         })
-        .directive('worldMap', ['$filter', '$timeout', 'indeedData', 'd3MapData', 'ZillowGetRegionChildren', function ($filter, $timeout, indeedData, d3MapData, ZillowGetRegionChildren) {
-            p.loadOrder('d3 directive');
-            return {
-                restrict: 'EA',
-                scope: {
-                    data: "=",
-                    label: "@",
-                    onClick: "&"
-                },
-                link: function ($scope, $element, $attr) {
+        .directive('usMap', ["MapControls", '$filter', '$timeout', 'indeedData', 'd3MapData', 'MUUSMapGDPByState', 'ZillowMapZipcodeMU',
+            function (MapControls, $filter, $timeout, indeedData, d3MapData, MUUSMapGDPByState, ZillowMapZipcodeMU) {
 
-                    //init service call
-                    d3MapData.getStatesAbbr();
+                return {
+                    restrict: 'EA',
+                    scope: {
+                        data: "=",
+                        label: "@",
+                        onClick: "&"
+                    },
+                    link: function ($scope, $element, $attr) {
 
-                    var svg = d3.select($element[0])
-                        .append("svg")
-                        .attr("width", "100%");
+                        //init service call
+//                    d3MapData.getStatesAbbr();
 
 
-                    // on window resize, re-render d3 canvas
-                    window.onresize = function () {
-                        return $scope.$apply();
-                    };
 
-                    $scope.$watch(function () {
-                            return angular.element(window)[0].innerWidth;
-                        }, function () {
-                            return $scope.render($scope.data);
-                        }
-                    );
+                        var svg = d3.select($element[0])
+                            .append("svg")
+                            .attr("width", "100%");
 
-                    // watch for data changes and re-render
-                    $scope.$watch('data', function (newVals, oldVals) {
-//                        console.log(newVals);
-                        return $scope.render(newVals);
-                    }, true);
+                        // on window resize, re-render d3 canvas
+                        window.onresize = function () {
+                            return $scope.$apply();
+                        };
 
-                    // watch for data changes and re-render
-                    $scope.indeedData = indeedData.params()
+                        //Watch for window reszie
+                        $scope.$watch(function () {
+                                return angular.element(window)[0].innerWidth;
+                            }, function () {
+                                return $scope.render($scope.data);
+                            }
+                        );
 
-                    //newVals is an array
-                    $scope.$watch('indeedData.indeedResults', function (newVals, oldVals) {
+                        // watch for data changes and re-render
+                        $scope.$watch('data', function (newVals, oldVals) {
+                            return $scope.render(newVals);
+                        }, true);
 
-                        $scope.renderCircles(newVals);
+                        //Watch for reset
+                        $scope.MapControls = MapControls;
+
+
+
+                        // watch for data changes and re-render
+                        $scope.indeedData = indeedData.params()
+
+                        //newVals is an array
+                        $scope.$watch('indeedData.indeedResults', function (newVals, oldVals) {
+
+                            $scope.renderCircles(newVals);
 //
-                    }, true);
+                        }, true);
 
-                    // define render function
-                    $scope.render = function (data) {
-                        // remove all previous items before render
-                        svg.selectAll("*").remove();
+                        // define render function
+                        $scope.render = function (data) {
+                            // remove all previous items before render
+                            svg.selectAll("*").remove();
 
-                        svg.on("click", stopped, true)
+                            svg.on("click", stopped, true);
 
-                        // setup variables
-                        var width, height, max;
-                        width = d3.select($element[0])[0][0].offsetWidth - 20;
+                            // setup variables
+                            var width, height, max;
+                            width = d3.select($element[0])[0][0].offsetWidth + 70;
 
-                        // 20 is for margins and can be changed
-                        height = 600;
-                        // 35 = 30(bar height) + 5(margin between bars)
-                        max = 98;
-                        // this can also be found dynamically when the data is not static
-                        // max = Math.max.apply(Math, _.map(data, ((val)-> val.count)))
+                            // 20 is for margins and can be changed
+//                            height = 600;
+                            height = 550;
+                            // 35 = 30(bar height) + 5(margin between bars)
+                            max = 98;
+                            // this can also be found dynamically when the data is not static
+                            // max = Math.max.apply(Math, _.map(data, ((val)-> val.count)))
 
-                        // set the height based on the calculations above
-                        svg.attr('height', "100%");
+                            // set the height based on the calculations above
+                            svg.attr('height', "100%");
 
-                        var active = d3.select(null);
+                            var active = d3.select(null);
 
-                        $scope.projection = d3.geo.albersUsa()
-                            .scale(1300)
-                            .translate([width / 2, height / 2]);
+                            $scope.projection = d3.geo.albersUsa()
+                                .scale(1100)
+                                .translate([width / 2, (height / 2) + 20]);
 
 
 //                        var coords = projection([d.lon, d.lat]);
 //                        var x = coords[0];
 //                        var y = coords[1];
 
-                        var zoom = d3.behavior.zoom()
-                            .translate([0, 0])
-                            .scale(1)
-                            .scaleExtent([1, 8])
-                            .on("zoom", zoomed);
+                            var zoom = d3.behavior.zoom()
+                                .translate([0, 0])
+                                .scale(1)
+                                .scaleExtent([1, 8])
+                                .on("zoom", zoomed);
 
-                        var path = d3.geo.path()
-                            .projection($scope.projection);
+
+
+                            var path = d3.geo.path()
+                                .projection($scope.projection);
 
 //                        var svg = d3.select("body").append("svg")
 //                            .attr("width", width)
 //                            .attr("height", height)
 //                            .on("click", stopped, true);
 
-                        svg.append("rect")
-                            .attr("class", "background")
-                            .attr("width", width)
-                            .attr("height", height)
-                            .on("click", resteState);
+                            svg.append("rect")
+                                .attr("class", "background")
+                                .attr("width", width)
+                                .attr("height", height)
+                                .on("click", resteState);
 
-                        var g = svg.append("g");
-                        g.attr("class", "nation-graphic");
-                        var z = svg.append("g"); //zipcodes
-                        z.attr("class", "zipcodes-graphic")
-                        var j = svg.append("g"); //Job circles
-                        j.attr("class", "jobs-graphic");
+                            var g = svg.append("g");
+                            g.attr("class", "nation-graphic");
+                            var z = svg.append("g"); //zipcodes
+                            z.attr("class", "zipcodes-graphic")
+                            var j = svg.append("g"); //Job circles
+                            j.attr("class", "jobs-graphic");
 
-                        svg.call(zoom) // delete this line to disable free zooming
-                            .call(zoom.event);
+                            svg.call(zoom) // delete this line to disable free zooming
+                                .call(zoom.event);
 
-                        d3MapData.getUsMap().then(function (us) {
+                            $scope.$watch('MapControls.zoomReset', function (newVals, oldVals) {
 
-                                g.selectAll("path")
-                                    .data(topojson.feature(us, us.objects.states).features)
-                                    .enter().append("path")
-                                    .attr("d", path)
-                                    .attr("class", "feature state")
-
-                                g.selectAll("path.state")
-                                    .on("click", stateClicked);
-
-                                g.append("path")
-                                    .datum(topojson.mesh(us, us.objects.states, function (a, b) {
-                                        return a !== b;
-                                    }))
-                                    .attr("class", "mesh")
-                                    .attr("d", path);
-
-                                $scope.renderCircles();
-
-                            }
-                        )
+                                if (newVals == true) {
+                                    svg.transition()
+                                        .duration(750)
+                                        .call(zoom.translate([0, 0]).scale(1).event);
 
 
-                        var stateZoomScale = {};
-
-
-
-                        function stateClicked(d) {
-
-                            console.log(d);
-
-                            d3MapData.getStatesAbbr(d.properties.name).then(function(stateAbbr) {
-                                console.log(stateAbbr);
-                                return ZillowGetRegionChildren.getDataByState(stateAbbr);
-
-                            }).then(function(zillowStateData) {
-                                console.log("data", zillowStateData);
-                            })
-
-                            z.selectAll('path')
-                                .transition()
-                                .duration(750)
-                                .style("opacity", 0);
-
-
-//                            console.log("evnt", event.pageX, event.pageY);
-
-                            function drawZipCodes() {
-                                z.selectAll('path').remove();
-
-                                d3MapData.getStateZipCodes(d.properties.name).then(function (zipCodeData) {
-
-                                    z.selectAll("path")
-                                        .data(topojson.feature(zipCodeData, zipCodeData.objects.zipcodes).features)
-                                        .enter().append("path")
-                                        .attr("d", path)
-                                        .attr("data", d.properties.name)
-                                        .attr("class", "feature")
-                                        .style("opacity", 0)
+                                    z.selectAll('path')
                                         .transition()
                                         .duration(750)
-//                                        .delay(750)
-                                        .style("opacity", 1);
+                                        .style("opacity", 0);
 
-                                    z.selectAll("path")
-                                        .on("click", zipCodeClicked);
+                                    $timeout(function(){
+                                        z.selectAll('path').remove();
+                                    }, 750)
 
-                                    z.append("path")
-                                        .datum(topojson.mesh(zipCodeData, zipCodeData.objects.zipcodes, function (a, b) {
+                                    $timeout(function() {
+                                        MapControls.zoomReset = false;
+                                    }, 100);
+
+
+                                }
+//
+                            }, true);
+
+                            $scope.$watch('MapControls.hideIndeedIconsToggle', function (newVals, oldVals) {
+
+                                console.log(newVals)
+
+                                if (newVals == true) {
+
+
+
+                                    j.selectAll("circle")
+                                        .transition()
+                                        .duration(750)
+                                        .style("opacity", 0);
+
+                                    $timeout(function(){
+                                        j.selectAll("circle").remove();
+                                        d3.selectAll(".popover-wrapper").remove();
+                                    }, 750)
+
+                                    $timeout(function() {
+                                        MapControls.hideIndeedIconsToggle = false;
+                                    }, 100);
+
+
+                                }
+//
+                            }, true);
+
+
+
+                            MUUSMapGDPByState.UsGDPByState('2012').then(function (result) {
+//                                    console.log('MUUSMapGDPByState', result);
+
+
+                                    var stateQantize = d3.scale.quantize()
+                                        .domain([result.bea.meta.min, result.bea.meta.max])
+                                        .range(d3.range(49).map(function (i) {
+                                            return 'q' + i + "-49";
+                                        }));
+
+                                    g.selectAll("path")
+                                        .data(topojson.feature(result.map, result.map.objects.states).features)
+                                        .enter().append("path")
+                                        .attr("class", function (d) {
+                                            var value;
+                                            if (!result.bea.data[d.properties.name]) {
+                                                value = result.bea.meta.min;
+                                            } else {
+                                                value = result.bea.data[d.properties.name]
+                                            }
+//                                            console.log(Number(value));
+                                            return stateQantize(Number(value)) + " state";
+                                        })
+                                        .attr("d", path);
+//                                    .attr("class", "feature state")
+
+                                    g.selectAll("path.state")
+                                        .on("click", stateClicked);
+
+                                    g.append("path")
+                                        .datum(topojson.mesh(result.map, result.map.objects.states, function (a, b) {
                                             return a !== b;
                                         }))
                                         .attr("class", "mesh")
-                                        .attr("d", path)
-                                        .style("opacity", 0)
-                                        .transition()
-                                        .duration(750)
-                                        .style("opacity", 1);
+                                        .attr("d", path);
+
+                                    $scope.renderCircles();
+
+                                }
+                            )
 
 
-                                }, function (error) { //Not a state
+                            var stateZoomScale = {};
+
+
+                            function stateClicked(d) {
+
+                                //TODO pull zipcode data when zoomed in
+                                //http://www.zillow.com/webservice/GetDemographics.htm?zws-id=X1-ZWz1dshk18nnyj_76gmj&zip=78723
+
+
+                                z.selectAll('path')
+                                    .transition()
+                                    .duration(750)
+                                    .style("opacity", 0);
+
+
+                                function drawZipCodes() {
+                                    z.selectAll('path').remove();
+
+//                                      //TODO replace with mashup
+                                    ZillowMapZipcodeMU.getMashUpByState(d.properties.name)
+                                        .then(function (mashData) {
+                                            console.log("mashed data", mashData);
+
+
+                                          var zipQuantize = d3.scale.quantize()
+                                                .domain([mashData.zillow.meta.min, mashData.zillow.meta.max]) //0 to 1 million
+                                                .range(d3.range(9).map(function (i) {
+//                                                        console.log("q" + i + "-9")
+                                                    return "q" + i + "-49";
+                                                }));
+
+                                            z.selectAll("path")
+                                                .data(topojson.feature(mashData.map, mashData.map.objects.counties).features)
+                                                .enter().append("path")
+                                                .attr("class", function (d) {
+                                                    var name = d.properties.name.replace(" Parish", "");
+                                                    name = name.replace(" County", "");
+//                                                    console.log(name, mashData.zillow.data)
+//                                                    console.log(quantize(rate));
+                                                    return zipQuantize(mashData.zillow.data[name]);
+                                                })
+                                                .attr("d", path)
+                                                .attr("data", d.properties.name)
+//                                                .attr("class", "feature")
+                                                .style("opacity", 0)
+                                                .transition()
+                                                .duration(750)
+//                                        .delay(750)
+                                                .style("opacity", 1);
+
+                                            z.selectAll("path")
+                                                .on("click", zipCodeClicked);
+
+                                            z.append("path")
+                                                .datum(topojson.mesh(mashData.map, mashData.map.objects.counties, function (a, b) {
+                                                    return a !== b;
+                                                }))
+                                                .attr("class", "mesh")
+                                                .attr("d", path)
+                                                .style("opacity", 0)
+                                                .transition()
+                                                .duration(750)
+                                                .style("opacity", 1);
+
+
+                                        }, function (error) { //Not a state
 //                                svg.on("click", stopped, true)
-                                    console.log("error", error)
+                                            console.log("error", error)
 
-                                    z.selectAll("path").remove();
-                                })
+                                            z.selectAll("path").remove();
+                                        })
+                                }
+
+                                $timeout(drawZipCodes, 750);
+
+                                if (active.node() === this) return resteState();
+                                active.classed("active", false);
+                                active = d3.select(this).classed("active", true);
+
+                                var bounds = path.bounds(d),
+                                    dx = bounds[1][0] - bounds[0][0],
+                                    dy = bounds[1][1] - bounds[0][1],
+                                    x = (bounds[0][0] + bounds[1][0]) / 2,
+                                    y = (bounds[0][1] + bounds[1][1]) / 2,
+                                    scale = .9 / Math.max(dx / width, dy / height),
+                                    translate = [width / 2 - scale * x, height / 2 - scale * y];
+
+                                stateZoomScale.bounds = bounds;
+                                stateZoomScale.dx = dx;
+                                stateZoomScale.dy = dy;
+                                stateZoomScale.x = x;
+                                stateZoomScale.y = y;
+                                stateZoomScale.scale = scale;
+                                stateZoomScale.translate = translate;
+
+                                svg.transition()
+                                    .duration(750)
+                                    .call(zoom.translate(translate).scale(scale).event);
+
+
                             }
 
-                            $timeout(drawZipCodes, 750);
 
-
-
-
-
-
-                            if (active.node() === this) return resteState();
-                            active.classed("active", false);
-                            active = d3.select(this).classed("active", true);
-
-                            var bounds = path.bounds(d),
-                                dx = bounds[1][0] - bounds[0][0],
-                                dy = bounds[1][1] - bounds[0][1],
-                                x = (bounds[0][0] + bounds[1][0]) / 2,
-                                y = (bounds[0][1] + bounds[1][1]) / 2,
-                                scale = .9 / Math.max(dx / width, dy / height),
-                                translate = [width / 2 - scale * x, height / 2 - scale * y];
-
-                            stateZoomScale.bounds = bounds;
-                            stateZoomScale.dx = dx;
-                            stateZoomScale.dy = dy;
-                            stateZoomScale.x = x;
-                            stateZoomScale.y = y;
-                            stateZoomScale.scale = scale;
-                            stateZoomScale.translate = translate;
-
-                            svg.transition()
-                                .duration(750)
-                                .call(zoom.translate(translate).scale(scale).event);
-                        }
-
-
-                        function zipCodeClicked(d) {
+                            function zipCodeClicked(d) {
 //                            console.log("zipCodeClicked", d)
 
-                            if (active.node() === this) return resetZipCode();
-                            active.classed("active", false);
-                            active = d3.select(this).classed("active", true);
+                                if (active.node() === this) return resetZipCode();
+                                active.classed("active", false);
+                                active = d3.select(this).classed("active", true);
 
-                            var bounds = path.bounds(d),
-                                dx = bounds[1][0] - bounds[0][0],
-                                dy = bounds[1][1] - bounds[0][1],
-                                x = (bounds[0][0] + bounds[1][0]) / 2,
-                                y = (bounds[0][1] + bounds[1][1]) / 2,
-                                scale = .9 / Math.max(dx / width, dy / height),
-                                translate = [width / 2 - scale * x, height / 2 - scale * y];
+                                var bounds = path.bounds(d),
+                                    dx = bounds[1][0] - bounds[0][0],
+                                    dy = bounds[1][1] - bounds[0][1],
+                                    x = (bounds[0][0] + bounds[1][0]) / 2,
+                                    y = (bounds[0][1] + bounds[1][1]) / 2,
+                                    scale = .9 / Math.max(dx / width, dy / height),
+                                    translate = [width / 2 - scale * x, height / 2 - scale * y];
 
-                            svg.transition()
-                                .duration(750)
-                                .call(zoom.translate(translate).scale(scale).event);
-                        }
+                                svg.transition()
+                                    .duration(750)
+                                    .call(zoom.translate(translate).scale(scale).event);
+                            }
 
-                        function resetZipCode() {
-                            active.classed("active", false);
-                            active = d3.select(null);
+                            function resetZipCode() {
+                                active.classed("active", false);
+                                active = d3.select(null);
 
-                            svg.transition()
-                                .duration(750)
-                                .call(zoom.translate(stateZoomScale.translate).scale(stateZoomScale.scale).event);
-                        }
-
-
-                        function resteState() {
-                            active.classed("active", false);
-                            active = d3.select(null);
-
-                            svg.transition()
-                                .duration(750)
-                                .call(zoom.translate([0, 0]).scale(1).event);
-                        }
-
-                        function zoomed() {
-                            //nation zoom
-                            g.style("stroke-width", 1.5 / d3.event.scale + "px");
-                            g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-
-                            //zipcodes zoom
-                            z.style("stroke-width", 1.5 / d3.event.scale + "px");
-                            z.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-
-                            //jobs zoom
-                            j.style("stroke-width", 1.5 / d3.event.scale + "px");
-                            j.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-
-                        }
-
-                        // If the drag behavior prevents the default click,
-                        // also stop propagation so we don’t click-to-zoom.
-                        function stopped() {
-                            if (d3.event.defaultPrevented) d3.event.stopPropagation();
-                        }
+                                svg.transition()
+                                    .duration(750)
+                                    .call(zoom.translate(stateZoomScale.translate).scale(stateZoomScale.scale).event);
+                            }
 
 
-                    };
+                            function resteState() {
+                                active.classed("active", false);
+                                active = d3.select(null);
+
+                                svg.transition()
+                                    .duration(750)
+                                    .call(zoom.translate([0, 0]).scale(1).event);
+                            }
+
+                            function zoomed() {
 
 
-                    $scope.renderCircles = function (data) {
+                                //nation zoom
+                                g.style("stroke-width", 1.5 / d3.event.scale + "px");
+                                g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 
-                        if (!data) {
-                            return;
-                        }
+                                //zipcodes zoom
+                                z.style("stroke-width", 1.5 / d3.event.scale + "px");
+                                z.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 
-                        var htmlFormatFactory = function (data) {
-                            var html = "";
+                                //jobs zoom
+                                j.style("stroke-width", 1.5 / d3.event.scale + "px");
+                                j.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 
-                            var date = Date(Date.parse(data.date));
+                            }
 
-                            //Header
-                            html += '<h3>' + data.jobtitle + '</h3>';
-                            html += '<p>' + data.company + '</p>';
-                            html += '<p>' + data.formattedLocation + '</p>';
-//                            html += '<p>' + Date(Date.parse(data.date)) + '</p>';
-                            html += '<p>' + $filter('date')(Date.parse(data.date), 'MMM d, y h:mm:ss a') + " " + date.substr(date.length - 5) + '</p>';
-                            html += '<p>' + data.snippet + '</p>';
-
-
-                            return html;
-                        }
-
-
-                        var popoverFactory = function (data, iter) {
-//                            console.log(data);
-
-                            d3.select("body")
-                                .append("div")
-                                .attr("id", "popover-" + iter)
-                                .attr("class", "popover-wrapper")
-                                .style("position", "absolute")
-                                .style("z-index", "10")
-                                .style("visibility", "hidden")
-
-
-                            d3.select("#popover-" + iter)
-                                .append("div")
-                                .attr("class", "d3-tip")
-                                .html(htmlFormatFactory(data))
-
-                            d3.select("#popover-" + iter)
-                                .append("div")
-                                .attr("class", "arrow-bottom")
+                            // If the drag behavior prevents the default click,
+                            // also stop propagation so we don’t click-to-zoom.
+                            function stopped() {
+                                if (d3.event.defaultPrevented) d3.event.stopPropagation();
+                            }
 
 
                         };
 
 
-                        var j = svg.select("g.jobs-graphic");
-                        j.selectAll("circle").remove();
-                        d3.selectAll(".popover-wrapper").remove();
+                        $scope.renderCircles = function (data) {
 
-                        var len = data.length, i = 0;
+                            if (!data) {
+                                return;
+                            }
 
-                        for (i; i < len; i++) {
-                            if (data[i].longitude && data[i].latitude) {
-                                popoverFactory(data[i], i)
+                            var htmlFormatFactory = function (data) {
+                                var html = "";
 
-                                j.append("circle")
-                                    .attr("cx", function (d) {
-                                        return $scope.projection([data[i].longitude, data[i].latitude ])[0];
-                                    })
-                                    .attr("cy", function (d) {
-                                        return $scope.projection([data[i].longitude, data[i].latitude])[1];
-                                    })
-                                    .attr("r", 2)
-                                    .attr("id", "c-" + i)
-                                    .style("fill", "red")
-                                    .on("mouseover", function () {
-                                        var id = "#popover-" + this.id.split("-")[1];
+                                var date = Date(Date.parse(data.date));
+
+                                //Header
+                                html += '<h3>' + data.jobtitle + '</h3>';
+                                html += '<p>' + data.company + '</p>';
+                                html += '<p>' + data.formattedLocation + '</p>';
+//                            html += '<p>' + Date(Date.parse(data.date)) + '</p>';
+                                html += '<p>' + $filter('date')(Date.parse(data.date), 'MMM d, y h:mm:ss a') + " " + date.substr(date.length - 5) + '</p>';
+                                html += '<p>' + data.snippet + '</p>';
+
+
+                                return html;
+                            }
+
+
+                            var popoverFactory = function (data, iter) {
+//                            console.log(data);
+
+                                d3.select("body")
+                                    .append("div")
+                                    .attr("id", "popover-" + iter)
+                                    .attr("class", "popover-wrapper")
+                                    .style("position", "absolute")
+                                    .style("z-index", "10")
+                                    .style("visibility", "hidden")
+
+
+                                d3.select("#popover-" + iter)
+                                    .append("div")
+                                    .attr("class", "d3-tip")
+                                    .html(htmlFormatFactory(data))
+
+                                d3.select("#popover-" + iter)
+                                    .append("div")
+                                    .attr("class", "arrow-bottom")
+
+
+                            };
+
+
+                            var j = svg.select("g.jobs-graphic");
+                            j.selectAll("circle").remove();
+                            d3.selectAll(".popover-wrapper").remove();
+
+                            var len = data.length, i = 0;
+
+                            for (i; i < len; i++) {
+                                if (data[i].longitude && data[i].latitude) {
+                                    popoverFactory(data[i], i)
+
+                                    j.append("circle")
+                                        .attr("cx", function (d) {
+                                            return $scope.projection([data[i].longitude, data[i].latitude ])[0];
+                                        })
+                                        .attr("cy", function (d) {
+                                            return $scope.projection([data[i].longitude, data[i].latitude])[1];
+                                        })
+                                        .attr("r", 2)
+                                        .attr("id", "c-" + i)
+                                        .style("fill", "red")
+                                        .on("mouseover", function () {
+                                            var id = "#popover-" + this.id.split("-")[1];
 //                                    var contentSelect = id + " > t3-tip";
-                                        var arrowSelect = id + " > arrow-bottom";
+                                            var arrowSelect = id + " > arrow-bottom";
 
-                                        d3.select(id).style("visibility", "visible")
+                                            d3.select(id).style("visibility", "visible")
 
 //                                    var padding = 20;
 //                                    var margin = 10;
@@ -22771,207 +23361,109 @@ define('d3Map',['angular', 'preprocess', 'd3', 'topojson', 'underscore', "factor
 //                                    console.log(this, event, d3.event);
 
 
-                                        var verticalOffset = $(id).height();
-                                        var horizontalOffset = $(id).width() / 2;
+                                            var verticalOffset = $(id).height();
+                                            var horizontalOffset = $(id).width() / 2;
 
-                                        d3.select(id).style("top", (event.pageY - verticalOffset) + "px").style("left", (event.pageX - horizontalOffset) + "px");
+                                            d3.select(id).style("top", (event.pageY - verticalOffset) + "px").style("left", (event.pageX - horizontalOffset) + "px");
 
-                                    })
-                                    .on("mouseout", function () {
-                                        var id = "#popover-" + this.id.split("-")[1];
-                                        return d3.select(id).style("visibility", "hidden");
-                                    });
+                                        })
+                                        .on("mouseout", function () {
+                                            var id = "#popover-" + this.id.split("-")[1];
+                                            return d3.select(id).style("visibility", "hidden");
+                                        });
+                                }
                             }
+
+
                         }
-
-
                     }
-                }
-            };
+                };
 
-        }])
+            }])
 });
-
-/**
- * %%templateName mockApiModuleTemplate.js %% Module.
- *
- * This is the directives angular module which
- * directives reference.
- */
-define('apiModule',['angular', 'preprocess'], function(angular, p){
-    p.loadOrder("apiModule preprocess");
-  angular.module('app.apiModule', [])
-});
-/**
- * %%templateName controllersModuleTemplate.js %% Module.
- *
- * This is the directives angular module which
- * directives reference.
- */
-define('controllersModule',['angular', 'preprocess'], function(angular, p){
-    p.loadOrder('controllersModule');
-
-  angular.module('app.controllersModule', []).
-      controller('MainAppController', ['$scope', function($scope) {
-          p.loadOrder('MainAppController');
-      }])
-});
-/**
- * %%templateName constantsModuleTemplate.js %% Module.
- *
- * This is the directives angular module which
- * directives reference.
- */
-define('constantsModule',['angular', 'preprocess'], function(angular, p){
-    p.loadOrder("constantsModule");
-  angular.module('app.constantsModule', [])
-});
-/**
- * %%templateName filtersModuleTemplate.js %% Module.
- *
- * This is the directives angular module which
- * directives reference.
- */
-define('filtersModule',['angular', 'preprocess'], function(angular, p){
-    p.loadOrder("filtersModule")
-  angular.module('app.filtersModule', [])
-});
-/**
- * %%templateName mockApiModuleTemplate.js %% Module.
- *
- * This is the directives angular module which
- * directives reference.
- */
-define('mockApiModule',['angular', 'preprocess'], function(angular, p){
-    p.loadOrder("mockApiModule");
-  angular.module('app.mockApiModule', [])
-});
-/**
- * %%templateName routesModuleTemplate.js %% Module.
- *
- * This is the directives angular module which
- * directives reference.
- */
-define('routesModule',['angular', 'preprocess'], function(angular, p){
-    p.loadOrder("routesModule");
-  angular.module('app.routesModule', [])
-});
-/**
- * %%templateName servicesModuleTemplate.js %% Module.
- *
- * This is the directives angular module which
- * directives reference.
- */
-define('servicesModule',['angular', 'preprocess'], function(angular, p){
-    p.loadOrder('servicesModule')
-  angular.module('app.servicesModule', []).
-    value('version', '0.1');
-});
-define('customDirective',['angular', 'preprocess'], function (angular, p) {
-    p.loadOrder('customDirective')
-
-    angular.module('app.directivesModule')
-        .directive('customDirective', function () {
-            p.loadOrder('customDirective directive');
-            return {
-//                require: '^AnswerController',
-                restrict: 'AE',
-                replace: false,
-                scope: {
-                    buttonValue: '@label'
-                },
-                controller: ['$scope', '$element', '$attrs', '$transclude',  function ($scope, $element, $attrs, $transclude) {
-
-
-
-                }],
-                templateUrl: 'app/ng/directives/customDirective/customDirective.html'
-            }
-        });
-});
-
 
 require.config(
-    {"baseUrl": "app/",
-        "paths": {
-            'preprocess': "preprocess",
-            "angular": "vendors/angular-1.2.14/angular",
-            "angularanimate": "vendors/angular-1.2.14/angular-animate.min",
-            "uirouter": "vendors/uirouter-0.2.8/angular-ui-router.min",
-            "angular-route": "vendors/angular-1.2.14/angular-route.min",
-//            "restangular": "vendors/restangular-1.3.1/restangular.min",
-            "underscore": "vendors/underscore-1.6.0/underscore-min",
-            "domReady": "vendors/requirejs-domready-2.0.1/domReady",
-            'ua-parser': "vendors/ua-parser-js-0.6.2/ua-parser.min",
-            "jquery": "vendors/jquery-2.1.0/jquery.min",
-            "bootstrap":"vendors/",
-            "uibootstrap": "vendors/angular-ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.min",
-            "d3": "vendors/d3-3.4.4/d3.min",
-            "topojson": "vendors/d3-3.4.4/topojson",
-            "ngConfig": "ng/configRoutes",
-            "apiModule": "ng/api/apiModule",
-            "constantsModule": "ng/constants/constantsModule",
-            "controllersModule": "ng/controllers/controllersModule",
-            "directivesModule": "ng/directives/directivesModule",
-            "factoriesModule": "ng/factories/factoriesModule",
-            "filtersModule": "ng/filters/filtersModule",
-            "mockApiModule": "ng/mockApi/mockApiModule",
-            "providersModule": "ng/providers/providersModule",
-            "routesModule": "ng/routes/routesModule",
-            "servicesModule": "ng/services/servicesModule",
-            "customDirective": "ng/directives/customDirective/customDirective",
-            "indeed": "ng/directives/indeedSearchForm/indeedSearchForm",
-            "d3Map": "ng/directives/d3-map/d3-map"
+    {'baseUrl': 'app/',
+        'paths': {
+
+            'app': 'preprocess',
+
+            'angular': 'vendors/angular-1.2.14/angular',
+            'angularanimate': 'vendors/angular-1.2.14/angular-animate.min',
+            'uirouter': 'vendors/uirouter-0.2.8/angular-ui-router.min',
+            'angular-route': 'vendors/angular-1.2.14/angular-route.min',
+            'underscore': 'vendors/underscore-1.6.0/underscore-min',
+            'domReady': 'vendors/requirejs-domready-2.0.1/domReady',
+            'ua-parser': 'vendors/ua-parser-js-0.6.2/ua-parser.min',
+            'jquery': 'vendors/jquery-2.1.0/jquery.min',
+//            'bootstrap':'vendors/bootstrap-3.1.1/js/bootstrap.min',
+            'uibootstrap': 'vendors/angular-ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.min',
+            'd3': 'vendors/d3-3.4.4/d3.min',
+            'topojson': 'vendors/d3-3.4.4/topojson',
+
+            'ineedjobsData': 'ng/data/indeedJobs',
+            'ipData': 'ng/data/ipData',
+            'd3MapDataJS': 'ng/data/d3MapData',
+            'zillowData': 'ng/data/zillowData',
+            'beaDataJs': 'ng/data/bea',
+
+            'zmMashUp': 'ng/dataMashUp/zillowMapMU',
+            'MUUSMapGDPByState': 'ng/dataMashUp/MUUSMapGDPByState',
+
+
+            'ngConfig': 'ng/configRoutes',
+            'controllersModule': 'ng/controllers/controllersModule',
+            'directivesModule': 'ng/directives/directivesModule',
+            'filtersModule': 'ng/filters/filtersModule',
+//            'customDirective': 'ng/directives/customDirective/customDirective',
+            'indeed': 'ng/directives/indeedSearchForm/indeedSearchForm',
+            'd3Map': 'ng/directives/d3-map/d3-map'
         },
-        "shim": {
+        'shim': {
 
 
-            'preprocess': {
-                "exports": "p",
-                "deps":["d3"]
+            'app': {
+                'exports': 'p',
+                'deps': ['d3']
             },
             'domReady': {
-                "deps": ['ngConfig']
+                'deps': ['ngConfig']
             },
-            "uirouter": {
-                "deps": ["angular"]
+            'uirouter': {
+                'deps': ['angular']
             },
-            "angularanimate": {
-                "deps": ["angular"]
+            'angularanimate': {
+                'deps': ['angular']
             },
-            "angular": {
-                "deps": ["jquery"],
-                "exports": "angular"
+            'angular': {
+                'deps': ['jquery'],
+                'exports': 'angular'
             },
-            "angular-mocks": {
-                "deps": ["angular"]
+            'angular-mocks': {
+                'deps': ['angular']
             },
-            "angular-resource": {
-                "deps": ["angular"]
+            'angular-resource': {
+                'deps': ['angular']
             },
-            "angular-route": {
-                "deps": ["angular"]
+            'angular-route': {
+                'deps': ['angular']
             },
 
-            "underscore": {
-                "exports": "_"
+            'underscore': {
+                'exports': '_'
             },
-//            "restangular": {
-//                "deps": ["angular", "underscore"]
+//            'bootstrap':{
+//              'deps':['jquery']
 //            },
-            "uibootstrap": {
-                "deps": ["angular"]
+
+            'uibootstrap': {
+                'deps': ['angular']
             },
 
-//            "ngConfig": {
-//                "deps": [
-//                    "uibootstrap",
-//                    'restangular'
-//                ]
-//            }
-            "ngConfig": {
-                "deps": [
-                    "uibootstrap"
+            'ngConfig': {
+                'deps': [
+                    'uibootstrap',
+                    'app'
                 ]
             }
 
@@ -22985,36 +23477,38 @@ require.config(
  */
 require([
         'domReady',
-        "ngConfig",
-        "angular",
-        "angular-route",
-        "angularanimate",
-        "underscore",
-//        "restangular",
-        "uibootstrap",
-        "uirouter",
-        "d3",
-        "topojson",
-        "d3Map",
-        "apiModule",
-        "controllersModule",
-        "constantsModule",
-        "directivesModule",
-        "factoriesModule",
-        "filtersModule",
-        "mockApiModule",
-        "providersModule",
-        "providersModule",
-        "routesModule",
-        "servicesModule",
-        "indeed",
-        'ua-parser',
-        "customDirective"
+        'angular',
+        'angularanimate',
+        'uirouter',
+        'angular-route',
+        'underscore',
 
+        'ua-parser',
+        'jquery',
+        'uibootstrap',
+        'd3',
+        'topojson',
+
+        'ineedjobsData',
+        'ipData',
+        'd3MapDataJS',
+        'zillowData',
+        'beaDataJs',
+
+        'zmMashUp',
+        'MUUSMapGDPByState',
+
+        'ngConfig',
+        'controllersModule',
+        'directivesModule',
+        'filtersModule',
+//    'customDirective',
+        'indeed',
+        'd3Map'
     ],
     function (document, angular) {
 
-        angular.bootstrap(document, ['app']);
+        angular.bootstrap(document, ['ftd']);
 
     });
 define("requirejs-config", function(){});
