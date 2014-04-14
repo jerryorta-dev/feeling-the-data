@@ -39,6 +39,10 @@ define(['angular', 'app', 'underscore', 'd3MapDataJS', 'beaDataJs'], function (a
                         data: {}
                     };
 
+                    /**
+                     * Get array of states only, dataset contains more than just states
+                     * @type {Array}
+                     */
                     var valueRange = [];
                     _.each(dataObject, function (value, index, list) {
                         if (mashedData[2].hasOwnProperty(value.GeoName)) {
@@ -48,7 +52,10 @@ define(['angular', 'app', 'underscore', 'd3MapDataJS', 'beaDataJs'], function (a
                     }, bea.data);
 
 
-                    bea.meta = app.calculate(valueRange, null, "min", "max");
+                    bea.meta = app.calculate(valueRange, {
+                        min: true,
+                        max: true
+                    });
 
 
                     deferred.resolve({

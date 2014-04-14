@@ -15,7 +15,6 @@ define(['angular', 'app'], function (angular, app) {
         .factory('ZillowGetRegionChildren', ['$q', '$http', "zillowApiKey", function ($q, $http, zillowApiKey) {
 
 
-
             /**
              * http://www.zillow.com/howto/api/GetRegionChildren.htm
              *
@@ -23,7 +22,7 @@ define(['angular', 'app'], function (angular, app) {
              * @type {{zws-id: *, state: null, childtype: string}}
              */
             var config = {
-                baseUrl:'http://feelingthedata.com/app/php/zillowDataService.php',
+                baseUrl: 'http://feelingthedata.com/app/php/zillowDataService.php',
                 params: {
                     "url": "GetRegionChildren",
                     "zws-id": zillowApiKey,
@@ -36,13 +35,7 @@ define(['angular', 'app'], function (angular, app) {
 
                 config.params.state = state;
 
-                return $http.get(app.createSearchUrl(config), {cache:true})
-                    .then(function(result) {
-
-                        result.meta = app.calculate(result.data.response.list.region, "zindex", "min", "max");
-
-                        return result
-                    });
+                return $http.get(app.createSearchUrl(config), {cache: true});
             };
 
             return {

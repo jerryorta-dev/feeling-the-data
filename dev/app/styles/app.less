@@ -3,7 +3,7 @@
 @import "app-mixins";
 
 body {
-  color: white;
+//  color: white;
   #gradient > .vertical(@start-color: #004d73; @end-color: #001b37);
   background-color: #131313;
 }
@@ -15,6 +15,7 @@ input[type = "text"] {
 .content {
   width: 100%;
   height: 100%;
+  min-height: 900px;
   padding:20px;
 
 }
@@ -54,13 +55,13 @@ input[type = "text"] {
     }
 
     &-description {
-        color:#fff;
+//        color:#fff;
     }
 }
 
 #indeed_at {
-    padding-top:20px;
-    color: white;
+//    padding-top:20px;
+//    color: white;
     text-decoration: none;
     /*& a {
         color: white;
@@ -94,40 +95,6 @@ input[type = "text"] {
 
 }
 
-/*
-.zipcodes {
-  fill: #ccc;
-  fill-opacity: 0.6;
-  stroke: #bbb;
-  stroke-width: 1px;
-}
-
-.zipcodes:hover {
-  fill: #bbb;
-  stroke: #999;
-}
-
-.zipcodes.clickable:hover {
-  cursor: pointer;
-}
-*/
-
-//.states {
-//  fill: none;
-//  stroke: #fff;
-//  stroke-linejoin: round;
-//}
-
-//.q0-9 { fill:rgb(247,251,255); }
-//.q1-9 { fill:rgb(222,235,247); }
-//.q2-9 { fill:rgb(198,219,239); }
-//.q3-9 { fill:rgb(158,202,225); }
-//.q4-9 { fill:rgb(107,174,214); }
-//.q5-9 { fill:rgb(66,146,198); }
-//.q6-9 { fill:rgb(33,113,181); }
-//.q7-9 { fill:rgb(8,81,156); }
-//.q8-9 { fill:rgb(8,48,107); }
-
 circle {
   fill: #ccc;
   fill-opacity: 0.6;
@@ -150,11 +117,6 @@ circle.clickable:hover {
   shape-rendering: crispedges;
 }
 
-//.popover {
-//  color:#333;
-//}
-
-
 .test {
     color:greem;
 }
@@ -164,5 +126,34 @@ circle.clickable:hover {
 .generate-color-steps(49, 0, #baa30c);
 //.generate-color-steps(49, 26, #8f1b08);
 
+.map-container {
+  padding:0;
+  height:650px;
+  margin-bottom: 20px;
+  border: 1px solid @well-border;
+  border-radius: @border-radius-large;
+  .box-shadow(inset 0 1px 1px rgba(0,0,0,.05));
+  blockquote {
+    border-color: #ddd;
+    border-color: rgba(0,0,0,.15);
+  }
 
 
+
+}
+
+.map-controls {
+  position: relative;
+  top: -652px;
+  width: 109px;
+  height: 117px;
+  background-color: #001b37;
+  padding: 5px;
+//  border: 1px solid @well-border;
+  border: 1px solid #001b37;
+  border-radius: @border-radius-large;
+
+  & .map-reset {
+    width:72px;
+  }
+}

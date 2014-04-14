@@ -23,13 +23,13 @@ define(["jquery", "underscore"], function () {
 
     })();
 
-    PreProcessor.prototype.cons = function() {
-      return {
-          SHOW_CONSOLE_LOG: constant('SHOW_CONSOLE_LOG'), //Turn off all console.logs
-          SHOW_LOAD_ORDER: constant('SHOW_LOAD_ORDER'), //Turn off all console.logs
-          VERSION: constant('VERSION'),
-          TYPE: constant('TYPE')
-      }
+    PreProcessor.prototype.cons = function () {
+        return {
+            SHOW_CONSOLE_LOG: constant('SHOW_CONSOLE_LOG'), //Turn off all console.logs
+            SHOW_LOAD_ORDER: constant('SHOW_LOAD_ORDER'), //Turn off all console.logs
+            VERSION: constant('VERSION'),
+            TYPE: constant('TYPE')
+        }
     };
 
 
@@ -58,7 +58,7 @@ define(["jquery", "underscore"], function () {
         return this.getBasePath() + path;
     };
 
-    PreProcessor.prototype.pluck = function(data, key) {
+    PreProcessor.prototype.pluck = function (data, key) {
         if (key) {
             return _.pluck(data, key);
         }
@@ -66,16 +66,16 @@ define(["jquery", "underscore"], function () {
         return data;
     }
 
-    PreProcessor.prototype.min = function(data, key) {
+    PreProcessor.prototype.min = function (data, key) {
         return _.min(this.pluck(data, key));
     };
 
-    PreProcessor.prototype.max = function(data, key) {
-         return _.max(this.pluck(data, key));
+    PreProcessor.prototype.max = function (data, key) {
+        return _.max(this.pluck(data, key));
     };
 
-    PreProcessor.prototype.sum = function(data, key) {
-        return _.reduce(this.pluck(data, key), function(memo, num){
+    PreProcessor.prototype.sum = function (data, key) {
+        return _.reduce(this.pluck(data, key), function (memo, num) {
             return memo + num;
         }, 0);
     };
@@ -88,23 +88,26 @@ define(["jquery", "underscore"], function () {
 
         var values = this.pluck(data, key);
 
-        values.sort( function(a,b) {return a - b;} );
+        values.sort(function (a, b) {
+            return a - b;
+        });
 
-        var half = Math.floor(values.length/2);
+        var half = Math.floor(values.length / 2);
 
-        if(values.length % 2)
+        if (values.length % 2)
             return values[half];
         else
-            return (values[half-1] + values[half]) / 2.0;
+            return (values[half - 1] + values[half]) / 2.0;
     };
 
 
-    PreProcessor.prototype.calculate = function(data, key) {
+    PreProcessor.prototype.calculate = function (data, config) {
 
 
-        var _rawData = this.pluck(data, key);
+        var _rawData = this.pluck(data, config.key);
 
         var _data = [];
+
 
         /**
          * Clean up data.
@@ -113,12 +116,17 @@ define(["jquery", "underscore"], function () {
          *
          * if number is a string, convert to a number
          */
-        _.each(_rawData, function(value, index, list) {
+        _.each(_rawData, function (value, index, list) {
             if (value != null && value != undefined) {
+
                 if (typeof value === 'string') {
                     this.push(Number(value));
                 } else {
                     this.push(value);
+                }
+            } else {
+                if (config.zeroData) {
+                    list[index] = 0;
                 }
             }
 
@@ -128,24 +136,31 @@ define(["jquery", "underscore"], function () {
 
         var calc = {};
 
-        if (_.contains(arguments, 'min')) {
+        if (config.min) {
             calc.min = this.min(_data);
         }
 
-        if (_.contains(arguments, 'max')) {
+        if (config.max) {
             calc.max = this.max(_data);
         }
 
-        if (_.contains(arguments, 'average')) {
+        if (config.average) {
             calc.average = this.average(_data);
         }
 
-        if (_.contains(arguments, 'median')) {
+        if (config.median) {
             calc.median = this.median(_data);
         }
 
-        if (_.contains(arguments, 'sum')) {
+        if (config.sum) {
             calc.sum = this.sum(_data);
+        }
+
+        if (config.zeroData) {
+           return {
+               data:_rawData,
+               meta:calc
+           }
         }
 
         return calc;
@@ -194,7 +209,8 @@ define(["jquery", "underscore"], function () {
         return singletonInstance;
     }
 
-    //Return API
+//Return API
     return getPreProcessor();
 
-});
+})
+;

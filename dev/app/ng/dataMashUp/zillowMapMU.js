@@ -4,7 +4,7 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['angular', 'app', 'zillowData', 'd3MapDataJS'], function (angular, app) {
+define(['angular', 'app', 'underscore', 'zillowData', 'd3MapDataJS'], function (angular, app, _) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("zillowMapMU")
@@ -34,10 +34,36 @@ define(['angular', 'app', 'zillowData', 'd3MapDataJS'], function (angular, app) 
 
                 }).then(function (mashedData) {
 
+                    var zillowMeta = app.calculate(mashedData[0].data.response.list.region,
+                        {
+//                            zeroData:true,
+                            key: "zindex",
+                            min: true,
+                            max: true
+                        });
+
+
+
+                    /**
+                     * Create reference object with keys as county name,
+                     * value as zindex
+                     */
+                    var zillowArrayToObject = {};
+                    _.each(mashedData[0].data.response.list.region, function(value, index, list) {
+
+                        if (value.zindex != undefined && value.zindex != null) {
+                            this[value.name.toString()] = value.zindex;
+                        } else {
+                            this[value.name.toString()] = 0;
+                        }
+
+
+                    }, zillowArrayToObject);
+
                     return {
                         zillow:{
-                            data:mashedData[0].data.response.list.region,
-                            meta:mashedData[0].meta
+                            data:zillowArrayToObject,
+                            meta:zillowMeta
                         },
                         map:mashedData[1]
                     }

@@ -3,10 +3,34 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("d3-map directive")
     }
-    app.log("d3 version: " + d3.version);
 
+    var MapControlsService = function () {
+        this.zoomReset = false;
+        this.reset = function() {
+            this.zoomReset = true;
+        }
+
+        this.hideIndeedIconsToggle = false;
+        this.hideIndeedIcons = function() {
+            this.hideIndeedIconsToggle = true;
+        }
+    };
 
     angular.module('ftd.directivesModule')
+
+
+        .service("MapControls", MapControlsService)
+
+        .controller('mapControlsController', ['$scope', "MapControls", function($scope, MapControls) {
+            $scope.reset = function() {
+                MapControls.reset();
+            }
+
+            $scope.hideIndeedIcons = function() {
+                MapControls.hideIndeedIcons();
+            }
+
+        }])
         .controller('WorldMapController', ['$scope', function ($scope) {
 
 //            console.log("data", $scope.data);
@@ -28,11 +52,12 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
                 scope: {
                     geoData: '='
                 },
-                templateUrl: "app/ng/directives/d3-map/d3-map.html"
+                templateUrl: "app/ng/directives/d3-map/d3-map.html",
+                transclude:true
             }
         })
-        .directive('worldMap', ['$filter', '$timeout', 'indeedData', 'd3MapData', 'MUUSMapGDPByState', 'ZillowMapZipcodeMU',
-            function ($filter, $timeout, indeedData, d3MapData, MUUSMapGDPByState, ZillowMapZipcodeMU) {
+        .directive('usMap', ["MapControls", '$filter', '$timeout', 'indeedData', 'd3MapData', 'MUUSMapGDPByState', 'ZillowMapZipcodeMU',
+            function (MapControls, $filter, $timeout, indeedData, d3MapData, MUUSMapGDPByState, ZillowMapZipcodeMU) {
 
                 return {
                     restrict: 'EA',
@@ -47,6 +72,7 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
 //                    d3MapData.getStatesAbbr();
 
 
+
                         var svg = d3.select($element[0])
                             .append("svg")
                             .attr("width", "100%");
@@ -56,6 +82,7 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
                             return $scope.$apply();
                         };
 
+                        //Watch for window reszie
                         $scope.$watch(function () {
                                 return angular.element(window)[0].innerWidth;
                             }, function () {
@@ -65,9 +92,13 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
 
                         // watch for data changes and re-render
                         $scope.$watch('data', function (newVals, oldVals) {
-//                        console.log(newVals);
                             return $scope.render(newVals);
                         }, true);
+
+                        //Watch for reset
+                        $scope.MapControls = MapControls;
+
+
 
                         // watch for data changes and re-render
                         $scope.indeedData = indeedData.params()
@@ -88,10 +119,11 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
 
                             // setup variables
                             var width, height, max;
-                            width = d3.select($element[0])[0][0].offsetWidth - 20;
+                            width = d3.select($element[0])[0][0].offsetWidth + 70;
 
                             // 20 is for margins and can be changed
-                            height = 600;
+//                            height = 600;
+                            height = 550;
                             // 35 = 30(bar height) + 5(margin between bars)
                             max = 98;
                             // this can also be found dynamically when the data is not static
@@ -103,8 +135,8 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
                             var active = d3.select(null);
 
                             $scope.projection = d3.geo.albersUsa()
-                                .scale(1300)
-                                .translate([width / 2, height / 2]);
+                                .scale(1100)
+                                .translate([width / 2, (height / 2) + 20]);
 
 
 //                        var coords = projection([d.lon, d.lat]);
@@ -116,6 +148,8 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
                                 .scale(1)
                                 .scaleExtent([1, 8])
                                 .on("zoom", zoomed);
+
+
 
                             var path = d3.geo.path()
                                 .projection($scope.projection);
@@ -140,6 +174,60 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
 
                             svg.call(zoom) // delete this line to disable free zooming
                                 .call(zoom.event);
+
+                            $scope.$watch('MapControls.zoomReset', function (newVals, oldVals) {
+
+                                if (newVals == true) {
+                                    svg.transition()
+                                        .duration(750)
+                                        .call(zoom.translate([0, 0]).scale(1).event);
+
+
+                                    z.selectAll('path')
+                                        .transition()
+                                        .duration(750)
+                                        .style("opacity", 0);
+
+                                    $timeout(function(){
+                                        z.selectAll('path').remove();
+                                    }, 750)
+
+                                    $timeout(function() {
+                                        MapControls.zoomReset = false;
+                                    }, 100);
+
+
+                                }
+//
+                            }, true);
+
+                            $scope.$watch('MapControls.hideIndeedIconsToggle', function (newVals, oldVals) {
+
+                                console.log(newVals)
+
+                                if (newVals == true) {
+
+
+
+                                    j.selectAll("circle")
+                                        .transition()
+                                        .duration(750)
+                                        .style("opacity", 0);
+
+                                    $timeout(function(){
+                                        j.selectAll("circle").remove();
+                                        d3.selectAll(".popover-wrapper").remove();
+                                    }, 750)
+
+                                    $timeout(function() {
+                                        MapControls.hideIndeedIconsToggle = false;
+                                    }, 100);
+
+
+                                }
+//
+                            }, true);
+
 
 
                             MUUSMapGDPByState.UsGDPByState('2012').then(function (result) {
@@ -205,30 +293,25 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
 //                                      //TODO replace with mashup
                                     ZillowMapZipcodeMU.getMashUpByState(d.properties.name)
                                         .then(function (mashData) {
-//                                            console.log("mashed data", mashData);
+                                            console.log("mashed data", mashData);
 
 
-                                            var rateById = d3.map();
-
-
-                                            var quantize = d3.scale.quantize()
+                                          var zipQuantize = d3.scale.quantize()
                                                 .domain([mashData.zillow.meta.min, mashData.zillow.meta.max]) //0 to 1 million
                                                 .range(d3.range(9).map(function (i) {
 //                                                        console.log("q" + i + "-9")
-                                                    return "q" + i + "-9";
+                                                    return "q" + i + "-49";
                                                 }));
 
                                             z.selectAll("path")
                                                 .data(topojson.feature(mashData.map, mashData.map.objects.counties).features)
                                                 .enter().append("path")
                                                 .attr("class", function (d) {
-//                                                    console.log(d);
-                                                    var rate = rateById.get(d.properties.name.split(" ")[0].toLowerCase());
-//                                                    console.log(rate);
-                                                    rate = (rate != undefined) ? rate : 0;
-
+                                                    var name = d.properties.name.replace(" Parish", "");
+                                                    name = name.replace(" County", "");
+//                                                    console.log(name, mashData.zillow.data)
 //                                                    console.log(quantize(rate));
-                                                    return quantize(rate);
+                                                    return zipQuantize(mashData.zillow.data[name]);
                                                 })
                                                 .attr("d", path)
                                                 .attr("data", d.properties.name)
@@ -242,16 +325,16 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
                                             z.selectAll("path")
                                                 .on("click", zipCodeClicked);
 
-//                                            z.append("path")
-//                                                .datum(topojson.mesh(mashData.map, mashData.map.objects.counties, function (a, b) {
-//                                                    return a !== b;
-//                                                }))
-//                                                .attr("class", "mesh")
-//                                                .attr("d", path)
-//                                                .style("opacity", 0)
-//                                                .transition()
-//                                                .duration(750)
-//                                                .style("opacity", 1);
+                                            z.append("path")
+                                                .datum(topojson.mesh(mashData.map, mashData.map.objects.counties, function (a, b) {
+                                                    return a !== b;
+                                                }))
+                                                .attr("class", "mesh")
+                                                .attr("d", path)
+                                                .style("opacity", 0)
+                                                .transition()
+                                                .duration(750)
+                                                .style("opacity", 1);
 
 
                                         }, function (error) { //Not a state
@@ -332,6 +415,8 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
                             }
 
                             function zoomed() {
+
+
                                 //nation zoom
                                 g.style("stroke-width", 1.5 / d3.event.scale + "px");
                                 g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
