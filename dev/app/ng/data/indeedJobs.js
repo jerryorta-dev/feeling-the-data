@@ -164,6 +164,7 @@ define(['angular', 'underscore', 'app', 'ua-parser', 'ipData'], function (angula
                             getParams().results(data.results);
                         }
 
+                        console.log(getParams().jsonp());
 
                         $http.jsonp(getParams().jsonp());
 
