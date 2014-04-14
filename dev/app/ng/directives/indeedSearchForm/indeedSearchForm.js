@@ -10,7 +10,9 @@ define(['angular', 'underscore', 'app', 'ua-parser', "jquery", 'ineedjobsData'],
 
     var IndeedSearchModalInstanceCtrl = function ($scope, $modalInstance, indeedData) {
 
-        $scope.indeed = {what:null, where:null};
+        $scope.indeed = {
+            what:indeedData.params().query(),
+            where:indeedData.params().location()};
 
         var parser = new UAParser();
         $scope.ua = parser.getResult().browser.name;

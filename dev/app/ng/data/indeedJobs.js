@@ -88,14 +88,26 @@ define(['angular', 'underscore', 'app', 'ua-parser', 'ipData'], function (angula
 
 
                     query: function (q) {
-//                        console.log("what", q);
-                        this.indeedparams.q = encodeURIComponent(q);
+
+                        if (q != null) {
+                            this.indeedparams.q = encodeURIComponent(q);
+                            return;
+                        }
+
+                        return decodeURIComponent(this.indeedparams.q);
+
 
                     },
 
                     location: function (l) {
 //                        console.log("where", l);
-                        this.indeedparams.l = encodeURIComponent(l);
+                        if (l != null) {
+                            this.indeedparams.l = encodeURIComponent(l);
+                            return;
+                        }
+
+                        return decodeURIComponent(this.indeedparams.l);
+
 
                     },
 
