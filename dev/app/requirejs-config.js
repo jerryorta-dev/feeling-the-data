@@ -23,11 +23,11 @@ require.config(
             'loadFileBea': 'ng/data/bea',
 
             'loadFileZillowMapMU': 'ng/dataMashUp/zillowMapMU',
-            'MUUSMapGDPByState': 'ng/dataMashUp/MUUSMapGDPByState',
+            'LoadFileMUUSMapGDPByState': 'ng/dataMashUp/MUUSMapGDPByState',
 
 
-            'ngConfig': 'ng/configRoutes',
-            'controllersModule': 'ng/controllers/controllersModule',
+            'loadFileConfigRoutes': 'ng/configRoutes',
+            'loadFileControllersModule': 'ng/controllers/controllersModule',
             'JobMarketResults': 'ng/controllers/JobMarketResultsController',
             'directivesModule': 'ng/directives/directivesModule',
             'filtersModule': 'ng/filters/filtersModule',
@@ -43,7 +43,7 @@ require.config(
                 'deps': ['loadFileD3']
             },
             'loadFileDomReady': {
-                'deps': ['ngConfig']
+                'deps': ['loadFileConfigRoutes']
             },
             'loadFileUiRouter': {
                 'deps': ['loadFileAngular']
@@ -76,7 +76,7 @@ require.config(
                 'deps': ['loadFileAngular']
             },
 
-            'ngConfig': {
+            'loadFileConfigRoutes': {
                 'deps': [
                     'loadFileUiBootstrap',
                     'loadFilePreprocess'
@@ -112,10 +112,10 @@ require([
         'loadFileBea',
 
         'loadFileZillowMapMU',
-        'MUUSMapGDPByState',
+        'LoadFileMUUSMapGDPByState',
 
-        'ngConfig',
-        'controllersModule',
+        'loadFileConfigRoutes',
+        'loadFileControllersModule',
         'directivesModule',
         'filtersModule',
         'JobMarketResults',
