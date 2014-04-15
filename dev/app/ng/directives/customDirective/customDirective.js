@@ -1,4 +1,4 @@
-define(['angular', 'app'], function (angular, app) {
+define(['loadFileAngular', 'app'], function (angular, app) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("customDirective")

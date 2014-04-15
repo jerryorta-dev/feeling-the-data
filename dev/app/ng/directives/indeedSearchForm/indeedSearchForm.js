@@ -1,4 +1,4 @@
-define(['angular', 'underscore', 'app', 'ua-parser', "jquery", 'ineedjobsData'], function (angular, _, app, UAParser) {
+define(['loadFileAngular', 'underscore', 'app', 'ua-parser', "jquery", 'ineedjobsData'], function (angular, _, app, UAParser) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("indeed data")

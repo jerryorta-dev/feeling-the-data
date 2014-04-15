@@ -4,7 +4,7 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['angular', 'app', 'underscore', 'zillowData', 'd3MapDataJS'], function (angular, app, _) {
+define(['loadFileAngular', 'app', 'underscore', 'zillowData', 'd3MapDataJS'], function (angular, app, _) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("zillowMapMU")

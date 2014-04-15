@@ -1,4 +1,4 @@
-define(['angular', 'underscore', 'app'], function (angular, _, app) {
+define(['loadFileAngular', 'underscore', 'app'], function (angular, _, app) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("bea")
