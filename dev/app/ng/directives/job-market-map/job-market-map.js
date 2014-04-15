@@ -1,7 +1,7 @@
 define(['loadFileAngular', 'loadFilePreprocess', 'loadFileD3', 'loadFileTopoJson', 'loadFileUnderscore', 'LoadFileMUUSMapGDPByState', 'loadFileZillowMapMU'], function (angular, app, d3, topojson, _) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
-        console.log("d3-map directive")
+        console.log("job-market-map directive")
     }
 
     var MapControlsService = function () {
@@ -46,17 +46,17 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileD3', 'loadFileTopoJson
             $scope.title = "World Map";
 
         }])
-        .directive('d3Map', function () {
+        .directive('jobMarketMap', function () {
             return {
                 restrict: 'EA',
                 scope: {
                     geoData: '='
                 },
-                templateUrl: "app/ng/directives/d3-map/d3-map.html",
+                templateUrl: "app/ng/directives/job-market-map/job-market-map.html",
                 transclude:true
             }
         })
-        .directive('usMap', ["MapControls", '$filter', '$timeout', 'indeedData', 'd3MapData', 'MUUSMapGDPByState', 'ZillowMapZipcodeMU',
+        .directive('jobMarketMapGraphic', ["MapControls", '$filter', '$timeout', 'indeedData', 'd3MapData', 'MUUSMapGDPByState', 'ZillowMapZipcodeMU',
             function (MapControls, $filter, $timeout, indeedData, d3MapData, MUUSMapGDPByState, ZillowMapZipcodeMU) {
 
                 return {

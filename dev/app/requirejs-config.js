@@ -31,9 +31,8 @@ require.config(
             'loadFileJobMarketResultsController': 'ng/controllers/JobMarketResultsController',
             'loadFileDirectivesModule': 'ng/directives/directivesModule',
             'loadFileFiltersModule': 'ng/filters/filtersModule',
-//            'customDirective': 'ng/directives/customDirective/customDirective',
-            'indeed': 'ng/directives/indeedSearchForm/indeedSearchForm',
-            'd3Map': 'ng/directives/d3-map/d3-map'
+            'loadFileIndeedSearchForm': 'ng/directives/indeedSearchForm/indeedSearchForm',
+            'loadFileJobMarketMap': 'ng/directives/job-market-map/job-market-map'
         },
         'shim': {
 
@@ -120,8 +119,8 @@ require([
         'loadFileFiltersModule',
         'loadFileJobMarketResultsController',
 //    'customDirective',
-        'indeed',
-        'd3Map'
+        'loadFileIndeedSearchForm',
+        'loadFileJobMarketMap'
     ],
     function (document, angular) {
 

@@ -25,5 +25,5 @@ app/ng/controllers/controllersModule.js
 app/ng/directives/directivesModule.js
 app/ng/filters/filtersModule.js
 app/ng/directives/indeedSearchForm/indeedSearchForm.js
-app/ng/directives/d3-map/d3-map.js
+app/ng/directives/d3-map/job-market-map.js
 app/requirejs-config.js
