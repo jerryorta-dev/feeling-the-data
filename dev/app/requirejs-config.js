@@ -18,7 +18,7 @@ require.config(
 
             'loadFileIndeedJobs': 'ng/data/indeedJobs',
             'loadFileIpData': 'ng/data/ipData',
-            'd3MapDataJS': 'ng/data/d3MapData',
+            'loadFileD3MapData': 'ng/data/d3MapData',
             'zillowData': 'ng/data/zillowData',
             'beaDataJs': 'ng/data/bea',
 
@@ -107,7 +107,7 @@ require([
 
         'loadFileIndeedJobs',
         'loadFileIpData',
-        'd3MapDataJS',
+        'loadFileD3MapData',
         'zillowData',
         'beaDataJs',
 

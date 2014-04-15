@@ -4,7 +4,7 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'd3MapDataJS', 'beaDataJs'], function (angular, app, _) {
+define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFileD3MapData', 'beaDataJs'], function (angular, app, _) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("MU USMapGDPByState")
