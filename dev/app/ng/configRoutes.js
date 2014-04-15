@@ -20,7 +20,8 @@ define(['loadFileAngular', 'loadFilePreprocess'], function (angular, app) {
             'ftd.ip',
             'ftd.topojsonMapData',
             'ftd.bea',
-            'ftd.jobMarketsResultsModule']
+            'ftd.jobMarketsResultsModule',
+            'ftd.parsingCache']
     );
 
     angular.module("ftd")

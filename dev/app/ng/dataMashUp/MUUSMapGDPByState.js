@@ -4,7 +4,7 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFileD3MapData', 'loadFileBea'], function (angular, app, _) {
+define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFileParsingCache', 'loadFileD3MapData', 'loadFileBea'], function (angular, app, _) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("MU USMapGDPByState")
@@ -12,85 +12,6 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFile
 
 
     angular.module('ftd.beaD3Map', [])
-
-
-    /**
-     * Cache the results of the mash-up;
-     */
-        .provider('MUUSMapGDPByStateParsingCache', function MUUSMapGDPByStateParsingCacheProvider() {
-            this.$get = ['$q', function ($q) {
-
-                /**
-                 * Variable to cache data.
-                 *
-                 * You can only call getResult() to retrieve this value as a promise;
-                 * @type {null}
-                 */
-                this.mashupResult = null;
-
-                /**
-                 * Lots of data has been called through $http,
-                 * and parsing through all this data is taking considerable time.
-                 * In the meantime, prevent additional service calls to
-                 * retrieve and parse the data again ( controllers have
-                 * repeated calls ).
-                 * @type {boolean}
-                 */
-                this.parseInProgress = false;
-
-                /**
-                 * Callback function called when parsing is complete --
-                 * $http ajax call and all data iterations (parsing)
-                 * are complete.
-                 * @type {null}
-                 */
-                this.onParseComplete = null;
-
-                /**
-                 * $http call and parsing are complete, cache the data,
-                 * call the callback function.
-                 * @param value
-                 */
-                var setResult = function (value) {
-                    this.mashupResult = value;
-                    if (this.onParseComplete != null) {
-                        this.onParseComplete.call(null, value);
-                    }
-                };
-
-                /**
-                 * Check if this.mashupResult already has data,
-                 * if so, return it as a promise, if not, create
-                 * a callback function to return data once parsing
-                 * is complete.
-                 *
-                 * @returns {*}
-                 */
-                var getResult = function () {
-                    var deferred = $q.defer();
-
-                    if (this.mashupResult != null) {
-                        deferred.resolve(this.mashupResult);
-                    } else {
-                        this.onParseComplete = function (result) {
-                            deferred.resolve(result);
-                        };
-                    }
-                    return deferred.promise;
-                };
-
-                /**
-                 * Api to set and get stuff.
-                 */
-                return {
-                    parseInProgress: this.parseInProgress,
-                    setResult: setResult,
-                    getResult: getResult
-                }
-
-
-            }]
-        })
 
 
     /**
@@ -105,7 +26,7 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFile
         .provider('MUUSMapGDPByState', function MUUSMapGDPByStateProvider() {
 
 
-            this.$get = ['$q', 'd3MapData', 'beaData', 'MUUSMapGDPByStateParsingCache', function ($q, d3MapData, beaData, DataCache) {
+            this.$get = ['$q', 'd3MapData', 'beaData', 'parsingCache', function ($q, d3MapData, beaData, parsingCache) {
 
                 var UsGDPByState = function (year, config) {
                     var deferred = $q.defer();
@@ -118,10 +39,10 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFile
 //                    console.log('flush', flush);
 //                    console.log('MUUSMapGDPByStateCache.mashupResult', MUUSMapGDPByStateCache.mashupResult)
 
-                    if (DataCache.parseInProgress && !flush) {
-                        return DataCache.getResult();
+                    if (parsingCache.get('MUUSMapGDPByState').parseInProgress && !flush) {
+                        return parsingCache.get('MUUSMapGDPByState').getResult();
                     } else {
-                        DataCache.parseInProgress = true;
+                        parsingCache.get('MUUSMapGDPByState').parseInProgress = true;
 
                         $q.all([
                             beaData.gdpByState(year),
@@ -163,7 +84,7 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFile
                              * Cache the result
                              * @type {{bea: {data: {}}, map: *}}
                              */
-                            DataCache.setResult(result);
+                            parsingCache.get('MUUSMapGDPByState').setResult(result);
 
                             deferred.resolve(result);
 

@@ -8,7 +8,7 @@ define(["jquery", "underscore"], function () {
 
         var constants = {
             SHOW_CONSOLE_LOG: true, //Turn off all console.logs
-            SHOW_LOAD_ORDER: false, //Turn off all console.logs
+            SHOW_LOAD_ORDER: true, //Turn off all console.logs
             VERSION: 1.0,
             TYPE: 'app'
         };

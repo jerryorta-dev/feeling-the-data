@@ -3,6 +3,8 @@ require.config(
         'paths': {
 
             'loadFilePreprocess': 'preprocess',
+            'loadFileConfigRoutes': 'ng/configRoutes',
+            'loadFileParsingCache':'ng/dataParsers/parserCache',
 
             'loadFileAngular': 'vendors/angular-1.2.14/angular',
             'loadFileAngularAnimate': 'vendors/angular-1.2.14/angular-animate.min',
@@ -25,8 +27,6 @@ require.config(
             'loadFileZillowMapMU': 'ng/dataMashUp/zillowMapMU',
             'LoadFileMUUSMapGDPByState': 'ng/dataMashUp/MUUSMapGDPByState',
 
-
-            'loadFileConfigRoutes': 'ng/configRoutes',
             'loadFileControllersModule': 'ng/controllers/controllersModule',
             'loadFileJobMarketResultsController': 'ng/controllers/JobMarketResultsController',
             'loadFileDirectivesModule': 'ng/directives/directivesModule',
@@ -98,6 +98,8 @@ require([
         'loadFileAngularRoute',
         'loadFileUnderscore',
 
+        'loadFileParsingCache',
+
         'loadFileUaParser',
         'loadFileJQuery',
         'loadFileUiBootstrap',
@@ -118,7 +120,6 @@ require([
         'loadFileDirectivesModule',
         'loadFileFiltersModule',
         'loadFileJobMarketResultsController',
-//    'customDirective',
         'loadFileIndeedSearchForm',
         'loadFileJobMarketMap'
     ],
