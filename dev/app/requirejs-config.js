@@ -12,8 +12,7 @@ require.config(
             'loadFileDomReady': 'vendors/requirejs-domready-2.0.1/domReady',
             'loadFileUaParser': 'vendors/ua-parser-js-0.6.2/ua-parser.min',
             'loadFileJQuery': 'vendors/jquery-2.1.0/jquery.min',
-//            'bootstrap':'vendors/bootstrap-3.1.1/js/bootstrap.min',
-            'uibootstrap': 'vendors/angular-ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.min',
+            'loadFileUiBootstrap': 'vendors/angular-ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.min',
             'loadFileD3': 'vendors/d3-3.4.4/d3.min',
             'topojson': 'vendors/d3-3.4.4/topojson',
 
@@ -73,13 +72,13 @@ require.config(
 //              'deps':['loadFileJQuery']
 //            },
 
-            'uibootstrap': {
+            'loadFileUiBootstrap': {
                 'deps': ['loadFileAngular']
             },
 
             'ngConfig': {
                 'deps': [
-                    'uibootstrap',
+                    'loadFileUiBootstrap',
                     'loadFilePreprocess'
                 ]
             }
@@ -102,7 +101,7 @@ require([
 
         'loadFileUaParser',
         'loadFileJQuery',
-        'uibootstrap',
+        'loadFileUiBootstrap',
         'loadFileD3',
         'topojson',
 
