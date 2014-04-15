@@ -5,11 +5,11 @@ require.config(
             'app': 'preprocess',
 
             'loadFileAngular': 'vendors/angular-1.2.14/angular',
-            'angularanimate': 'vendors/angular-1.2.14/angular-animate.min',
-            'uirouter': 'vendors/uirouter-0.2.8/angular-ui-router.min',
-            'angular-route': 'vendors/angular-1.2.14/angular-route.min',
+            'loadFileAngularAnimate': 'vendors/angular-1.2.14/angular-animate.min',
+            'loadFileUiRouter': 'vendors/uirouter-0.2.8/angular-ui-router.min',
+            'loadFileAngularRoute': 'vendors/angular-1.2.14/angular-route.min',
             'underscore': 'vendors/underscore-1.6.0/underscore-min',
-            'domReady': 'vendors/requirejs-domready-2.0.1/domReady',
+            'loadFileDomReady': 'vendors/requirejs-domready-2.0.1/domReady',
             'ua-parser': 'vendors/ua-parser-js-0.6.2/ua-parser.min',
             'loadFileJQuery': 'vendors/jquery-2.1.0/jquery.min',
 //            'bootstrap':'vendors/bootstrap-3.1.1/js/bootstrap.min',
@@ -43,13 +43,13 @@ require.config(
                 'exports': 'p',
                 'deps': ['loadFileD3']
             },
-            'domReady': {
+            'loadFileDomReady': {
                 'deps': ['ngConfig']
             },
-            'uirouter': {
+            'loadFileUiRouter': {
                 'deps': ['loadFileAngular']
             },
-            'angularanimate': {
+            'loadFileAngularAnimate': {
                 'deps': ['loadFileAngular']
             },
             'loadFileAngular': {
@@ -62,7 +62,7 @@ require.config(
             'angular-resource': {
                 'deps': ['loadFileAngular']
             },
-            'angular-route': {
+            'loadFileAngularRoute': {
                 'deps': ['loadFileAngular']
             },
 
@@ -93,11 +93,11 @@ require.config(
  * DO NOT INCLUDE ANGULAR CONFIG FILE -- ngConfig
  */
 require([
-        'domReady',
+        'loadFileDomReady',
         'loadFileAngular',
-        'angularanimate',
-        'uirouter',
-        'angular-route',
+        'loadFileAngularAnimate',
+        'loadFileUiRouter',
+        'loadFileAngularRoute',
         'underscore',
 
         'ua-parser',
