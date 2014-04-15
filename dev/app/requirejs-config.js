@@ -28,9 +28,9 @@ require.config(
 
             'loadFileConfigRoutes': 'ng/configRoutes',
             'loadFileControllersModule': 'ng/controllers/controllersModule',
-            'JobMarketResults': 'ng/controllers/JobMarketResultsController',
-            'directivesModule': 'ng/directives/directivesModule',
-            'filtersModule': 'ng/filters/filtersModule',
+            'loadFileJobMarketResultsController': 'ng/controllers/JobMarketResultsController',
+            'loadFileDirectivesModule': 'ng/directives/directivesModule',
+            'loadFileFiltersModule': 'ng/filters/filtersModule',
 //            'customDirective': 'ng/directives/customDirective/customDirective',
             'indeed': 'ng/directives/indeedSearchForm/indeedSearchForm',
             'd3Map': 'ng/directives/d3-map/d3-map'
@@ -116,9 +116,9 @@ require([
 
         'loadFileConfigRoutes',
         'loadFileControllersModule',
-        'directivesModule',
-        'filtersModule',
-        'JobMarketResults',
+        'loadFileDirectivesModule',
+        'loadFileFiltersModule',
+        'loadFileJobMarketResultsController',
 //    'customDirective',
         'indeed',
         'd3Map'
