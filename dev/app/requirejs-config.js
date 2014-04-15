@@ -22,7 +22,7 @@ require.config(
             'loadFileZillowData': 'ng/data/zillowData',
             'loadFileBea': 'ng/data/bea',
 
-            'zmMashUp': 'ng/dataMashUp/zillowMapMU',
+            'loadFileZillowMapMU': 'ng/dataMashUp/zillowMapMU',
             'MUUSMapGDPByState': 'ng/dataMashUp/MUUSMapGDPByState',
 
 
@@ -111,7 +111,7 @@ require([
         'loadFileZillowData',
         'loadFileBea',
 
-        'zmMashUp',
+        'loadFileZillowMapMU',
         'MUUSMapGDPByState',
 
         'ngConfig',
