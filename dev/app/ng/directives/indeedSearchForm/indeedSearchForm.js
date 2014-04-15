@@ -23,12 +23,12 @@ define(['angular', 'underscore', 'app', 'ua-parser', "jquery", 'ineedjobsData'],
                 $scope.indeed.where = "";
             }
 
-            console.log($scope.indeed.what);
+//            console.log($scope.indeed.what);
 
             indeedData.params().query($scope.indeed.what);
             indeedData.params().location($scope.indeed.where);
             indeedData.getData().then(function (results) {
-                console.log("results from indeed: ", results);
+//                console.log("results from indeed: ", results);
             });
 
             $modalInstance.close();

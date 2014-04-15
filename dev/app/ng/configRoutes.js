@@ -19,7 +19,8 @@ define(["angular", "app"], function (angular, app) {
             "ftd.filtersModule",
             'ftd.ip',
             'ftd.topojsonMapData',
-            'ftd.bea']
+            'ftd.bea',
+            'ftd.jobMarketsResultsModule']
     );
 
     angular.module("ftd")

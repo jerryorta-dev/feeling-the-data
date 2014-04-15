@@ -195,19 +195,15 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
                                     $timeout(function() {
                                         MapControls.zoomReset = false;
                                     }, 100);
-
-
                                 }
 //
                             }, true);
 
                             $scope.$watch('MapControls.hideIndeedIconsToggle', function (newVals, oldVals) {
 
-                                console.log(newVals)
+//                                console.log(newVals)
 
                                 if (newVals == true) {
-
-
 
                                     j.selectAll("circle")
                                         .transition()
@@ -222,8 +218,6 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
                                     $timeout(function() {
                                         MapControls.hideIndeedIconsToggle = false;
                                     }, 100);
-
-
                                 }
 //
                             }, true);
@@ -293,7 +287,7 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
 //                                      //TODO replace with mashup
                                     ZillowMapZipcodeMU.getMashUpByState(d.properties.name)
                                         .then(function (mashData) {
-                                            console.log("mashed data", mashData);
+//                                            console.log("mashed data", mashData);
 
 
                                           var zipQuantize = d3.scale.quantize()
@@ -339,7 +333,7 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
 
                                         }, function (error) { //Not a state
 //                                svg.on("click", stopped, true)
-                                            console.log("error", error)
+//                                            console.log("error", error)
 
                                             z.selectAll("path").remove();
                                         })
@@ -502,10 +496,15 @@ define(['angular', 'app', 'd3', 'topojson', 'underscore', 'MUUSMapGDPByState', '
 
                                     j.append("circle")
                                         .attr("cx", function (d) {
-                                            return $scope.projection([data[i].longitude, data[i].latitude ])[0];
+
+                                            if ($scope.projection([data[i].longitude, data[i].latitude])) {
+                                                return $scope.projection([data[i].longitude, data[i].latitude])[0];
+                                            }
                                         })
                                         .attr("cy", function (d) {
-                                            return $scope.projection([data[i].longitude, data[i].latitude])[1];
+                                            if ($scope.projection([data[i].longitude, data[i].latitude])) {
+                                                return $scope.projection([data[i].longitude, data[i].latitude])[1];
+                                            }
                                         })
                                         .attr("r", 2)
                                         .attr("id", "c-" + i)

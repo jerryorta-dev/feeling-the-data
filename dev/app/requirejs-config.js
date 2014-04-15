@@ -29,6 +29,7 @@ require.config(
 
             'ngConfig': 'ng/configRoutes',
             'controllersModule': 'ng/controllers/controllersModule',
+            'JobMarketResults': 'ng/controllers/JobMarketResultsController',
             'directivesModule': 'ng/directives/directivesModule',
             'filtersModule': 'ng/filters/filtersModule',
 //            'customDirective': 'ng/directives/customDirective/customDirective',
@@ -118,6 +119,7 @@ require([
         'controllersModule',
         'directivesModule',
         'filtersModule',
+        'JobMarketResults',
 //    'customDirective',
         'indeed',
         'd3Map'

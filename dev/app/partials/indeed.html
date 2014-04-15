@@ -6,7 +6,23 @@
     </div>
     <div class="col-md-3" >
         <div class="well">
-            <indeed-jobs ></indeed-jobs>
+           <div ng-controller="JobMarketResultsController">
+
+
+               <!-- indeed results -->
+               <div ng-if="query.length > 0">
+                   <div id=indeed_at>
+                       <a href="http://www.indeed.com/?indpubnum=4600389599611799">jobs</a> by
+                       <a href="http://www.indeed.com/?indpubnum=4600389599611799" title="Job Search">
+                           <img src="http://www.indeed.com/p/jobsearch.gif" style="border: 0; vertical-align: middle" alt="job search">
+                       </a>:
+                   </div>
+                   Searching for <span class="indeed-title">{{query}}</span> <span ng-if="location">in <span class="indeed-title">{{location}}</span></span>
+
+               </div>
+
+
+           </div>
         </div>
 
     </div>

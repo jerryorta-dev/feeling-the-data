@@ -6,7 +6,16 @@ define(['angular', 'underscore', 'app'], function (angular, _, app) {
 
 
     angular.module('ftd.bea', [])
-        .provider('beaData', function ipProvider() {
+
+    /**
+     *
+     *
+     *
+     * Key Codes:
+     * http://bea.gov/api/data/?&UserID=E5311C0F-5662-4934-B043-69BA533F9959&method=GetParameterValues&datasetname=RegionalData&ParameterName=keycode&
+     *
+     */
+        .provider('beaData', function beaDataProvider() {
 
 
             this.$get = ['$q', '$http', "beaApiKey", function ($q, $http, beaApiKey) {
