@@ -20,7 +20,7 @@ require.config(
             'loadFileIpData': 'ng/data/ipData',
             'loadFileD3MapData': 'ng/data/d3MapData',
             'loadFileZillowData': 'ng/data/zillowData',
-            'beaDataJs': 'ng/data/bea',
+            'loadFileBea': 'ng/data/bea',
 
             'zmMashUp': 'ng/dataMashUp/zillowMapMU',
             'MUUSMapGDPByState': 'ng/dataMashUp/MUUSMapGDPByState',
@@ -109,7 +109,7 @@ require([
         'loadFileIpData',
         'loadFileD3MapData',
         'loadFileZillowData',
-        'beaDataJs',
+        'loadFileBea',
 
         'zmMashUp',
         'MUUSMapGDPByState',
