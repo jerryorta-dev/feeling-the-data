@@ -21,55 +21,78 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFile
      *  returns promise
      *
      */
-        .factory('ZillowMapZipcodeMU', ['$q', 'ZillowGetRegionChildren', 'd3MapData', function ($q, ZillowGetRegionChildren, d3MapData) {
+        .factory('ZillowMapZipcodeMU', ['$q', 'ZillowGetRegionChildren', 'd3MapData', 'parsingCache', function ($q, ZillowGetRegionChildren, d3MapData, parsingCache) {
 
             var getMashUpByState = function (state) {
+                var deferred = $q.defer();
 
-                return d3MapData.getStatesAbbr(state).then(function (stateAbbr) {
+                var errorCallback = function(error) {
+                    deferred.reject(error);
+                }
 
-                    return $q.all([
-                        ZillowGetRegionChildren.getDataByState(stateAbbr),
-                        d3MapData.getStateCounties(state)
-                    ])
+                /**
+                 * flush will make ajax call again if year is different
+                 * from previous calls. IE, $http url is different.
+                 */
+                var flush = (config != null) ? ((config.flush != null) ? config.flush : false) : false;
 
-                }).then(function (mashedData) {
+                if (parsingCache.get('ZillowMapZipcodeMU').parseInProgress && !flush) {
+                    return parsingCache.get('ZillowMapZipcodeMU').getResult();
+                } else {
+                    parsingCache.get('ZillowMapZipcodeMU').parseInProgress = true;
 
-                    var zillowMeta = app.calculate(mashedData[0].data.response.list.region,
-                        {
+                    d3MapData.getStatesAbbr(state).then(function (stateAbbr) {
+
+                        return $q.all([
+                            ZillowGetRegionChildren.getDataByState(stateAbbr),
+                            d3MapData.getStateCounties(state)
+                        ])
+
+                    }, errorCallback).then(function (mashedData) {
+
+                        var zillowMeta = app.calculate(mashedData[0].data.response.list.region,
+                            {
 //                            zeroData:true,
-                            key: "zindex",
-                            min: true,
-                            max: true
-                        });
+                                key: "zindex",
+                                min: true,
+                                max: true
+                            });
 
 
+                        /**
+                         * Create reference object with keys as county name,
+                         * value as zindex
+                         */
+                        var zillowArrayToObject = {};
+                        _.each(mashedData[0].data.response.list.region, function (value, index, list) {
 
-                    /**
-                     * Create reference object with keys as county name,
-                     * value as zindex
-                     */
-                    var zillowArrayToObject = {};
-                    _.each(mashedData[0].data.response.list.region, function(value, index, list) {
-
-                        if (value.zindex != undefined && value.zindex != null) {
-                            this[value.name.toString()] = value.zindex;
-                        } else {
-                            this[value.name.toString()] = 0;
-                        }
+                            if (value.zindex != undefined && value.zindex != null) {
+                                this[value.name.toString()] = value.zindex;
+                            } else {
+                                this[value.name.toString()] = 0;
+                            }
 
 
-                    }, zillowArrayToObject);
+                        }, zillowArrayToObject);
 
-                    return {
-                        zillow:{
-                            data:zillowArrayToObject,
-                            meta:zillowMeta
-                        },
-                        map:mashedData[1]
-                    }
+                        var result = {
+                            zillow: {
+                                data: zillowArrayToObject,
+                                meta: zillowMeta
+                            },
+                            map: mashedData[1]
+                        };
 
-                })
+                        /**
+                         * Cache the result
+                         * @type {{bea: {data: {}}, map: *}}
+                         */
+                        parsingCache.get('ZillowMapZipcodeMU').setResult(result);
 
+                        deferred.resolve(result);
+                    }, errorCallback)
+
+                }
 
 
 

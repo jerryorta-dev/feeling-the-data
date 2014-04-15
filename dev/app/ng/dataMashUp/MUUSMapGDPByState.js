@@ -4,7 +4,7 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFileParsingCache', 'loadFileD3MapData', 'loadFileBea'], function (angular, app, _) {
+define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFileParsedDataCache', 'loadFileD3MapData', 'loadFileBea'], function (angular, app, _) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("MU USMapGDPByState")
@@ -23,10 +23,7 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFile
      *  returns promise
      *
      */
-        .provider('MUUSMapGDPByState', function MUUSMapGDPByStateProvider() {
-
-
-            this.$get = ['$q', 'd3MapData', 'beaData', 'parsingCache', function ($q, d3MapData, beaData, parsingCache) {
+        .factory('MUUSMapGDPByState', ['$q', 'd3MapData', 'beaData', 'parsingCache', function ($q, d3MapData, beaData, parsingCache) {
 
                 var UsGDPByState = function (year, config) {
                     var deferred = $q.defer();
@@ -36,13 +33,12 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFile
                      * from previous calls. IE, $http url is different.
                      */
                     var flush = (config != null) ? ((config.flush != null) ? config.flush : false) : false;
-//                    console.log('flush', flush);
-//                    console.log('MUUSMapGDPByStateCache.mashupResult', MUUSMapGDPByStateCache.mashupResult)
 
                     if (parsingCache.get('MUUSMapGDPByState').parseInProgress && !flush) {
                         return parsingCache.get('MUUSMapGDPByState').getResult();
                     } else {
                         parsingCache.get('MUUSMapGDPByState').parseInProgress = true;
+//                        console.log('get data')
 
                         $q.all([
                             beaData.gdpByState(year),
@@ -101,6 +97,6 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFile
                 return {
                     UsGDPByState: UsGDPByState
                 }
-            }];
-        })
+
+        }]);
 });

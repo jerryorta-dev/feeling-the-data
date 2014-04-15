@@ -102,13 +102,10 @@ define(['loadFileAngular', 'loadFilePreprocess'], function (angular, app) {
                     delete  cacheObj.cache[cacheId];
                 };
 
-
                 return {
                     get: getCache,
                     delete: deleteCache
                 }
-
-
             }]
         })
 });

@@ -4,7 +4,7 @@ require.config(
 
             'loadFilePreprocess': 'preprocess',
             'loadFileConfigRoutes': 'ng/configRoutes',
-            'loadFileParsingCache':'ng/dataParsers/parserCache',
+            'loadFileParsedDataCache':'ng/dataParsers/ParsedDataCache',
 
             'loadFileAngular': 'vendors/angular-1.2.14/angular',
             'loadFileAngularAnimate': 'vendors/angular-1.2.14/angular-animate.min',
@@ -98,7 +98,7 @@ require([
         'loadFileAngularRoute',
         'loadFileUnderscore',
 
-        'loadFileParsingCache',
+        'loadFileParsedDataCache',
 
         'loadFileUaParser',
         'loadFileJQuery',
