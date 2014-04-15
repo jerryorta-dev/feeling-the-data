@@ -4,7 +4,7 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'zillowData', 'loadFileD3MapData'], function (angular, app, _) {
+define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFileZillowData', 'loadFileD3MapData'], function (angular, app, _) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("zillowMapMU")

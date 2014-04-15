@@ -19,7 +19,7 @@ require.config(
             'loadFileIndeedJobs': 'ng/data/indeedJobs',
             'loadFileIpData': 'ng/data/ipData',
             'loadFileD3MapData': 'ng/data/d3MapData',
-            'zillowData': 'ng/data/zillowData',
+            'loadFileZillowData': 'ng/data/zillowData',
             'beaDataJs': 'ng/data/bea',
 
             'zmMashUp': 'ng/dataMashUp/zillowMapMU',
@@ -108,7 +108,7 @@ require([
         'loadFileIndeedJobs',
         'loadFileIpData',
         'loadFileD3MapData',
-        'zillowData',
+        'loadFileZillowData',
         'beaDataJs',
 
         'zmMashUp',
