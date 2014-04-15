@@ -2,7 +2,7 @@ require.config(
     {'baseUrl': 'app/',
         'paths': {
 
-            'app': 'preprocess',
+            'loadFilePreprocess': 'preprocess',
 
             'loadFileAngular': 'vendors/angular-1.2.14/angular',
             'loadFileAngularAnimate': 'vendors/angular-1.2.14/angular-animate.min',
@@ -39,7 +39,7 @@ require.config(
         'shim': {
 
 
-            'app': {
+            'loadFilePreprocess': {
                 'exports': 'p',
                 'deps': ['loadFileD3']
             },
@@ -80,7 +80,7 @@ require.config(
             'ngConfig': {
                 'deps': [
                     'uibootstrap',
-                    'app'
+                    'loadFilePreprocess'
                 ]
             }
 

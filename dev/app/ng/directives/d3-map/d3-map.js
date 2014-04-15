@@ -1,4 +1,4 @@
-define(['loadFileAngular', 'app', 'loadFileD3', 'topojson', 'loadFileUnderscore', 'MUUSMapGDPByState', 'zmMashUp'], function (angular, app, d3, topojson, _) {
+define(['loadFileAngular', 'loadFilePreprocess', 'loadFileD3', 'topojson', 'loadFileUnderscore', 'MUUSMapGDPByState', 'zmMashUp'], function (angular, app, d3, topojson, _) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("d3-map directive")

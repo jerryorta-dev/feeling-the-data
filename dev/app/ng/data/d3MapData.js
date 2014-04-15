@@ -4,7 +4,7 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['loadFileAngular', 'app', 'loadFileD3', 'zmMashUp'], function (angular, app, d3) {
+define(['loadFileAngular', 'loadFilePreprocess', 'loadFileD3', 'zmMashUp'], function (angular, app, d3) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("mapData")
