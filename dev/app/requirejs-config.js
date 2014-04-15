@@ -17,7 +17,7 @@ require.config(
             'loadFileTopoJson': 'vendors/d3-3.4.4/topojson',
 
             'loadFileIndeedJobs': 'ng/data/indeedJobs',
-            'ipData': 'ng/data/ipData',
+            'loadFileIpData': 'ng/data/ipData',
             'd3MapDataJS': 'ng/data/d3MapData',
             'zillowData': 'ng/data/zillowData',
             'beaDataJs': 'ng/data/bea',
@@ -106,7 +106,7 @@ require([
         'loadFileTopoJson',
 
         'loadFileIndeedJobs',
-        'ipData',
+        'loadFileIpData',
         'd3MapDataJS',
         'zillowData',
         'beaDataJs',
