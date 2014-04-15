@@ -8,7 +8,7 @@ require.config(
             'loadFileAngularAnimate': 'vendors/angular-1.2.14/angular-animate.min',
             'loadFileUiRouter': 'vendors/uirouter-0.2.8/angular-ui-router.min',
             'loadFileAngularRoute': 'vendors/angular-1.2.14/angular-route.min',
-            'underscore': 'vendors/underscore-1.6.0/underscore-min',
+            'loadFileUnderscore': 'vendors/underscore-1.6.0/underscore-min',
             'loadFileDomReady': 'vendors/requirejs-domready-2.0.1/domReady',
             'ua-parser': 'vendors/ua-parser-js-0.6.2/ua-parser.min',
             'loadFileJQuery': 'vendors/jquery-2.1.0/jquery.min',
@@ -66,7 +66,7 @@ require.config(
                 'deps': ['loadFileAngular']
             },
 
-            'underscore': {
+            'loadFileUnderscore': {
                 'exports': '_'
             },
 //            'bootstrap':{
@@ -98,7 +98,7 @@ require([
         'loadFileAngularAnimate',
         'loadFileUiRouter',
         'loadFileAngularRoute',
-        'underscore',
+        'loadFileUnderscore',
 
         'ua-parser',
         'loadFileJQuery',

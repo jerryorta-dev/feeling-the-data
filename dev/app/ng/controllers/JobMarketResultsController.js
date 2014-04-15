@@ -1,7 +1,7 @@
 /**
  * Created by jerryorta on 4/14/14.
  */
-define(['loadFileAngular', 'underscore', 'app', 'ua-parser', "jquery", 'ineedjobsData', 'ipData', 'd3MapDataJS', 'zillowData', 'beaDataJs', 'zmMashUp', 'MUUSMapGDPByState'], function (angular, _, app, UAParser) {
+define(['loadFileAngular', 'loadFileUnderscore', 'app', 'ua-parser', "jquery", 'ineedjobsData', 'ipData', 'd3MapDataJS', 'zillowData', 'beaDataJs', 'zmMashUp', 'MUUSMapGDPByState'], function (angular, _, app, UAParser) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("JobMarket Results")

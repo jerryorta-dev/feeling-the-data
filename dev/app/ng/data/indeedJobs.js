@@ -1,4 +1,4 @@
-define(['loadFileAngular', 'underscore', 'app', 'ua-parser', 'ipData'], function (angular, _, app, UAParser) {
+define(['loadFileAngular', 'loadFileUnderscore', 'app', 'ua-parser', 'ipData'], function (angular, _, app, UAParser) {
 
     if (app.cons().SHOW_LOAD_ORDER) {
         console.log("indeed data")
