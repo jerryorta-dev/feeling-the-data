@@ -14,9 +14,9 @@ require.config(
             'loadFileJQuery': 'vendors/jquery-2.1.0/jquery.min',
             'loadFileUiBootstrap': 'vendors/angular-ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.min',
             'loadFileD3': 'vendors/d3-3.4.4/d3.min',
-            'topojson': 'vendors/d3-3.4.4/topojson',
+            'loadFileTopoJson': 'vendors/d3-3.4.4/topojson',
 
-            'ineedjobsData': 'ng/data/indeedJobs',
+            'loadFileIndeedJobs': 'ng/data/indeedJobs',
             'ipData': 'ng/data/ipData',
             'd3MapDataJS': 'ng/data/d3MapData',
             'zillowData': 'ng/data/zillowData',
@@ -103,9 +103,9 @@ require([
         'loadFileJQuery',
         'loadFileUiBootstrap',
         'loadFileD3',
-        'topojson',
+        'loadFileTopoJson',
 
-        'ineedjobsData',
+        'loadFileIndeedJobs',
         'ipData',
         'd3MapDataJS',
         'zillowData',
