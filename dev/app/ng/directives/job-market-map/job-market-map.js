@@ -230,8 +230,8 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileD3', 'loadFileTopoJson
 
                                     var stateQantize = d3.scale.quantize()
                                         .domain([result.bea.meta.min, result.bea.meta.max])
-                                        .range(d3.range(49).map(function (i) {
-                                            return 'q' + i + "-49";
+                                        .range(d3.range(24).map(function (i) {
+                                            return 'q' + i + "-24";
                                         }));
 
                                     g.selectAll("path")
@@ -294,7 +294,7 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileD3', 'loadFileTopoJson
                                                 .domain([mashData.zillow.meta.min, mashData.zillow.meta.max]) //0 to 1 million
                                                 .range(d3.range(9).map(function (i) {
 //                                                        console.log("q" + i + "-9")
-                                                    return "q" + i + "-49";
+                                                    return "q" + i + "-24";
                                                 }));
 
                                             z.selectAll("path")

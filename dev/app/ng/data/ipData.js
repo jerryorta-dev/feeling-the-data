@@ -18,7 +18,7 @@ define(['loadFileAngular', 'loadFilePreprocess'], function (angular, app) {
 
                 var deferred = $q.defer();
 
-                $http.jsonp('http://ipinfo.io/?callback=JSON_CALLBACK', {cache:true})
+                $http.jsonp('http://ipinfo.io/?callback=JSON_CALLBACK', {cache:false})
                     .success(function (data) {
                         var ip = {};
                         ip.ip = data.ip;

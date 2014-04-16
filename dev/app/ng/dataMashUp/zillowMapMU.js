@@ -36,10 +36,10 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFile
                  */
                 var flush = (config != null) ? ((config.flush != null) ? config.flush : false) : false;
 
-                if (parsingCache.get('ZillowMapZipcodeMU').parseInProgress && !flush) {
-                    return parsingCache.get('ZillowMapZipcodeMU').getResult();
+                if (parsingCache.get(state).parseInProgress && !flush) {
+                    return parsingCache.get(state).getResult();
                 } else {
-                    parsingCache.get('ZillowMapZipcodeMU').parseInProgress = true;
+                    parsingCache.get(state).parseInProgress = true;
                     console.log("getting data")
 
                     d3MapData.getStatesAbbr(state).then(function (stateAbbr) {
@@ -89,7 +89,7 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFile
                              * Cache the result
                              * @type {{bea: {data: {}}, map: *}}
                              */
-                            parsingCache.get('ZillowMapZipcodeMU').setResult(result);
+                            parsingCache.get(state).setResult(result);
 
                             deferred.resolve(result);
                         })

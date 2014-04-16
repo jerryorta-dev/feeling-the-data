@@ -5,7 +5,7 @@
 
 
 .generate-color-steps(@n, @i: 1, @base: #990000) when (@i =< @n) {
-  .q@{i}&-49 {
+  .q@{i}&-24 {
     fill:darken(spin(@base, .1), 2%);
   }
   .generate-color-steps(@n, (@i + 1), darken(spin(@base, .1), 2%));
