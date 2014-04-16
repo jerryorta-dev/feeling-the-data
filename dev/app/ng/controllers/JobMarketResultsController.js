@@ -11,6 +11,14 @@ define(['loadFileAngular', 'loadFileUnderscore', 'loadFilePreprocess', 'loadFile
     angular.module('ftd.jobMarketsResultsModule', [])
         .controller('JobMarketResultsController', ['$scope', "MapControls", '$filter', '$timeout', 'indeedData', 'd3MapData', 'MUUSMapGDPByState', 'ZillowMapZipcodeMU', function($scope, MapControls, $filter, $timeout, indeedData, d3MapData, MUUSMapGDPByState, ZillowMapZipcodeMU) {
 
+            //GDP by state
+            MUUSMapGDPByState.UsGDPByState('2012').then(function (result) {
+                $scope.stateGdpMin = result.bea.meta.min;
+                $scope.stateGdpMax = result.bea.meta.max;
+            })
+
+
+
             // watch for data changes and re-render
             $scope.indeedData = indeedData.params();
 

@@ -161,14 +161,11 @@ define(['loadFileAngular', 'loadFileUnderscore', 'loadFilePreprocess', 'loadFile
                 }
 
                 var getData = function () {
-//                    console.log(getParams().jsonp());
+/*
                     return ip.then(function (ipResult) {
                         getParams().userip(ipResult.ip);
                         return ipResult.ip;
                     }).then(function (ip) {
-
-//                        getParams().getUrl();
-
                         var deferred = $q.defer();
 
                         window.INDEED_CALLBACK = function (data) {
@@ -176,14 +173,25 @@ define(['loadFileAngular', 'loadFileUnderscore', 'loadFilePreprocess', 'loadFile
                             getParams().results(data.results);
                         }
 
-//                        console.log(getParams().jsonp());
-
                         $http.jsonp(getParams().jsonp());
 
 
                         return deferred.promise;
 
                     })
+                    */
+
+                    var deferred = $q.defer();
+
+                    window.INDEED_CALLBACK = function (data) {
+                        deferred.resolve(data.results);
+                        getParams().results(data.results);
+                    }
+
+                    $http.jsonp(getParams().jsonp());
+
+
+                    return deferred.promise;
                 };
 
                 var getResults = function() {

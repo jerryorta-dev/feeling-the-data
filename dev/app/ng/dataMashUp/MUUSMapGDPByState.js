@@ -38,7 +38,7 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFile
                         return parsingCache.get('MUUSMapGDPByState').getResult();
                     } else {
                         parsingCache.get('MUUSMapGDPByState').parseInProgress = true;
-//                        console.log('get data')
+                        console.log('Get GDP By State')
 
                         $q.all([
                             beaData.gdpByState(year),

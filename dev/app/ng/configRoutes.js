@@ -42,7 +42,7 @@ define(['loadFileAngular', 'loadFilePreprocess'], function (angular, app) {
                 .state("indeed", {
                     url: "/indeed",
                     views: {
-                        "@": {templateUrl: "app/partials/indeed.html",
+                        "@": {templateUrl: "app/partials/job-market.html",
                             controller: "MainAppController"}
                     }
                 })
