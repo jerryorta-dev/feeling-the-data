@@ -6112,12 +6112,97 @@ button.close {
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1);
 }
+/*
+
+#custom-gradient {
+
+  // Horizontal gradient, from left to right
+  //
+  // Creates two color stops, start and end, by specifying a color and position for each color stop.
+  // Color stops are not available in IE9 and below.
+  .horizontal(@start-color: #555; @end-color: #333; @start-percent: 0%; @end-percent: 100%) {
+    background-image: -webkit-linear-gradient(left, color-stop(@start-color @start-percent), color-stop(@end-color @end-percent)); // Safari 5.1-6, Chrome 10+
+    background-image:  linear-gradient(to right, @start-color @start-percent, @end-color @end-percent); // Standard, IE10, Firefox 16+, Opera 12.10+, Safari 7+, Chrome 26+
+    background-repeat: repeat-x;
+    filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=1)",argb(@start-color),argb(@end-color))); // IE9 and down
+
+    background: @start-color; */
+/* Old browsers */
+/*
+
+    background: -moz-linear-gradient(left,  @start-color @start-percent, @end-color @end-percent); */
+/* FF3.6+ */
+/*
+
+    background: -webkit-gradient(linear, left top, right top, color-stop(@start-percent,@start-color), color-stop(@end-percent,@end-color)); */
+/* Chrome,Safari4+ */
+/*
+
+    background: -webkit-linear-gradient(left,  @start-color @start-percent,@end-color @end-percent); */
+/* Chrome10+,Safari5.1+ */
+/*
+
+    background: -o-linear-gradient(left,  @start-color @start-percent,@end-color @end-percent); */
+/* Opera 11.10+ */
+/*
+
+    background: -ms-linear-gradient(left,  @start-color @start-percent,@end-color @end-percent); */
+/* IE10+ */
+/*
+
+    background: linear-gradient(to right,  @start-color @start-percent,@end-color @end-percent); */
+/* W3C */
+/*
+
+
+
+  }
+
+
+
+  // Vertical gradient, from top to bottom
+  //
+  // Creates two color stops, start and end, by specifying a color and position for each color stop.
+  // Color stops are not available in IE9 and below.
+  .vertical(@start-color: #555; @end-color: #333; @start-percent: 0%; @end-percent: 100%) {
+    background-image: -webkit-linear-gradient(top, @start-color @start-percent, @end-color @end-percent);  // Safari 5.1-6, Chrome 10+
+    background-image: linear-gradient(to bottom, @start-color @start-percent, @end-color @end-percent); // Standard, IE10, Firefox 16+, Opera 12.10+, Safari 7+, Chrome 26+
+    background-repeat: repeat-x;
+    filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)",argb(@start-color),argb(@end-color))); // IE9 and down
+  }
+
+  .directional(@start-color: #555; @end-color: #333; @deg: 45deg) {
+    background-repeat: repeat-x;
+    background-image: -webkit-linear-gradient(@deg, @start-color, @end-color); // Safari 5.1-6, Chrome 10+
+    background-image: linear-gradient(@deg, @start-color, @end-color); // Standard, IE10, Firefox 16+, Opera 12.10+, Safari 7+, Chrome 26+
+  }
+  .horizontal-three-colors(@start-color: #00b3ee; @mid-color: #7a43b6; @color-stop: 50%; @end-color: #c3325f) {
+    background-image: -webkit-linear-gradient(left, @start-color, @mid-color @color-stop, @end-color);
+    background-image: linear-gradient(to right, @start-color, @mid-color @color-stop, @end-color);
+    background-repeat: no-repeat;
+    filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=1)",argb(@start-color),argb(@end-color))); // IE9 and down, gets no color-stop at all for proper fallback
+  }
+  .vertical-three-colors(@start-color: #00b3ee; @mid-color: #7a43b6; @color-stop: 50%; @end-color: #c3325f) {
+    background-image: -webkit-linear-gradient(@start-color, @mid-color @color-stop, @end-color);
+    background-image: linear-gradient(@start-color, @mid-color @color-stop, @end-color);
+    background-repeat: no-repeat;
+    filter: e(%("progid:DXImageTransform.Microsoft.gradient(startColorstr='%d', endColorstr='%d', GradientType=0)",argb(@start-color),argb(@end-color))); // IE9 and down, gets no color-stop at all for proper fallback
+  }
+  .radial(@inner-color: #555; @outer-color: #333) {
+    background-image: -webkit-radial-gradient(circle, @inner-color, @outer-color);
+    background-image: radial-gradient(circle, @inner-color, @outer-color);
+    background-repeat: no-repeat;
+  }
+  .striped(@color: rgba(255,255,255,.15); @angle: 45deg) {
+    background-image: -webkit-linear-gradient(@angle, @color 25%, transparent 25%, transparent 50%, @color 50%, @color 75%, transparent 75%, transparent);
+    background-image: linear-gradient(@angle, @color 25%, transparent 25%, transparent 50%, @color 50%, @color 75%, transparent 75%, transparent);
+  }
+}*/
 body {
   background-image: -webkit-linear-gradient(top, #004d73 0%, #001b37 100%);
   background-image: linear-gradient(to bottom, #004d73 0%, #001b37 100%);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff004d73', endColorstr='#ff001b37', GradientType=0);
-  background-color: #131313;
 }
 input[type="text"] {
   color: black;
@@ -6152,6 +6237,16 @@ input[type="text"] {
 }
 .indeed-title {
   color: #F60;
+  margin: 0;
+}
+.indeed-description {
+  color: #999999;
+}
+.indeed-trends {
+  margin-top: 20px;
+}
+.indeed .row {
+  margin-bottom: 10px;
 }
 #indeed_at {
   text-decoration: none;
@@ -6199,157 +6294,82 @@ circle.clickable:hover {
   shape-rendering: crispedges;
 }
 .test {
-  color: greem;
+  color: pink;
 }
 .q0-24 {
-  fill: #b09b0b;
+  fill: #d0a65b;
 }
 .q1-24 {
-  fill: #a7930b;
+  fill: #cea153;
 }
 .q2-24 {
-  fill: #9d8b0a;
+  fill: #cc9d4b;
 }
 .q3-24 {
-  fill: #94820a;
+  fill: #ca9943;
 }
 .q4-24 {
-  fill: #8a7a09;
+  fill: #c7953b;
 }
 .q5-24 {
-  fill: #817208;
+  fill: #c19037;
 }
 .q6-24 {
-  fill: #776a08;
+  fill: #b98a35;
 }
 .q7-24 {
-  fill: #6d6107;
+  fill: #b28533;
 }
 .q8-24 {
-  fill: #645906;
+  fill: #aa7f30;
 }
 .q9-24 {
-  fill: #5a5006;
+  fill: #a2792e;
 }
 .q10-24 {
-  fill: #514805;
+  fill: #9a732c;
 }
 .q11-24 {
-  fill: #474005;
+  fill: #926e2a;
 }
 .q12-24 {
-  fill: #3d3704;
+  fill: #8a6827;
 }
 .q13-24 {
-  fill: #342f03;
+  fill: #826225;
 }
 .q14-24 {
-  fill: #2a2603;
+  fill: #7a5c23;
 }
 .q15-24 {
-  fill: #211d02;
+  fill: #725620;
 }
 .q16-24 {
-  fill: #171501;
+  fill: #6a501e;
 }
 .q17-24 {
-  fill: #0e0c01;
+  fill: #624b1c;
 }
 .q18-24 {
-  fill: #040400;
+  fill: #5a451a;
 }
 .q19-24 {
-  fill: #000000;
+  fill: #523f17;
 }
 .q20-24 {
-  fill: #000000;
+  fill: #4a3915;
 }
 .q21-24 {
-  fill: #000000;
+  fill: #423313;
 }
 .q22-24 {
-  fill: #000000;
+  fill: #3a2d11;
 }
 .q23-24 {
-  fill: #000000;
+  fill: #33270e;
 }
 .q24-24 {
-  fill: #000000;
-}
-.q25-24 {
-  fill: #000000;
-}
-.q26-24 {
-  fill: #000000;
-}
-.q27-24 {
-  fill: #000000;
-}
-.q28-24 {
-  fill: #000000;
-}
-.q29-24 {
-  fill: #000000;
-}
-.q30-24 {
-  fill: #000000;
-}
-.q31-24 {
-  fill: #000000;
-}
-.q32-24 {
-  fill: #000000;
-}
-.q33-24 {
-  fill: #000000;
-}
-.q34-24 {
-  fill: #000000;
-}
-.q35-24 {
-  fill: #000000;
-}
-.q36-24 {
-  fill: #000000;
-}
-.q37-24 {
-  fill: #000000;
-}
-.q38-24 {
-  fill: #000000;
-}
-.q39-24 {
-  fill: #000000;
-}
-.q40-24 {
-  fill: #000000;
-}
-.q41-24 {
-  fill: #000000;
-}
-.q42-24 {
-  fill: #000000;
-}
-.q43-24 {
-  fill: #000000;
-}
-.q44-24 {
-  fill: #000000;
-}
-.q45-24 {
-  fill: #000000;
-}
-.q46-24 {
-  fill: #000000;
-}
-.q47-24 {
-  fill: #000000;
-}
-.q48-24 {
-  fill: #000000;
-}
-.q49-24 {
-  fill: #000000;
+  fill: #2b210c;
 }
 .map-container {
   padding: 0;
@@ -6376,4 +6396,43 @@ circle.clickable:hover {
 }
 .map-controls .map-reset {
   width: 72px;
+}
+.result-section {
+  position: relative;
+  border-bottom: 1px solid #999999;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+.result-section-last {
+  border-bottom: 0 solid white;
+}
+.result-section .indeed-trends {
+  max-width: 440px;
+}
+.result-section .indeed-trends-graph {
+  max-height: 200px;
+}
+.result-title {
+  color: #555555;
+}
+.result-title span {
+  font-size: 8px;
+}
+.result-title .logo {
+  float: left;
+  margin-right: 5px;
+  width: 38px;
+  height: 38px;
+}
+.result-title .title-text {
+  position: relative;
+  top: -8px;
+}
+.result-gdp-state-legend {
+  background-image: -webkit-linear-gradient(left, color-stop(#d0a65b 0%), color-stop(#2b210c 100%));
+  background-image: linear-gradient(to right, #d0a65b 0%, #2b210c 100%);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffd0a65b', endColorstr='#ff2b210c', GradientType=1);
+  height: 30px;
+  border-radius: 6px;
 }

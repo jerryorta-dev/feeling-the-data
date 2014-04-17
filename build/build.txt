@@ -12,6 +12,7 @@ app/vendors/requirejs-domready-2.0.1/domReady.js
 app/vendors/angular-1.2.14/angular-animate.min.js
 app/vendors/uirouter-0.2.8/angular-ui-router.min.js
 app/vendors/angular-1.2.14/angular-route.min.js
+app/ng/dataParsers/ParsedDataCache.js
 app/vendors/ua-parser-js-0.6.2/ua-parser.min.js
 app/vendors/d3-3.4.4/topojson.js
 app/ng/data/ipData.js
@@ -24,6 +25,7 @@ app/ng/dataMashUp/MUUSMapGDPByState.js
 app/ng/controllers/controllersModule.js
 app/ng/directives/directivesModule.js
 app/ng/filters/filtersModule.js
+app/ng/controllers/JobMarketResultsController.js
 app/ng/directives/indeedSearchForm/indeedSearchForm.js
-app/ng/directives/d3-map/job-market-map.js
+app/ng/directives/job-market-map/job-market-map.js
 app/requirejs-config.js

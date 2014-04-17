@@ -2,7 +2,7 @@
     appDir: "../dev",
     baseUrl: "app",
     dir: "../build",
-    fileExclusionRegExp: /^(r|build)\.js$/,
+//    fileExclusionRegExp: /^(r|build)\.js$/,
     optimize: "none",
     mainConfigFile: "../dev/app/requirejs-config.js",
     removeCombined: true,

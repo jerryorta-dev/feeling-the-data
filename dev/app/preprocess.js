@@ -1,7 +1,7 @@
 /**
  * Created by jerryorta on 3/14/14.
  */
-define(["jquery", "underscore"], function () {
+define(["loadFileJQuery", "loadFileUnderscore"], function () {
 
 
     var PreProcessor = (function () {
