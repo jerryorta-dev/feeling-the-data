@@ -6294,7 +6294,7 @@ circle.clickable:hover {
   shape-rendering: crispedges;
 }
 .test {
-  color: pink;
+  color: blud;
 }
 .q0-24 {
   fill: #d0a65b;
@@ -6410,7 +6410,7 @@ circle.clickable:hover {
   max-width: 440px;
 }
 .result-section .indeed-trends-graph {
-  max-height: 200px;
+  width: 100%;
 }
 .result-title {
   color: #555555;
