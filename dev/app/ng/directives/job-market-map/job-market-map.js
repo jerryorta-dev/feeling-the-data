@@ -10,9 +10,13 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileD3', 'loadFileTopoJson
             this.zoomReset = true;
         }
 
-        this.hideIndeedIconsToggle = false;
+        this.showIndeedIconsToggle = true;
         this.hideIndeedIcons = function() {
-            this.hideIndeedIconsToggle = true;
+            this.showIndeedIconsToggle = false;
+        }
+
+        this.showIndeedIcons = function() {
+            this.showIndeedIconsToggle = true;
         }
     };
 
@@ -28,6 +32,10 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileD3', 'loadFileTopoJson
 
             $scope.hideIndeedIcons = function() {
                 MapControls.hideIndeedIcons();
+            }
+
+            $scope.showIndeedIcons = function() {
+                MapControls.showIndeedIcons();
             }
 
         }])
@@ -199,28 +207,46 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileD3', 'loadFileTopoJson
 //
                             }, true);
 
-                            $scope.$watch('MapControls.hideIndeedIconsToggle', function (newVals, oldVals) {
+                            $scope.$watch('MapControls.showIndeedIconsToggle', function (newVals, oldVals) {
 
-//                                console.log(newVals)
 
                                 if (newVals == true) {
 
                                     j.selectAll("circle")
                                         .transition()
                                         .duration(750)
+                                        .style("opacity", 1);
+
+//                                    $timeout(function(){
+//                                        j.selectAll("circle").remove();
+//                                        d3.selectAll(".popover-wrapper").remove();
+//                                    }, 750)
+
+//                                    $timeout(function() {
+//                                        MapControls.hideIndeedIconsToggle = true;
+//                                    }, 100);
+                                }
+
+                                if (newVals == false) {
+
+                                    j.selectAll("circle")
+                                        .transition()
+                                        .duration(750)
                                         .style("opacity", 0);
 
-                                    $timeout(function(){
-                                        j.selectAll("circle").remove();
-                                        d3.selectAll(".popover-wrapper").remove();
-                                    }, 750)
+//                                    $timeout(function(){
+//                                        j.selectAll("circle").remove();
+//                                        d3.selectAll(".popover-wrapper").remove();
+//                                    }, 750)
 
-                                    $timeout(function() {
-                                        MapControls.hideIndeedIconsToggle = false;
-                                    }, 100);
+//                                    $timeout(function() {
+//                                        MapControls.hideIndeedIconsToggle = true;
+//                                    }, 100);
                                 }
 //
                             }, true);
+
+
 
 
 

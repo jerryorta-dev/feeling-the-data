@@ -6237,6 +6237,16 @@ input[type="text"] {
 }
 .indeed-title {
   color: #F60;
+  margin: 0;
+}
+.indeed-description {
+  color: #999999;
+}
+.indeed-trends {
+  margin-top: 20px;
+}
+.indeed .row {
+  margin-bottom: 10px;
 }
 #indeed_at {
   text-decoration: none;
@@ -6390,7 +6400,8 @@ circle.clickable:hover {
 .result-section {
   position: relative;
   border-bottom: 1px solid #999999;
-  padding-bottom: 10px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
 }
 .result-section-last {
   border-bottom: 0 solid white;

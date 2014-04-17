@@ -46,8 +46,13 @@ input[type = "text"] {
     font-family: arial;
     color: #000;
 
+    &-form {
+//      padding-bottom: 10px;
+    }
+
     &-title {
         color:#F60;
+      margin:0;
     }
 
     &-input {
@@ -55,7 +60,18 @@ input[type = "text"] {
     }
 
     &-description {
+//      font-size:10px;
+      color:@gray-light;
 //        color:#fff;
+    }
+
+    &-trends {
+      margin-top:20px;
+//      padding-bottom:10px;
+    }
+
+    & .row {
+      margin-bottom:10px;
     }
 }
 
@@ -163,7 +179,8 @@ circle.clickable:hover {
   &-section{
     position:relative;
     border-bottom:1px solid @gray-light;
-    padding-bottom: 10px;
+    padding-bottom: 20px;
+    margin-bottom:20px;
 
     &-last {
       border-bottom:0 solid white;

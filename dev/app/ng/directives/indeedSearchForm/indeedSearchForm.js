@@ -11,13 +11,13 @@ define(['loadFileAngular', 'loadFileUnderscore', 'loadFilePreprocess', 'loadFile
     var IndeedSearchModalInstanceCtrl = function ($scope, $modalInstance, indeedData) {
 
         $scope.indeed = {
-            what:indeedData.params().query(),
-            where:indeedData.params().location()};
+            what: indeedData.params().query(),
+            where: indeedData.params().location()};
 
         var parser = new UAParser();
         $scope.ua = parser.getResult().browser.name;
 
-        $scope.ok = function () {
+        $scope.findJobsModal = function () {
 //            $modalInstance.close($scope.selected.item);
             if ($scope.indeed.what == undefined || $scope.indeed.where == null) {
                 $scope.indeed.where = "";
@@ -40,39 +40,21 @@ define(['loadFileAngular', 'loadFileUnderscore', 'loadFilePreprocess', 'loadFile
     };
 
 
-
     angular.module('ftd.indeedModule', [])
-        .controller('IndeedModalSearchCtrl', ['$scope', '$modal', '$log', 'indeedData', function($scope, $modal, $log, indeedData) {
+        .controller('IndeedModalSearchCtrl', ['$scope', '$modal', '$log', 'indeedData', function ($scope, $modal, $log, indeedData) {
 
-            $scope.open = function () {
 
-                var modalInstance = $modal.open({
-
-                    templateUrl: 'IndeedSearchModalContent.html',
-                    controller: IndeedSearchModalInstanceCtrl,
-                    resolve: {
-                        indeedData:function() {
-                            return indeedData;
-                        }
-
-                    }
-                });
-
-                modalInstance.result.then(function (selectedItem) {
-                    $scope.selected = selectedItem;
-                }, function () {
-                    $log.info('Modal dismissed at: ' + new Date());
-                });
-            };
         }])
 
-        .directive('indeedJobs', ['$compile', 'indeedData', function ($compile, indeedData) {
+        .directive('indeedJobs', ['$compile', 'indeedData','$modal', function ($compile, indeedData, $modal) {
 
             return {
                 restrict: 'EA',
                 link: function ($scope, $element, $attr) {
 
-
+                    $scope.indeed = {
+                        what: indeedData.params().query(),
+                        where: indeedData.params().location()};
 
                     var parser = new UAParser();
                     $scope.ua = parser.getResult().browser.name;
@@ -80,27 +62,43 @@ define(['loadFileAngular', 'loadFileUnderscore', 'loadFilePreprocess', 'loadFile
 
                     $scope.findJobs = function () {
 
+                        if ($scope.indeed.what == undefined || $scope.indeed.where == null) {
+                            $scope.indeed.where = "";
+                        }
 
 
-//                        if ($scope.indeedWhere == undefined || $scope.indeedWhere == null) {
-//                            $scope.indeedWhere = "";
-//                        }
-//
-//                        console.log("what", $scope.indeedWhat)
-//                        console.log("where", $scope.indeedWhere);
-//
-//                        indeedData.params().query($scope.indeedWhat);
-//                        indeedData.params().location($scope.indeedWhere);
-//                        indeedData.getData().then(function (results) {
-//                            console.log("results from indeed: ", results);
-//                        });
+                        indeedData.params().query($scope.indeed.what);
+                        indeedData.params().location($scope.indeed.where);
+                        indeedData.getData().then(function (results) {
+                        });
 
                     }
+
+                    $scope.open = function () {
+
+                        var modalInstance = $modal.open({
+
+                            templateUrl: 'IndeedSearchModalContent.html',
+                            controller: IndeedSearchModalInstanceCtrl,
+                            resolve: {
+                                indeedData: function () {
+                                    return indeedData;
+                                }
+
+                            }
+                        });
+
+                        modalInstance.result.then(function (selectedItem) {
+                            $scope.selected = selectedItem;
+                        }, function () {
+                            $log.info('Modal dismissed at: ' + new Date());
+                        });
+                    };
 
                 },
                 templateUrl: "app/ng/directives/indeedSearchForm/indeedSearchForm.html"
             };
 
         }])
- });
+});
 
