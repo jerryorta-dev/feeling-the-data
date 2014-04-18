@@ -1,11 +1,8 @@
 /**
  * Created by jerryorta on 4/14/14.
  */
-define(['loadFileAngular', 'loadFileUnderscore', 'loadFilePreprocess', 'loadFileUaParser', "jquery", 'loadFileIndeedJobs', 'loadFileIpData', 'loadFileD3MapData', 'loadFileZillowData', 'loadFileBea', 'loadFileZillowMapMU', 'LoadFileMUUSMapGDPByState'], function (angular, _, app, UAParser) {
+define(['loadFileAngular', 'loadFileUnderscore', 'loadFileUaParser', "jquery", 'loadFileIndeedJobs', 'loadFileIpData', 'loadFileD3MapData', 'loadFileZillowData', 'loadFileBea', 'loadFileZillowMapMU', 'LoadFileMUUSMapGDPByState'], function (angular, _, UAParser) {
 
-    if (app.cons().SHOW_LOAD_ORDER) {
-        console.log("JobMarket Results")
-    }
 
 
     angular.module('ftd.jobMarketsResultsModule', [])

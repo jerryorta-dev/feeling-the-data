@@ -1,10 +1,5 @@
 define(['loadFileAngular', 'loadFileUnderscore', 'loadFilePreprocess'], function (angular, _, app) {
 
-    if (app.cons().SHOW_LOAD_ORDER) {
-        console.log("bea")
-    }
-
-
     angular.module('ftd.bea', [])
 
     /**

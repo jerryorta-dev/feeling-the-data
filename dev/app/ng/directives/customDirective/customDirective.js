@@ -1,12 +1,7 @@
-define(['loadFileAngular', 'loadFilePreprocess'], function (angular, app) {
-
-    if (app.cons().SHOW_LOAD_ORDER) {
-        console.log("customDirective")
-    }
+define(['loadFileAngular'], function (angular) {
 
     angular.module('ftd.directivesModule')
         .directive('customDirective', function () {
-            app.loadOrder('customDirective directive');
             return {
 //                require: '^AnswerController',
                 restrict: 'AE',

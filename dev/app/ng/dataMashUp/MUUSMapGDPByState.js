@@ -4,12 +4,7 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFileParsedDataCache', 'loadFileD3MapData', 'loadFileBea'], function (angular, app, _) {
-
-    if (app.cons().SHOW_LOAD_ORDER) {
-        console.log("MU USMapGDPByState")
-    }
-
+define(['loadFileAngular', 'loadFileCalculate', 'loadFileUnderscore', 'loadFileParsedDataCache', 'loadFileD3MapData', 'loadFileBea'], function (angular, calc, _) {
 
     angular.module('ftd.beaD3Map', [])
 
@@ -66,7 +61,7 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFile
                             }, bea.data);
 
 
-                            bea.meta = app.calculate(valueRange, {
+                            bea.meta = calc.calculate(valueRange, {
                                 min: true,
                                 max: true
                             });

@@ -1,8 +1,4 @@
-define(['loadFileAngular', 'loadFileUnderscore', 'loadFilePreprocess', 'loadFileUaParser', 'loadFileIpData'], function (angular, _, app, UAParser) {
-
-    if (app.cons().SHOW_LOAD_ORDER) {
-        console.log("indeed data")
-    }
+define(['loadFileAngular', 'loadFileUnderscore', 'loadFileUaParser', 'loadFileIpData'], function (angular, _, UAParser) {
 
 
     window.INDEED_CALLBACK = function (data) {

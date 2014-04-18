@@ -1,11 +1,8 @@
 /**
  * Created by jerryorta on 4/15/14.
  */
-define(['loadFileAngular', 'loadFilePreprocess'], function (angular, app) {
+define(['loadFileAngular'], function (angular) {
 
-    if (app.cons().SHOW_LOAD_ORDER) {
-        console.log("Parsing Cache")
-    }
 
     var ParsingCacheDictionary = function() {
         this.cache = {};

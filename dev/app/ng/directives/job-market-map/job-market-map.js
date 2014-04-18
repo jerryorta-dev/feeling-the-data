@@ -1,8 +1,5 @@
 define(['loadFileAngular', 'loadFilePreprocess', 'loadFileD3', 'loadFileTopoJson', 'loadFileUnderscore', 'LoadFileMUUSMapGDPByState', 'loadFileZillowMapMU'], function (angular, app, d3, topojson, _) {
 
-    if (app.cons().SHOW_LOAD_ORDER) {
-        console.log("job-market-map directive")
-    }
 
     var MapControlsService = function () {
         this.zoomReset = false;

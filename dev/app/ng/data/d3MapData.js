@@ -4,11 +4,8 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['loadFileAngular', 'loadFilePreprocess', 'loadFileD3', 'loadFileZillowMapMU'], function (angular, app, d3) {
+define(['loadFileAngular', 'loadFileZillowMapMU'], function (angular) {
 
-    if (app.cons().SHOW_LOAD_ORDER) {
-        console.log("mapData")
-    };
 
     angular.module('ftd.topojsonMapData', [])
         .provider('d3MapData', function () {

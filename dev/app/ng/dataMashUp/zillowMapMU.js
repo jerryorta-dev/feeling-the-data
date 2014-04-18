@@ -4,11 +4,9 @@
  * This is the directives angular module which
  * directives reference.
  */
-define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFileZillowData', 'loadFileD3MapData'], function (angular, app, _) {
+define(['loadFileAngular', 'loadFileCalculate', 'loadFileUnderscore', 'loadFileZillowData', 'loadFileD3MapData'], function (angular, calc, _) {
 
-    if (app.cons().SHOW_LOAD_ORDER) {
-        console.log("zillowMapMU")
-    }
+
     angular.module('ftd.zillowMapMU', [])
 
 
@@ -52,7 +50,7 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileUnderscore', 'loadFile
 
                             console.log('mashedData',mashedData)
 
-                            var zillowMeta = app.calculate(mashedData[0].data.response.list.region,
+                            var zillowMeta = calc.calculate(mashedData[0].data.response.list.region,
                                 {
 //                            zeroData:true,
                                     key: "zindex",

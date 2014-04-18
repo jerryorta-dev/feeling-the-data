@@ -1,8 +1,5 @@
-define(['loadFileAngular', 'loadFilePreprocess'], function (angular, app) {
+define(['loadFileAngular', 'loadFileUnderscore', 'loadFileApiKeys'], function (angular, _, $a) {
 
-    if (app.cons().SHOW_LOAD_ORDER) {
-        console.log("configRoutes")
-    }
 
     angular.module("ftd", [
             "ngRoute",
@@ -21,20 +18,17 @@ define(['loadFileAngular', 'loadFilePreprocess'], function (angular, app) {
             'ftd.topojsonMapData',
             'ftd.bea',
             'ftd.jobMarketsResultsModule',
-            'ftd.parsingCache']
+            'ftd.parsingCache',
+            'ftdui.toggleswitch']
     );
 
-    angular.module("ftd")
-        .constant("zillowApiKey", "X1-ZWz1dshk18nnyj_76gmj")
-        .constant("truliaApiKey", "5kpnkmaued687936qm6y9chc")
-        .constant("indeedApiKey", "4600389599611799")
-        .constant("usaTodayApiKey", "474qrq8eh68cqa4hvw45tqfu")
-        .constant("censusDataApiKey", "f136a395509816b3bda96f6a1375b3960f27cbbb")
-        .constant("beaApiKey", "E5311C0F-5662-4934-B043-69BA533F9959")
+    _.each($a.list(), function(value, key, list) {
+        angular.module("ftd").constant(value.name, value.key);
+    });
+
 
     angular.module("ftd").config(["$stateProvider", "$urlRouterProvider",
         function ($stateProvider, $urlRouterProvider) {
-
 
             $urlRouterProvider.otherwise("/indeed");
 
@@ -46,27 +40,7 @@ define(['loadFileAngular', 'loadFilePreprocess'], function (angular, app) {
                             controller: "MainAppController"}
                     }
                 })
-            /*.state("quiz.questions", {
-             url: "", //do not deep link the actual quiz
-             views: {
-             "@": {templateUrl: "app/partials/quiz.questions.html",
-             controller: "AnswerController"},
-             "controls@quiz.questions": {templateUrl: "app/partials/quiz.questions.controls.html"},
-             "question@quiz.questions": {templateUrl: "app/partials/quiz.questions.question.html"}
-             }
-
-             }).state("quiz.result", {
-             url: "/result",
-             views: {
-             "@": {templateUrl: "app/partials/quiz.result.html",
-             controller: "ResultController"},
-             "controls@quiz.result": {templateUrl: "app/partials/quiz.result.controls.html"},
-             "result@quiz.result": {templateUrl: "app/partials/quiz.result.current.html"}
-             }
-             })*/
-
-        }
-
+         }
     ])
         .run(["$rootScope", "$state", "$stateParams",
             function ($rootScope, $state, $stateParams) {

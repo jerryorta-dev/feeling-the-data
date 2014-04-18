@@ -6,9 +6,6 @@
  */
 define(['loadFileAngular', 'loadFilePreprocess'], function (angular, app) {
 
-    if (app.cons().SHOW_LOAD_ORDER) {
-        console.log("zillowData")
-    }
     angular.module('ftd.zillowData', [])
 
 

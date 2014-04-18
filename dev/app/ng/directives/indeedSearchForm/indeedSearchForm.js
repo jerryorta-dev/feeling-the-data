@@ -1,8 +1,4 @@
-define(['loadFileAngular', 'loadFileUnderscore', 'loadFilePreprocess', 'loadFileUaParser', "jquery", 'loadFileIndeedJobs'], function (angular, _, app, UAParser) {
-
-    if (app.cons().SHOW_LOAD_ORDER) {
-        console.log("indeed data")
-    }
+define(['loadFileAngular', 'loadFileUnderscore', 'loadFileUaParser', "jquery", 'loadFileIndeedJobs'], function (angular, _, UAParser) {
 
 
     // Please note that $modalInstance represents a modal window (instance) dependency.

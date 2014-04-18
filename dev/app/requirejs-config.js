@@ -3,6 +3,10 @@ require.config(
         'paths': {
 
             'loadFilePreprocess': 'preprocess',
+            'loadFileCalculate': 'calculate',
+            'loadFileApiKeys': 'apiKeys',
+
+
             'loadFileConfigRoutes': 'ng/configRoutes',
             'loadFileParsedDataCache':'ng/dataParsers/ParsedDataCache',
 
@@ -17,6 +21,10 @@ require.config(
             'loadFileUiBootstrap': 'vendors/angular-ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.min',
             'loadFileD3': 'vendors/d3-3.4.4/d3.min',
             'loadFileTopoJson': 'vendors/d3-3.4.4/topojson',
+            'loadFileTweenMax':'vendors/greensock-1.11.6/HTML5/src/minified/TweenMax.min',
+
+//            'loadFileFTDUIModule':'ng/directives/ftdui/ftduiModule',
+            'loadFileFTDUIToggleSwitch':'ng/directives/ftdui/toggle-switch/toggle-switch',
 
             'loadFileIndeedJobs': 'ng/data/indeedJobs',
             'loadFileIpData': 'ng/data/ipData',
@@ -36,11 +44,39 @@ require.config(
         },
         'shim': {
 
+            'loadFileTweenMax':{
+              'exports':'TweenMax'
+            },
 
+            /**
+             * 'loadFileD3' makes this file load,
+             * so you will not see it "required"
+             * in the app.
+             */
+            'loadFileApiKeys': {
+                'exports': '$a'
+            },
+
+            /**
+             * 'loadFileD3' makes this file load,
+             * so you will not see it "required"
+             * in the app.
+             */
             'loadFilePreprocess': {
-                'exports': 'p',
+                'exports': '$p',
                 'deps': ['loadFileD3']
             },
+
+            /**
+             * 'loadFileD3' makes this file load,
+             * so you will not see it "required"
+             * in the app.
+             */
+            'loadFileCalculate': {
+                'exports': '$c',
+                'deps': ['loadFileD3']
+            },
+
             'loadFileDomReady': {
                 'deps': ['loadFileConfigRoutes']
             },
@@ -78,7 +114,8 @@ require.config(
             'loadFileConfigRoutes': {
                 'deps': [
                     'loadFileUiBootstrap',
-                    'loadFilePreprocess'
+                    'loadFilePreprocess',
+                    'loadFileApiKeys'
                 ]
             }
 
@@ -105,6 +142,7 @@ require([
         'loadFileUiBootstrap',
         'loadFileD3',
         'loadFileTopoJson',
+        'loadFileTweenMax',
 
         'loadFileIndeedJobs',
         'loadFileIpData',
@@ -114,6 +152,9 @@ require([
 
         'loadFileZillowMapMU',
         'LoadFileMUUSMapGDPByState',
+
+//        'loadFileFTDUIModule',
+        'loadFileFTDUIToggleSwitch',
 
         'loadFileConfigRoutes',
         'loadFileControllersModule',
