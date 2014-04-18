@@ -23,7 +23,7 @@ require.config(
             'loadFileTopoJson': 'vendors/d3-3.4.4/topojson',
             'loadFileTweenMax':'vendors/greensock-1.11.6/HTML5/src/minified/TweenMax.min',
 
-//            'loadFileFTDUIModule':'ng/directives/ftdui/ftduiModule',
+            'loadFileFTDUIModule':'ng/directives/ftdui/ftduiModule',
             'loadFileFTDUIToggleSwitch':'ng/directives/ftdui/toggle-switch/toggle-switch',
 
             'loadFileIndeedJobs': 'ng/data/indeedJobs',
@@ -153,7 +153,7 @@ require([
         'loadFileZillowMapMU',
         'LoadFileMUUSMapGDPByState',
 
-//        'loadFileFTDUIModule',
+        'loadFileFTDUIModule',
         'loadFileFTDUIToggleSwitch',
 
         'loadFileConfigRoutes',

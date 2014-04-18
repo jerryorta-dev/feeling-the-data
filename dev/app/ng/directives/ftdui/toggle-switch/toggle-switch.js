@@ -16,10 +16,13 @@ define(['loadFileAngular', 'loadFileTweenMax'], function (angular, TweenMax) {
                     btnGlyph: '@btnGlyph',
                     name:'@name'
                 },
-                controller: ['$scope', '$element', '$attrs', '$transclude', function ($scope, $element, $attrs, $transclude) {
+                controller: ['$scope', '$element', '$attrs', '$transclude', 'UIControls', function ($scope, $element, $attrs, $transclude, UIControls) {
 
                     $scope.toggle = true;
                     $scope.btnLabel = ($scope.toggle == true ) ? $scope.btnOn : $scope.btnOff;
+
+
+                    UIControls.set($scope.name, true);
 
 
                     $scope.$watch(function () {
@@ -40,6 +43,7 @@ define(['loadFileAngular', 'loadFileTweenMax'], function (angular, TweenMax) {
                             endAnimation = 0;
                         }
 
+                        UIControls.update($scope.name, $scope.toggle);
                         TweenMax.to($('button', $element),.25, {left:endAnimation, ease:"Circ.easeOut"});
 
                     }

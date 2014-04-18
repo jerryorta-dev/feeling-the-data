@@ -6,6 +6,7 @@ define(['loadFileAngular', 'loadFileUnderscore', 'loadFileApiKeys'], function (a
             "ui.router",
             "ngAnimate",
             "ui.bootstrap",
+            'ftdui',
             "ftd.indeedJobsData",
             "ftd.controllersModule",
             "ftd.directivesModule",

@@ -1,6 +1,7 @@
 define(['loadFileAngular', 'loadFilePreprocess', 'loadFileD3', 'loadFileTopoJson', 'loadFileUnderscore', 'LoadFileMUUSMapGDPByState', 'loadFileZillowMapMU'], function (angular, app, d3, topojson, _) {
 
 
+
     var MapControlsService = function () {
         this.zoomReset = false;
         this.reset = function() {
@@ -38,6 +39,7 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileD3', 'loadFileTopoJson
         }])
         .controller('WorldMapController', ['$scope', function ($scope) {
 
+
 //            console.log("data", $scope.data);
 
             /**
@@ -61,8 +63,8 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileD3', 'loadFileTopoJson
                 transclude:true
             }
         })
-        .directive('jobMarketMapGraphic', ["MapControls", '$filter', '$timeout', 'indeedData', 'd3MapData', 'MUUSMapGDPByState', 'ZillowMapZipcodeMU',
-            function (MapControls, $filter, $timeout, indeedData, d3MapData, MUUSMapGDPByState, ZillowMapZipcodeMU) {
+        .directive('jobMarketMapGraphic', ["MapControls", '$filter', '$timeout', 'indeedData', 'd3MapData', 'MUUSMapGDPByState', 'ZillowMapZipcodeMU', 'UIControls',
+            function (MapControls, $filter, $timeout, indeedData, d3MapData, MUUSMapGDPByState, ZillowMapZipcodeMU, UIControls) {
 
                 return {
                     restrict: 'EA',
@@ -76,7 +78,23 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileD3', 'loadFileTopoJson
                         //init service call
 //                    d3MapData.getStatesAbbr();
 
+                        $scope.test1 = UIControls.ui("jobMarketIndeed")
+                        $scope.test2 = UIControls.ui("test2")
 
+                        console.log("test1", $scope.test1)
+                        console.log("test2", $scope.test2)
+
+                        $scope.test3;
+                        $scope.test4;
+
+                        UIControls.uiPromise("jobMarketIndeed").then(function(result) {
+                            $scope.test3 = result;
+                            console.log("promise jobMarketIndeed", result);
+                        })
+                        UIControls.uiPromise("test2").then(function(result) {
+                            $scope.test4 = result;
+                            console.log("promise test2", result);
+                        })
 
                         var svg = d3.select($element[0])
                             .append("svg")
