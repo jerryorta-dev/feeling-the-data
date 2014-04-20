@@ -87,14 +87,14 @@ define(['loadFileAngular', 'loadFilePreprocess', 'loadFileD3', 'loadFileTopoJson
                         $scope.test3;
                         $scope.test4;
 
-                        UIControls.uiPromise("jobMarketIndeed").then(function(result) {
-                            $scope.test3 = result;
-                            console.log("promise jobMarketIndeed", result);
-                        })
-                        UIControls.uiPromise("test2").then(function(result) {
-                            $scope.test4 = result;
-                            console.log("promise test2", result);
-                        })
+//                        UIControls.uiPromise("jobMarketIndeed").then(function(result) {
+//                            $scope.test3 = result;
+//                            console.log("promise jobMarketIndeed", result);
+//                        })
+//                        UIControls.uiPromise("test2").then(function(result) {
+//                            $scope.test4 = result;
+//                            console.log("promise test2", result);
+//                        })
 
                         var svg = d3.select($element[0])
                             .append("svg")
