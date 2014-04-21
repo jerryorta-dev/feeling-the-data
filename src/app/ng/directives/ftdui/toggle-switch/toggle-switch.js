@@ -1,4 +1,4 @@
-angular.module('ftdui.toggleswitch', [])
+angular.module('ftd.ui.toggleswitch', [])
 
     .directive('ftdUiToggleswitch', function () {
 
@@ -13,7 +13,7 @@ angular.module('ftdui.toggleswitch', [])
                 btnGlyph: '@btnGlyph',
                 name: '@name'
             },
-            controller: ['$scope', '$element', '$attrs', '$transclude', 'UIControls', function ($scope, $element, $attrs, $transclude, UIControls) {
+            controller: ['$scope', '$element', '$attrs', '$transclude', 'ftd.pubsub', function ($scope, $element, $attrs, $transclude, UIControls) {
 
                 $scope.toggle = true;
                 $scope.btnLabel = ($scope.toggle == true ) ? $scope.btnOn : $scope.btnOff;
@@ -21,10 +21,13 @@ angular.module('ftdui.toggleswitch', [])
 
                 UIControls.set($scope.name, true);
 
+                var button = angular.element($element).find('button')[0];
+                var buttonContainer = angular.element($element).find('div')[0];
+
 
                 $scope.$watch(function () {
-//                    $scope.buttonWidth = $('button', $element).outerWidth();
-//                    $scope.elementWidth = $element.context.children[0].clientWidth;
+                    $scope.buttonWidth = button.offsetWidth;
+                    $scope.elementWidth = buttonContainer.offsetWidth;
                 });
 
 
@@ -41,7 +44,7 @@ angular.module('ftdui.toggleswitch', [])
                     }
 
                     UIControls.update($scope.name, $scope.toggle);
-                    TweenMax.to($('button', $element), .25, {left: endAnimation, ease: "Circ.easeOut"});
+                    TweenMax.to(button, .25, {left: endAnimation, ease: "Circ.easeOut"});
 
                 }
 

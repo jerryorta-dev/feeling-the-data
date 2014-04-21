@@ -4,21 +4,21 @@
  * This is the directives angular module which
  * directives reference.
  */
-angular.module('ftdui', [])
+angular.module('ftd.ui', [])
 
 var UIControlCache = function () {
     this.cache = {};
 };
 
 
-angular.module('ftdui')
+angular.module('ftd.ui')
 
     .service('UIControlCache', UIControlCache)
 
 /**
  * Cache the results of the mash-up;
  */
-    .provider('UIControls', function UIControls() {
+    .provider('ftd.pubsub', function UIControls() {
         this.$get = ['$q', 'UIControlCache', function ($q, cacheObj) {
 
             /**

@@ -59,7 +59,7 @@
                 transclude:true
             }
         })
-        .directive('jobMarketMapGraphic', ["MapControls", '$filter', '$timeout', 'indeedData', 'd3MapData', 'MUUSMapGDPByState', 'ZillowMapZipcodeMU', 'UIControls',
+        .directive('jobMarketMapGraphic', ["MapControls", '$filter', '$timeout', 'indeedData', 'd3MapData', 'MUUSMapGDPByState', 'ZillowMapZipcodeMU', 'ftd.pubsub',
             function (MapControls, $filter, $timeout, indeedData, d3MapData, MUUSMapGDPByState, ZillowMapZipcodeMU, UIControls) {
 
                 return {

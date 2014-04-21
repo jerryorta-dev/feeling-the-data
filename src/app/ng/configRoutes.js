@@ -3,7 +3,7 @@ angular.module("ftd", [
         "ui.router",
         "ngAnimate",
         "ui.bootstrap",
-        'ftdui',
+        'ftd.ui',
         "ftd.indeedJobsData",
         "ftd.controllersModule",
         "ftd.directivesModule",
@@ -18,7 +18,7 @@ angular.module("ftd", [
         'ftd.jobMarketsResultsModule',
         'ftd.parsingCache',
         'ftd.servicesModule',
-        'ftdui.toggleswitch']
+        'ftd.ui.toggleswitch']
 );
 
 _.each(apikeys.reference, function (value, key, list) {
