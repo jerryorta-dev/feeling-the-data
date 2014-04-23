@@ -159,8 +159,6 @@ angular.module('ftd.ui')
                     cache.subscribers[publisherId] = o.subscribers;
                 }
 
-
-
                 return o;
 
             };

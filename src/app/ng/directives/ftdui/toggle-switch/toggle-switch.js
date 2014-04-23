@@ -3,7 +3,7 @@ angular.module('ftd.ui.toggleswitch', [])
 /**
  * <ftd-ui-toggleswitch></ftd-ui-toggleswitch>
  */
-    .directive('ftdUiToggleswitch', function () {
+    .directive('ftdUiToggleswitch', ['ftd.ui.pubsub', function (ps) {
 
         return {
             restrict: 'AE',
@@ -17,7 +17,7 @@ angular.module('ftd.ui.toggleswitch', [])
                 name: '@name',
                 publishTypes:'@publishTypes'
             },
-            controller: ['$scope', '$element', '$attrs', '$transclude', 'ftd.ui.pubsub', function ($scope, $element, $attrs, $transclude, ps) {
+            link: function ($scope, $element, $attrs, $transclude) {
 
                 $scope.toggle = true;
                 $scope.btnLabel = ($scope.toggle == true ) ? $scope.btnOn : $scope.btnOff;
@@ -53,7 +53,7 @@ angular.module('ftd.ui.toggleswitch', [])
 
                 }
 
-            }],
+            },
             templateUrl: 'app/ng/directives/ftdui/toggle-switch/toggle-switch.html'
         }
-    });
+    }]);
