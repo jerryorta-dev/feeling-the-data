@@ -48,7 +48,6 @@ angular.module('ftd.ui.toggleswitch', [])
                         endAnimation = 0;
                     }
 
-//                    UIControls.update($scope.name, $scope.toggle);
                     TweenMax.to(button, .25, {left: endAnimation, ease: "Circ.easeOut"});
 
                 }
