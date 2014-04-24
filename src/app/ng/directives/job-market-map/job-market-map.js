@@ -219,7 +219,8 @@ angular.module('ftd.directivesModule')
 //
                         }, true);
 
-                        uiControl.subscribe('jobMarketIndeed', 'map', function (value) {
+
+                        var toggleIndeedJobs = function(value) {
                             if (value) { //true
                                 j.selectAll("circle")
                                     .transition()
@@ -249,7 +250,9 @@ angular.module('ftd.directivesModule')
 //                                        MapControls.hideIndeedIconsToggle = true;
 //                                    }, 100);
                             }
-                        });
+                        }
+
+                        uiControl.subscribe('jobMarketIndeed', toggleIndeedJobs, {type:'map'});
 
 
                         MUUSMapGDPByState.UsGDPByState('2012').then(function (result) {

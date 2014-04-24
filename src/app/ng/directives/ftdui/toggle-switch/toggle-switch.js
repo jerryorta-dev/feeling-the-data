@@ -22,9 +22,10 @@ angular.module('ftd.ui.toggleswitch', [])
                 $scope.toggle = true;
                 $scope.btnLabel = ($scope.toggle == true ) ? $scope.btnOn : $scope.btnOff;
 
-                var ptypes = $scope.publishTypes.split(' ');
+                //TODO pass this functionality to the publisher
+//                var ptypes = $scope.publishTypes.split(' ');
 
-                var publisher = ps.makePublisher($scope.name, {}, {types: ptypes, value: true});
+                var publisher = ps.makePublisher($scope.name, true, {types: $scope.publishTypes});
 
                 var button = angular.element($element).find('button')[0];
                 var buttonContainer = angular.element($element).find('div')[0];
@@ -37,7 +38,7 @@ angular.module('ftd.ui.toggleswitch', [])
                 $scope.toggleBtn = function () {
                     $scope.toggle = !$scope.toggle;
 
-                    publisher.publish(ptypes, $scope.toggle);
+                    publisher.publish($scope.toggle);
 
                     $scope.btnLabel = ($scope.toggle == true ) ? $scope.btnOn : $scope.btnOff;
 

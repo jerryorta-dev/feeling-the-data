@@ -28,41 +28,37 @@ angular.module('ftd.ui')
 
             var publisher = {
 
-                /**
-                 * Latest data set by the publisher.
-                 */
-                data: null,
 
-                /**
-                 * History of published data.
-                 */
-                history: [],
-
-                subscribers: {
-                    any: []
-                },
-
-                subscribe: function (type, fn, context) {
-                    type = type || 'any';
-                    fn = typeof fn === "function" ? fn : context[fn];
-
-                    if (typeof this.subscribers[type] === "undefined") {
-                        this.subscribers[type] = [];
-                    }
-                    this.subscribers[type].push({fn: fn, context: context || this});
-                },
 
                 unsubscribe: function (type, fn, context) {
-                    this.visitSubscribers('unsubscribe', type, fn, context);
+                    this.callSubscribers('unsubscribe', type, fn, context);
                 },
 
-                publish: function (types, value) {
-                    this.visitSubscribers('publish', types, value);
+                publish: function (value, configObj) {
+
+                    var types;
+
+                    /**
+                     * Config object overrides this.config, not add
+                     * functionality to config.
+                     */
+                    if ( configObj ) {
+                        if ( configObj.types ) {
+                            types = (typeof configObj.types == 'string') ? configObj.split(' ') : configObj.types;
+                        }
+                    } else {
+                        types = this.types;
+                    }
+
+                    this.data = value;
+                    if (this.config.saveHistory) {this.history.push(value)};
+
+                    this.callSubscribers('publish', types, value);
                 },
 
-                visitSubscribers: function (action, types, arg, context) {
+                callSubscribers: function (action, types, arg, context) {
                     var _self = this;
-                    angular.forEach(types, function(type, index, list) {
+                    angular.forEach(types, function (type, index, list) {
                         var pubtype = type || 'any',
                             subscribers = (_self.subscribers && _self.subscribers[pubtype]) ? _self.subscribers[pubtype] : null;
                         if (subscribers) {
@@ -81,12 +77,23 @@ angular.module('ftd.ui')
                         }
                     });
 
+                },
+
+                addType: function( newType ) {
+                    this.types.push( newType );
+                },
+
+                status:function( fn ) {
+                  //TODO callback for publisher status
+                },
+
+                subscriberStatus:function() {
+
                 }
 
-
-
-
             };
+
+
 
             /**
              *
@@ -94,7 +101,7 @@ angular.module('ftd.ui')
              *
              * @param o
              */
-            function makePublisher(publisherId, newPublisher, init) {
+            function makePublisher(publisherId, initValue, config, newPublisher) {
 
                 var o = (newPublisher != null) ? newPublisher : {};
 
@@ -108,8 +115,8 @@ angular.module('ftd.ui')
                     /**
                      * Only look at the functions of the publisher
                      */
-//                    if (publisher.hasOwnProperty(i) && typeof publisher[i] === "function") {
-                    if (publisher.hasOwnProperty(i)) {
+                    if (publisher.hasOwnProperty(i) && typeof publisher[i] === "function") {
+//                    if (publisher.hasOwnProperty(i)) {
 
                         /**
                          * if the publisher's property is a function, assign it to the
@@ -119,9 +126,34 @@ angular.module('ftd.ui')
                     }
                 }
 
-                if (init.value) {
-                    o.data = init.value;
-                    o.history.push(init.value);
+                /**
+                 * if there is a config object, save it
+                 *
+                 */
+                o.config = (config != null) ? config : {};
+
+                //defaults
+                o.saveHistory = false;
+
+                /**
+                 * Latest data set by the publisher.
+                 */
+                o.data = null;
+
+                /**
+                 * History of published data.
+                 */
+                o.history = [];
+
+                o.subscribers = {
+                    any: []
+                };
+
+                o.types = (config.types != null) ? (typeof config.types == 'string') ? config.types.split(' ') : config.types : [];
+
+                if (initValue) {
+                    o.data = initValue;
+                    o.history.push(initValue);
                 }
 
                 if (!cache.publishers[publisherId]) {
@@ -147,9 +179,9 @@ angular.module('ftd.ui')
                     /**
                      * if publisher has an init value, send it to subscribers
                      */
-                    if (init.value) {
-                        o.publish(init.types, init.value);
-                     }
+                    if (initValue) {
+                        o.publish(config.types, initValue);
+                    }
 
                 } else {
                     /**
@@ -163,13 +195,90 @@ angular.module('ftd.ui')
 
             };
 
+            var subscriber = {
+                update : function(value) {
+                    this.data = value;
+                }
+            };
 
-            var subscribe = function (publisherId, type, fn, context) {
+            var makeSubscriber = function(publisherId, type, fn, context, config) {
+                /**
+                 * Make subscriber
+                 */
+                var s = {};
+
+                var i;
+
+                /**
+                 * Iterate of subscriber properties
+                 */
+                for (i in subscriber) {
+
+                    /**
+                     * Only look at the functions of the subscriber
+                     */
+                    if (subscriber.hasOwnProperty(i) && typeof subscriber[i] === "function") {
+//                    if (publisher.hasOwnProperty(i)) {
+
+                        /**
+                         * if the subscribers' property is a function, assign it to the
+                         * "make subscriber" object s
+                         */
+                        s[i] = subscriber[i];
+                    }
+                }
+
+                s.fn = fn;
+                s.context = context;
+
+                /**
+                 * if there is a config object, save it
+                 *
+                 */
+                s.config = (config != null) ? config : {};
+
+                /**
+                 * Latest data set by the publisher.
+                 */
+                s.data = null;
+
+                /**
+                 * History of published data.
+                 */
+                s.history = [];
+
+
+                return s;
+            };
+
+
+            /**
+             * Can only subscribe to one type.
+             * @param publisherId
+             * @param fn
+             * @param config
+             * @param context
+             */
+            var subscribe = function (publisherId, fn, config, context) {
+
+                /**
+                 * Create a publisher id for subscribers
+                 */
                 if (!cache.subscribers[publisherId]) {
                     cache.subscribers[publisherId] = {};
                 }
 
-                type = type || 'any';
+
+                /**
+                 * Type of subscriber, same as publisher type
+                 * @type {*|string}
+                 */
+                var type;
+
+                if (config) {
+                    type = (config.type != null) ? config.type : 'any';
+                }
+
                 fn = typeof fn === "function" ? fn : context[fn];
 
                 if (typeof cache.subscribers[publisherId][type] === "undefined") {
@@ -186,7 +295,8 @@ angular.module('ftd.ui')
                     context = null;
                 }
 
-                cache.subscribers[publisherId][type].push({fn: fn, context: context});
+
+                cache.subscribers[publisherId][type].push( makeSubscriber(publisherId, type, fn, context, config) );
 
                 /**
                  * Return data from the publisher, if any exists
@@ -196,10 +306,7 @@ angular.module('ftd.ui')
                 if (cache.publishers[publisherId]) {
                     fn.call(context, cache.publishers[publisherId].data);
                 }
-
-
             };
-
 
 
             return {
