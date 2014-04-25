@@ -83,13 +83,13 @@ angular.module('ftd.ui')
                     this.types.push( newType );
                 },
 
-                status:function( fn ) {
-                  //TODO callback for publisher status
-                },
+                //TODO not done
+                addCallback:function( types, fn ) {
 
-                subscriberStatus:function() {
 
                 }
+
+
 
             };
 
@@ -149,7 +149,17 @@ angular.module('ftd.ui')
                     any: []
                 };
 
+
+                /**
+                 * Types are an array, but may be passed as a string that is space delimited.
+                 * @type {Array|*}
+                 */
                 o.types = (config.types != null) ? (typeof config.types == 'string') ? config.types.split(' ') : config.types : [];
+
+
+
+
+
 
                 if (initValue) {
                     o.data = initValue;
@@ -174,6 +184,9 @@ angular.module('ftd.ui')
                         }
                     });
 
+                    /**
+                     * Keep a reference of subscribers
+                     */
                     o.subscribers = cache.subscribers[publisherId];
 
                     /**
@@ -196,59 +209,12 @@ angular.module('ftd.ui')
             };
 
             var subscriber = {
-                update : function(value) {
+
+
+                resolve : function(value) {
                     this.data = value;
+                    this.publisherCallback();
                 }
-            };
-
-            var makeSubscriber = function(publisherId, type, fn, context, config) {
-                /**
-                 * Make subscriber
-                 */
-                var s = {};
-
-                var i;
-
-                /**
-                 * Iterate of subscriber properties
-                 */
-                for (i in subscriber) {
-
-                    /**
-                     * Only look at the functions of the subscriber
-                     */
-                    if (subscriber.hasOwnProperty(i) && typeof subscriber[i] === "function") {
-//                    if (publisher.hasOwnProperty(i)) {
-
-                        /**
-                         * if the subscribers' property is a function, assign it to the
-                         * "make subscriber" object s
-                         */
-                        s[i] = subscriber[i];
-                    }
-                }
-
-                s.fn = fn;
-                s.context = context;
-
-                /**
-                 * if there is a config object, save it
-                 *
-                 */
-                s.config = (config != null) ? config : {};
-
-                /**
-                 * Latest data set by the publisher.
-                 */
-                s.data = null;
-
-                /**
-                 * History of published data.
-                 */
-                s.history = [];
-
-
-                return s;
             };
 
 
@@ -259,7 +225,7 @@ angular.module('ftd.ui')
              * @param config
              * @param context
              */
-            var subscribe = function (publisherId, fn, config, context) {
+            var makeSubscriber = function (publisherId, fn, config, context) {
 
                 /**
                  * Create a publisher id for subscribers
@@ -296,7 +262,53 @@ angular.module('ftd.ui')
                 }
 
 
-                cache.subscribers[publisherId][type].push( makeSubscriber(publisherId, type, fn, context, config) );
+                /**
+                 * Make subscriber
+                 */
+                var s = {};
+
+                var i;
+
+                /**
+                 * Iterate of subscriber properties
+                 */
+                for (i in subscriber) {
+
+                    /**
+                     * Only look at the functions of the subscriber
+                     */
+                    if (subscriber.hasOwnProperty(i) && typeof subscriber[i] === "function") {
+//                    if (publisher.hasOwnProperty(i)) {
+
+                        /**
+                         * if the subscribers' property is a function, assign it to the
+                         * "make subscriber" object s
+                         */
+                        s[i] = subscriber[i];
+                    }
+                }
+
+                s.fn = fn;
+                s.context = context;
+
+                /**
+                 * if there is a config object, save it
+                 *
+                 */
+                s.config = (config != null) ? config : {};
+
+                /**
+                 * Latest data parsed by the subscriber.
+                 */
+                s.data = null;
+
+                /**
+                 * History of published data.
+                 */
+                s.history = [];
+
+
+                cache.subscribers[publisherId][type].push( s );
 
                 /**
                  * Return data from the publisher, if any exists
@@ -306,12 +318,14 @@ angular.module('ftd.ui')
                 if (cache.publishers[publisherId]) {
                     fn.call(context, cache.publishers[publisherId].data);
                 }
+
+                return s;
             };
 
 
             return {
                 makePublisher: makePublisher,
-                subscribe: subscribe
+                makeSubscriber: makeSubscriber
             }
         }
         ]

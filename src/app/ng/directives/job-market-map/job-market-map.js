@@ -252,7 +252,7 @@ angular.module('ftd.directivesModule')
                             }
                         }
 
-                        uiControl.subscribe('jobMarketIndeed', toggleIndeedJobs, {type:'map'});
+                        var toggleIndeed = uiControl.makeSubscriber('jobMarketIndeed', toggleIndeedJobs, {type:'map'});
 
 
                         MUUSMapGDPByState.UsGDPByState('2012').then(function (result) {
