@@ -72,28 +72,13 @@ angular.module('ftd.directivesModule')
                 link: function ($scope, $element, $attr) {
 
 
+                    var toggleIndeed = uiControl.subscribe('jobMarketIndeed',
+                        {
+                            type:'map'
+                        });
 
 
-                    //init service call
-//                    d3MapData.getStatesAbbr();
 
-//                        $scope.test1 = UIControls.ui("jobMarketIndeed")
-//                        $scope.test2 = UIControls.ui("test2")
-
-//                        console.log("test1", $scope.test1)
-//                        console.log("test2", $scope.test2)
-
-//                        $scope.test3;
-//                        $scope.test4;
-
-//                        UIControls.uiPromise("jobMarketIndeed").then(function(result) {
-//                            $scope.test3 = result;
-//                            console.log("promise jobMarketIndeed", result);
-//                        })
-//                        UIControls.uiPromise("test2").then(function(result) {
-//                            $scope.test4 = result;
-//                            console.log("promise test2", result);
-//                        })
 
                     var svg = d3.select($element[0])
                         .append("svg")
@@ -131,8 +116,13 @@ angular.module('ftd.directivesModule')
 //
                     }, true);
 
+
+
+
                     // define render function
                     $scope.render = function (data) {
+
+                        var _self = this;
                         // remove all previous items before render
                         svg.selectAll("*").remove();
 
@@ -221,43 +211,51 @@ angular.module('ftd.directivesModule')
 
 
                         var toggleIndeedJobs = function(value) {
-                            if (value) { //true
-                                j.selectAll("circle")
-                                    .transition()
-                                    .duration(750)
-                                    .style("opacity", 1);
-//                                    $timeout(function(){
-//                                        j.selectAll("circle").remove();
-//                                        d3.selectAll(".popover-wrapper").remove();
-//                                    }, 750)
 
-//                                    $timeout(function() {
-//                                        MapControls.hideIndeedIconsToggle = true;
-//                                    }, 100);
-
-                            } else {
-                                j.selectAll("circle")
-                                    .transition()
-                                    .duration(750)
-                                    .style("opacity", 0);
-
-//                                    $timeout(function(){
-//                                        j.selectAll("circle").remove();
-//                                        d3.selectAll(".popover-wrapper").remove();
-//                                    }, 750)
-
-//                                    $timeout(function() {
-//                                        MapControls.hideIndeedIconsToggle = true;
-//                                    }, 100);
+                            // prevent multiple renders if same value
+                            if (toggleIndeed.data == value) {
+                                return;
                             }
+
+                            toggleIndeed.callPublisher(value);
+
+                            console.log(value);
+
+                                if (value) { //true
+                                    j.selectAll("circle")
+                                        .transition()
+                                        .duration(750)
+                                        .style("opacity", 1);
+//                                    $timeout(function(){
+//                                        j.selectAll("circle").remove();
+//                                        d3.selectAll(".popover-wrapper").remove();
+//                                    }, 750)
+
+//                                    $timeout(function() {
+//                                        MapControls.hideIndeedIconsToggle = true;
+//                                    }, 100);
+
+                                } else {
+                                    j.selectAll("circle")
+                                        .transition()
+                                        .duration(750)
+                                        .style("opacity", 0);
+
+//                                    $timeout(function(){
+//                                        j.selectAll("circle").remove();
+//                                        d3.selectAll(".popover-wrapper").remove();
+//                                    }, 750)
+
+//                                    $timeout(function() {
+//                                        MapControls.hideIndeedIconsToggle = true;
+//                                    }, 100);
+                                }
+
                         }
 
-                        var toggleIndeed = uiControl.makeSubscriber('jobMarketIndeed', toggleIndeedJobs, {type:'map'});
-
+                        toggleIndeed.notify(toggleIndeedJobs);
 
                         MUUSMapGDPByState.UsGDPByState('2012').then(function (result) {
-//                                    console.log('MUUSMapGDPByState', result);
-
 
                                 var stateQantize = d3.scale.quantize()
                                     .domain([result.bea.meta.min, result.bea.meta.max])
@@ -315,7 +313,9 @@ angular.module('ftd.directivesModule')
                             function drawZipCodes() {
                                 z.selectAll('path').remove();
 
-//                                      //TODO replace with mashup
+                                /**
+                                 * Creates a new promise every call
+                                 */
                                 ZillowMapZipcodeMU.getMashUpByState(d.properties.name)
                                     .then(function (mashData) {
 //                                            console.log("mashed data", mashData);
@@ -571,6 +571,8 @@ angular.module('ftd.directivesModule')
 
 
                     }
+
+
                 }
             };
 

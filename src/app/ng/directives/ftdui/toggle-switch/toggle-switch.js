@@ -19,13 +19,22 @@ angular.module('ftd.ui.toggleswitch', [])
             },
             link: function ($scope, $element, $attrs, $transclude) {
 
+                /**
+                 * Publish toggle states to data sets
+                 */
+                var publisher = ps.makePublisher($scope.name, true, {types: $scope.publishTypes});
+
+                /**
+                 * TODO should this be a thenable to resemble a promise? Be consistent?
+                 */
+//                publisher.status(function(result) {
+//
+//                });
+
+
                 $scope.toggle = true;
                 $scope.btnLabel = ($scope.toggle == true ) ? $scope.btnOn : $scope.btnOff;
 
-                //TODO pass this functionality to the publisher
-//                var ptypes = $scope.publishTypes.split(' ');
-
-                var publisher = ps.makePublisher($scope.name, true, {types: $scope.publishTypes});
 
                 var button = angular.element($element).find('button')[0];
                 var buttonContainer = angular.element($element).find('div')[0];
@@ -52,6 +61,12 @@ angular.module('ftd.ui.toggleswitch', [])
                     TweenMax.to(button, .25, {left: endAnimation, ease: "Circ.easeOut"});
 
                 }
+
+                //TODO work this in
+                //TODO pass string or array
+                publisher.all('maps').notify(function(result) {
+
+                })
 
             },
             templateUrl: 'app/ng/directives/ftdui/toggle-switch/toggle-switch.html'
