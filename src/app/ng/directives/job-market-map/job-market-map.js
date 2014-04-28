@@ -251,6 +251,8 @@ angular.module('ftd.directivesModule')
 //                                    }, 100);
                                 }
 
+                                toggleIndeed.callPublisher("test from subscriber callback");
+
                         }
 
 //                        $timeout(function() {

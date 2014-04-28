@@ -24,6 +24,7 @@ angular.module('ftd.ui.toggleswitch', [])
                  */
                 var publisher = ps.makePublisher($scope.name, true, {types: $scope.publishTypes});
 
+              console.log('$scope.publishTypes', $scope.publishTypes)
                 /**
                  * TODO should this be a thenable to resemble a promise? Be consistent?
                  */
@@ -64,9 +65,9 @@ angular.module('ftd.ui.toggleswitch', [])
 
                 //TODO work this in
                 //TODO pass string or array
-//                publisher.all('maps').notify(function(result) {
-//
-//                })
+                publisher.all('map').notify(function(result) {
+                  console.log("publisher callback", result)
+                })
 
             },
             templateUrl: 'app/ng/directives/ftdui/toggle-switch/toggle-switch.html'
