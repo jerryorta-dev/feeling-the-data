@@ -29,5 +29,8 @@
   "bugs": {
     "url": "https://github.com/jerryorta/indeedjobs-geo-census-housing/issues"
   },
-  "homepage": "https://github.com/jerryorta/indeedjobs-geo-census-housing"
+  "homepage": "https://github.com/jerryorta/indeedjobs-geo-census-housing",
+  "dependencies": {
+    "express": "^4.1.1"
+  }
 }

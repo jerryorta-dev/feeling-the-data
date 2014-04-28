@@ -305,10 +305,6 @@ angular.module('ftd.ui')
                  */
                 o.types = (o.config.types != null) ? (typeof o.config.types == 'string') ? o.config.types.split(' ') : o.config.types : [];
 
-                o.subscriberCallback = {};
-                angular.forEach(o.types, function (type, index, list) {
-                    o.subscriberCallback[type] = [];
-                })
 
                 if (initValue) {
                     o.data = initValue;
