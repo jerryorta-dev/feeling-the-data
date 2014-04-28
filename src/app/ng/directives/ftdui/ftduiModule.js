@@ -21,10 +21,148 @@ angular.module('ftd.ui')
     .provider('ftd.ui.pubsub', function FTDPubSub() {
         this.$get = ['$q', 'ftd.ui.pubsub.cache', function ($q) {
 
+            /**
+             * Allows for asynchronous instantiation of publishers and subscribers
+             * @type {{publishers: {}, subscribers: {}, publisherCallback: {}}}
+             */
             var cache = {
                 publishers: {},
-                subscribers: {}
+                subscribers: {},
+                publisherCallback: {}
             };
+
+
+            var deferFactory = function (config) {
+
+                var d = {};
+
+                d.thenFunction = null;
+                d.errorFunction = null;
+                d.notifyFunction = null;
+
+                /**
+                 * if there is a config object, save it
+                 *
+                 */
+                d.config = (config != null) ? config : {};
+
+                var applyDeferredCallbacks = function () {
+                    d.deferred = null;
+                    d.deferred = $q.defer();
+                    d.deferred.promise.then(
+                        d.thenFunction,
+                        d.errorFunction,
+                        d.notifyFunction
+                    );
+                };
+
+                /**
+                 * config object is a function
+                 *
+                 * {
+                 *   then:function(result) { ... }
+                 * }
+                 *
+                 * config object is an array
+                 *
+                 * {
+                 *   then:[ function(result) { ... }, context ]
+                 * }
+                 */
+                if (d.config.then) {
+                    if (typeof d.config.then === 'function') {
+                        d.thenFunction = function (result) {
+                            d.config.then.call(this, result);
+                        }
+                    }
+
+                    if (typeof d.config.then === 'array') {
+                        d.thenFunction = function (result) {
+                            d.config.then[0].call(d.config.then[1], result);
+                        }
+                    }
+
+                }
+
+                if (d.config.error) {
+                    if (typeof d.config.error === 'function') {
+                        d.errorFunction = function (result) {
+                            d.config.error.call(this, result);
+                        }
+                    }
+
+                    if (typeof d.config.error === 'array') {
+                        d.errorFunction = function (result) {
+                            d.config.error[0].call(d.config.error[1], result);
+                        }
+                    }
+
+                }
+
+                if (d.config.notify) {
+                    if (typeof d.config.notify === 'function') {
+                        d.notifyFunction = function (result) {
+                            d.config.notify.call(this, result);
+                        }
+                    }
+
+                    if (typeof d.config.notify === 'array') {
+                        d.notifyFunction = function (result) {
+                            d.config.notify[0].call(d.config.notify[1], result);
+                        }
+                    }
+
+                }
+
+                applyDeferredCallbacks();
+
+                /**
+                 * If subscriber object is returned, allow
+                 * notify object to be directly returned.
+                 *
+                 * var bar = function(result) {...}
+                 *
+                 * var foo = uiControl.makeSubscriber('foo',
+                 * {
+                 *     type:'myType',
+                 *     return:'subscriber'
+                 * })
+                 *
+                 * foo.notify(bar)
+                 *
+                 * @param fn
+                 */
+                d.then = function (fn, context) {
+
+                    d.thenFunction = function (result) {
+                        fn.call(context, result);
+                    };
+
+                    applyDeferredCallbacks();
+                };
+
+                d.error = function (fn, context) {
+
+                    d.errorFunction = function (result) {
+                        fn.call(context, result);
+                    };
+
+                    applyDeferredCallbacks();
+                };
+
+                d.notify = function (fn, context) {
+//                    console.log(fn);
+
+                    d.notifyFunction = function (result) {
+                        fn.call(context, result);
+                    };
+
+                    applyDeferredCallbacks();
+                };
+
+                return d;
+            };
+
 
             var publisher = {
 
@@ -44,7 +182,7 @@ angular.module('ftd.ui')
                      */
                     if (configObj) {
                         if (configObj.types) {
-                            types = (typeof configObj.types == 'string') ? configObj.split(' ') : configObj.types;
+                            types = (typeof configObj.types == 'string') ? configObj.types.split(' ') : configObj.types;
                         }
                     } else {
                         types = this.types;
@@ -54,7 +192,6 @@ angular.module('ftd.ui')
                     if (this.config.saveHistory) {
                         this.history.push(value)
                     }
-                    ;
 
                     this.callSubscribers('publish', types, value);
                 },
@@ -86,6 +223,11 @@ angular.module('ftd.ui')
 
                 addType: function (newType) {
                     this.types.push(newType);
+                },
+
+                all: function (types) {
+
+
                 }
 
             };
@@ -99,7 +241,13 @@ angular.module('ftd.ui')
              */
             function makePublisher(publisherId, initValue, config, newPublisher) {
 
-                var o = (newPublisher != null) ? newPublisher : {};
+                var o = deferFactory(config);
+
+                var n;
+                for (n in newPublisher) {
+                    o[n] = newPublisher[n];
+                }
+
 
                 var i;
 
@@ -112,7 +260,6 @@ angular.module('ftd.ui')
                      * Only look at the functions of the publisher
                      */
                     if (publisher.hasOwnProperty(i) && typeof publisher[i] === "function") {
-//                    if (publisher.hasOwnProperty(i)) {
 
                         /**
                          * if the publisher's property is a function, assign it to the
@@ -136,6 +283,7 @@ angular.module('ftd.ui')
                  */
                 o.data = null;
 
+
                 /**
                  * History of published data.
                  */
@@ -145,13 +293,16 @@ angular.module('ftd.ui')
                     any: []
                 };
 
-
                 /**
                  * Types are an array, but may be passed as a string that is space delimited.
                  * @type {Array|*}
                  */
-                o.types = (config.types != null) ? (typeof config.types == 'string') ? config.types.split(' ') : config.types : [];
+                o.types = (o.config.types != null) ? (typeof o.config.types == 'string') ? o.config.types.split(' ') : o.config.types : [];
 
+                o.subscriberCallback = {};
+                angular.forEach(o.types, function (type, index, list) {
+                    o.subscriberCallback[type] = [];
+                })
 
                 if (initValue) {
                     o.data = initValue;
@@ -161,6 +312,7 @@ angular.module('ftd.ui')
                 if (!cache.publishers[publisherId]) {
                     cache.publishers[publisherId] = o;
                 }
+
 
                 /**
                  * If any subscribers already exist
@@ -185,7 +337,7 @@ angular.module('ftd.ui')
                      * if publisher has an init value, send it to subscribers
                      */
                     if (initValue) {
-                        o.publish(config.types, initValue);
+                        o.publish(o.config.types, initValue);
                     }
 
                 } else {
@@ -215,27 +367,31 @@ angular.module('ftd.ui')
             var subscribe = function (publisherId, config, context) {
 
                 /**
+                 * Make subscriber
+                 */
+                var s = deferFactory(config);
+
+                /**
                  * Create a publisher id for subscribers
                  */
                 if (!cache.subscribers[publisherId]) {
                     cache.subscribers[publisherId] = {};
                 }
 
+                /**
+                 * if there is a config object, save it
+                 *
+                 */
+                s.config = (config != null) ? config : {};
 
                 /**
                  * Type of subscriber, same as publisher type
                  * @type {*|string}
                  */
-                var type;
+                s.type = (config && config.type != null) ? config.type : 'any';
 
-                if (config) {
-                    type = (config.type != null) ? config.type : 'any';
-                }
-
-//                fn = typeof fn === "function" ? fn : context[fn];
-
-                if (typeof cache.subscribers[publisherId][type] === "undefined") {
-                    cache.subscribers[publisherId][type] = [];
+                if (typeof cache.subscribers[publisherId][s.type] === "undefined") {
+                    cache.subscribers[publisherId][s.type ] = [];
                 }
 
                 /**
@@ -249,11 +405,6 @@ angular.module('ftd.ui')
                 }
 
 
-                /**
-                 * Make subscriber
-                 */
-                var s = {};
-
                 var i;
 
                 /**
@@ -265,7 +416,6 @@ angular.module('ftd.ui')
                      * Only look at the functions of the subscriber
                      */
                     if (subscriber.hasOwnProperty(i) && typeof subscriber[i] === "function") {
-//                    if (publisher.hasOwnProperty(i)) {
 
                         /**
                          * if the subscribers' property is a function, assign it to the
@@ -275,15 +425,8 @@ angular.module('ftd.ui')
                     }
                 }
 
-
-
                 s.context = context;
 
-                /**
-                 * if there is a config object, save it
-                 *
-                 */
-                s.config = (config != null) ? config : {};
 
                 /**
                  * Latest data parsed by the subscriber.
@@ -296,165 +439,27 @@ angular.module('ftd.ui')
                 s.history = [];
 
 
-                cache.subscribers[publisherId][type].push(s);
-
                 /**
-                 * Return data from the publisher, if any exists
-                 *
-                 * //TODO may have to be returned as a promise
+                 * Save in cache
                  */
-                if (cache.publishers[publisherId]) {
-                    s.deferred.notify(cache.publishers[publisherId].data)
-//                    fn.call(context, cache.publishers[publisherId].data);
-                }
+                cache.subscribers[publisherId][s.type].push(s);
 
 
-                s.thenFunction = null;
-                s.errorFunction = null;
-                s.notifyFunction = null;
 
-                var applyDeferredCallbacks = function() {
-                    s.deferred = null;
-                    s.deferred = $q.defer();
-                    s.deferred.promise.then(
-                        s.thenFunction,
-                        s.errorFunction,
-                        s.notifyFunction
-                    );
-                };
-
-                /**
-                 * config object is a function
-                 *
-                 * {
-                 *   then:function(result) { ... }
-                 * }
-                 *
-                 * config object is an array
-                 *
-                 * {
-                 *   then:[ function(result) { ... }, context ]
-                 * }
-                 */
-                if (config.then) {
-                    if (typeof config.then === 'function') {
-                        s.thenFunction = function ( result ) {
-                            config.then.call(this, result);
-                        }
-                    }
-
-                    if (typeof config.then === 'array') {
-                        s.thenFunction = function( result ) {
-                            config.then[0].call( config.then[1], result);
-                        }
-                    }
-
-                }
-
-                if (config.error) {
-                    if (typeof config.error === 'function') {
-                        s.errorFunction = function ( result ) {
-                            config.error.call(this, result);
-                        }
-                    }
-
-                    if (typeof config.error === 'array') {
-                        s.errorFunction = function( result ) {
-                            config.error[0].call( config.error[1], result);
-                        }
-                    }
-
-                }
-
-                if (config.notify) {
-                    if (typeof config.notify === 'function') {
-                        s.notifyFunction = function ( result ) {
-                            config.notify.call(this, result);
-                        }
-                    }
-
-                    if (typeof config.notify === 'array') {
-                        s.notifyFunction = function( result ) {
-                            config.notify[0].call( config.notify[1], result);
-                        }
-                    }
-
-                }
-
-                applyDeferredCallbacks();
-
-                /**
-                 * If subscriber object is returned, allow
-                 * notify object to be directly returned.
-                 *
-                 * var bar = function(result) {...}
-                 *
-                 * var foo = uiControl.makeSubscriber('foo',
-                 * {
-                 *     type:'myType',
-                 *     return:'subscriber'
-                 * })
-                 *
-                 * foo.notify(bar)
-                 *
-                 * @param fn
-                 */
-                s.then = function (fn, context) {
-
-                    s.thenFunction = function(result) {
-                        fn.call(context, result);
-                    };
-
-                    applyDeferredCallbacks();
-                };
-
-                s.error = function (fn, context) {
-
-                    s.errorFunction = function(result) {
-                        fn.call(context, result);
-                    };
-
-                    applyDeferredCallbacks();
-                };
-
-                s.notify = function (fn, context) {
-
-                    s.notifyFunction = function(result) {
-                        fn.call(context, result);
-                    };
-
-                    applyDeferredCallbacks();
-                };
-
-
-                s.publisherCallbackPromise = null;
-
-                s.callPublisher = function(data, context) {
-                    if (data) {
-                        s.data = data;
-                    }
-
-                    if (s.data && s.publisherCallbackPromise) {
-                        s.publisherCallbackPromise.notify(data)
-                    }
-
-                };
 
 
                 /**
                  * Options to return
                  */
-                if (config.return) {
+                if (s.config.return) {
 
-                    if (config.return == 'subscriber') {
+                    if (s.config.return == 'subscriber') {
                         return s;
                     }
 
-                    if (config.return == 'promise') {
+                    if (s.config.return == 'promise') {
                         return s.deferred.promise;
                     }
-
-
                 }
 
                 /**

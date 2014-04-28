@@ -64,9 +64,9 @@ angular.module('ftd.ui.toggleswitch', [])
 
                 //TODO work this in
                 //TODO pass string or array
-                publisher.all('maps').notify(function(result) {
-
-                })
+//                publisher.all('maps').notify(function(result) {
+//
+//                })
 
             },
             templateUrl: 'app/ng/directives/ftdui/toggle-switch/toggle-switch.html'

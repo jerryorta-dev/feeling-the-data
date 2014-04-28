@@ -217,7 +217,7 @@ angular.module('ftd.directivesModule')
                                 return;
                             }
 
-                            toggleIndeed.callPublisher(value);
+//                            toggleIndeed.callPublisher(value);
 
                             console.log(value);
 
