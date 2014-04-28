@@ -59,8 +59,8 @@ angular.module('ftd.directivesModule')
             transclude: true
         }
     })
-    .directive('jobMarketMapGraphic', ["MapControls", '$filter', '$timeout', 'indeedData', 'd3MapData', 'MUUSMapGDPByState', 'ZillowMapZipcodeMU', 'ftd.ui.pubsub',
-        function (MapControls, $filter, $timeout, indeedData, d3MapData, MUUSMapGDPByState, ZillowMapZipcodeMU, uiControl) {
+    .directive('jobMarketMapGraphic', ["MapControls", '$filter', '$timeout', 'indeedData', 'd3MapData', 'MUUSMapGDPByState', 'ZillowMapZipcodeMU', 'ftd.ui.pubsub', '$timeout',
+        function (MapControls, $filter, $timeout, indeedData, d3MapData, MUUSMapGDPByState, ZillowMapZipcodeMU, uiControl, $timeout) {
 
             return {
                 restrict: 'EA',
@@ -219,7 +219,7 @@ angular.module('ftd.directivesModule')
 
 //                            toggleIndeed.callPublisher(value);
 
-                            console.log(value);
+                            console.log("subsriber called:",value);
 
                                 if (value) { //true
                                     j.selectAll("circle")
@@ -253,6 +253,9 @@ angular.module('ftd.directivesModule')
 
                         }
 
+//                        $timeout(function() {
+//
+//                        }, 6000)
                         toggleIndeed.notify(toggleIndeedJobs);
 
                         MUUSMapGDPByState.UsGDPByState('2012').then(function (result) {

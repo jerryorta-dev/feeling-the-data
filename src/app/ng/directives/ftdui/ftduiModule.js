@@ -46,7 +46,7 @@ angular.module('ftd.ui')
                  */
                 d.config = (config != null) ? config : {};
 
-                var applyDeferredCallbacks = function () {
+                d.applyDeferredCallbacks = function () {
                     d.deferred = null;
                     d.deferred = $q.defer();
                     d.deferred.promise.then(
@@ -114,7 +114,7 @@ angular.module('ftd.ui')
 
                 }
 
-                applyDeferredCallbacks();
+                d.applyDeferredCallbacks();
 
                 /**
                  * If subscriber object is returned, allow
@@ -157,7 +157,7 @@ angular.module('ftd.ui')
                         fn.call(context, result);
                     };
 
-                    applyDeferredCallbacks();
+                    d.applyDeferredCallbacks();
                 };
 
                 return d;
@@ -172,20 +172,20 @@ angular.module('ftd.ui')
                     this.callSubscribers('unsubscribe', type, fn, context);
                 },
 
-                publish: function (value, configObj) {
+                publish: function (value, types) {
 
-                    var types;
+                    var _types;
 
                     /**
                      * Config object overrides this.config, not add
                      * functionality to config.
                      */
-                    if (configObj) {
-                        if (configObj.types) {
-                            types = (typeof configObj.types == 'string') ? configObj.types.split(' ') : configObj.types;
+                    if (types) {
+                        if (types) {
+                            _types = (typeof types == 'string') ? types.split(' ') : types;
                         }
                     } else {
-                        types = this.types;
+                        _types = this.types;
                     }
 
                     this.data = value;
@@ -193,10 +193,15 @@ angular.module('ftd.ui')
                         this.history.push(value)
                     }
 
-                    this.callSubscribers('publish', types, value);
+                    this.callSubscribers('publish', _types, value);
                 },
 
+                //TODO need context?
                 callSubscribers: function (action, types, arg, context) {
+                    console.log('action', action);
+                    console.log('types', types);
+                    console.log('arg', arg);
+                    console.log('context', context)
                     var _self = this;
                     angular.forEach(types, function (type, index, list) {
                         var pubtype = type || 'any',
@@ -207,6 +212,7 @@ angular.module('ftd.ui')
 
                             for (i = 0; i < max; i += 1) {
                                 if (action === 'publish') {
+
 //                                    subscribers[i].fn.call(subscribers[i].context, arg);
                                     subscribers[i].deferred.notify(arg)
                                 } else {
@@ -312,7 +318,7 @@ angular.module('ftd.ui')
                 if (!cache.publishers[publisherId]) {
                     cache.publishers[publisherId] = o;
                 }
-
+                console.log("subscriber when publisher initted", cache.subscribers[publisherId])
 
                 /**
                  * If any subscribers already exist
@@ -337,7 +343,7 @@ angular.module('ftd.ui')
                      * if publisher has an init value, send it to subscribers
                      */
                     if (initValue) {
-                        o.publish(o.config.types, initValue);
+                        o.publish(initValue, o.config.types);
                     }
 
                 } else {
@@ -364,12 +370,17 @@ angular.module('ftd.ui')
              * @param config
              * @param context
              */
-            var subscribe = function (publisherId, config, context) {
+            var subscribe = function (publisherId, config, context, newSubscriber) {
 
                 /**
                  * Make subscriber
                  */
                 var s = deferFactory(config);
+
+                var n;
+                for (n in newSubscriber) {
+                    s[n] = newSubscriber[n];
+                }
 
                 /**
                  * Create a publisher id for subscribers
@@ -384,15 +395,7 @@ angular.module('ftd.ui')
                  */
                 s.config = (config != null) ? config : {};
 
-                /**
-                 * Type of subscriber, same as publisher type
-                 * @type {*|string}
-                 */
-                s.type = (config && config.type != null) ? config.type : 'any';
 
-                if (typeof cache.subscribers[publisherId][s.type] === "undefined") {
-                    cache.subscribers[publisherId][s.type ] = [];
-                }
 
                 /**
                  * If context needs to change to that of the publisher, it will be done
@@ -438,6 +441,16 @@ angular.module('ftd.ui')
                  */
                 s.history = [];
 
+                /**
+                 * Type of subscriber, same as publisher type
+                 * @type {*|string}
+                 */
+                s.type = (config && config.type != null) ? config.type : 'any';
+
+                if (typeof cache.subscribers[publisherId][s.type] === "undefined") {
+                    cache.subscribers[publisherId][s.type ] = [];
+                }
+
 
                 /**
                  * Save in cache
@@ -445,7 +458,28 @@ angular.module('ftd.ui')
                 cache.subscribers[publisherId][s.type].push(s);
 
 
+                /**
+                 * Get initial publisher value
+                 *
+                 * overrides deferFactory
+                 */
+                s.isInitted = false;
+                s.notify = function (fn, context) {
 
+
+                    s.notifyFunction = function (result) {
+                        fn.call(context, result);
+                    };
+
+                    s.applyDeferredCallbacks();
+
+                    if (!s.isInitted && cache.publishers[publisherId] && cache.publishers[publisherId].data) {
+                        console.log("publisher when subscriber initted", cache.publishers[publisherId])
+                        cache.publishers[publisherId].publish(cache.publishers[publisherId].data, s.type);
+                    }
+
+                    s.isInitted = true;
+                };
 
 
                 /**

@@ -17,12 +17,12 @@ angular.module('ftd.jobMarketsResultsModule', [])
 
         //newVals is an array
         $scope.$watch('indeedData.indeedResults', function (newVals, oldVals) {
-            console.log($scope.indeedData);
+//            console.log($scope.indeedData);
             $scope.query = $scope.indeedData.query();
             $scope.location = $scope.indeedData.location();
 
 
-            console.log("jobmarketresults", newVals)
+//            console.log("jobmarketresults", newVals)
 //
         }, true);
 
