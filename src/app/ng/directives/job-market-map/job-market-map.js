@@ -562,9 +562,9 @@ angular.module('ftd.directivesModule')
 
 //                                    console.log(this, event, d3.event);
 
+                                        var verticalOffset = angular.element(document.querySelector(id))[0].clientHeight;
+                                        var horizontalOffset = (angular.element(document.querySelector(id))[0].clientWidth) /2;
 
-                                        var verticalOffset = $(id).height();
-                                        var horizontalOffset = $(id).width() / 2;
 
                                         d3.select(id).style("top", (event.pageY - verticalOffset) + "px").style("left", (event.pageX - horizontalOffset) + "px");
 
