@@ -15,7 +15,9 @@ angular.module('ftd.ui.toggleswitch', [])
                 btnOff: '@btnOff',
                 btnGlyph: '@btnGlyph',
                 name: '@name',
-                publishTypes:'@publishTypes'
+                publishTypes: '@publishTypes',
+                onImage: '@onImage',
+                offImage: '@offImage'
             },
             link: function ($scope, $element, $attrs, $transclude) {
 
@@ -24,13 +26,10 @@ angular.module('ftd.ui.toggleswitch', [])
                  */
                 var publisher = ps.makePublisher($scope.name, true, {types: $scope.publishTypes});
 
-              console.log('$scope.publishTypes', $scope.publishTypes)
-                /**
-                 * TODO should this be a thenable to resemble a promise? Be consistent?
-                 */
-//                publisher.status(function(result) {
-//
-//                });
+                $scope.disabled = true;
+
+                console.log('$scope.publishTypes', $scope.publishTypes)
+
 
 
                 $scope.toggle = true;
@@ -46,6 +45,11 @@ angular.module('ftd.ui.toggleswitch', [])
                 });
 
                 $scope.toggleBtn = function () {
+
+                    if ($scope.disabled) {
+                        return;
+                    }
+                    ;
                     $scope.toggle = !$scope.toggle;
 
                     publisher.publish($scope.toggle);
@@ -63,10 +67,17 @@ angular.module('ftd.ui.toggleswitch', [])
 
                 }
 
-                //TODO work this in
-                //TODO pass string or array
-                publisher.all('map').notify(function(result) {
-                  console.log("publisher callback", result)
+                //Enable / disable button based on indeed data
+                publisher.all('map').notify(function (result) {
+                    var isEnabled = true;
+                    angular.forEach(result, function (value, index, list) {
+                        if (value == 'disabled') {
+                            $scope.disabled = true;
+                            isEnabled = false;
+                        }
+                    })
+
+                    $scope.disabled = !isEnabled;
                 })
 
             },

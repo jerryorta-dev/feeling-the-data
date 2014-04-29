@@ -251,7 +251,7 @@ angular.module('ftd.directivesModule')
 //                                    }, 100);
                                 }
 
-                                toggleIndeed.callPublisher("test from subscriber callback");
+
 
                         }
 
@@ -476,6 +476,8 @@ angular.module('ftd.directivesModule')
                         if (!data) {
                             return;
                         }
+
+                        toggleIndeed.callPublisher("enabled");
 
                         var htmlFormatFactory = function (data) {
                             var html = "";
