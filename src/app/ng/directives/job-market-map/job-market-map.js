@@ -498,7 +498,6 @@ angular.module('ftd.directivesModule')
 
 
                         var popoverFactory = function (data, iter) {
-//                            console.log(data);
 
                             d3.select("body")
                                 .append("div")
@@ -511,12 +510,12 @@ angular.module('ftd.directivesModule')
 
                             d3.select("#popover-" + iter)
                                 .append("div")
-                                .attr("class", "d3-tip")
+                                .attr("class", "d3-tip fadein")
                                 .html(htmlFormatFactory(data))
 
                             d3.select("#popover-" + iter)
                                 .append("div")
-                                .attr("class", "arrow-bottom")
+                                .attr("class", "arrow-bottom fadein")
 
 
                         };
@@ -530,7 +529,7 @@ angular.module('ftd.directivesModule')
 
                         for (i; i < len; i++) {
                             if (data[i].longitude && data[i].latitude) {
-                                popoverFactory(data[i], i)
+                                popoverFactory(data[i], i);
 
                                 j.append("circle")
                                     .attr("cx", function (d) {

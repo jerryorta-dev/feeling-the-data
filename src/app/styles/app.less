@@ -88,21 +88,27 @@ input[type = "text"] {
 .popover-wrapper {
   max-width: 400px;
 
+
   .d3-tip {
     font-size: 12px;
     stroke: none;
-    color: #fff;
-    background-color: #333;
-    padding: 1px 20px 10px 20px;
+//    color: #fff;
+    background-color: @popover-title-bg;
+    background-clip: padding-box;
+    border: 1px solid @popover-fallback-border-color;
+    border: 1px solid @popover-border-color;
+    padding: 9px 14px;
+    .box-shadow(0 5px 10px rgba(0,0,0,.2));
     .app-border-radius(6px, 6px, 6px, 6px)
   }
 
   .arrow-bottom {
     position: relative;
+    top: -1px;
     left: 47%;
     width: 0;
     height: 0;
-    border-top: 10px solid #333;
+    border-top: 10px solid @popover-arrow-color;
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
   }
