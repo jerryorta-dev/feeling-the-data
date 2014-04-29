@@ -17,7 +17,9 @@ angular.module('ftd.ui.toggleswitch', [])
                 name: '@name',
                 publishTypes: '@publishTypes',
                 onImage: '@onImage',
-                offImage: '@offImage'
+                offImage: '@offImage',
+                msgEnabled: '@msgEnabled',
+                msgDisabled: '@msgDisabled'
             },
             link: function ($scope, $element, $attrs, $transclude) {
 
@@ -78,7 +80,13 @@ angular.module('ftd.ui.toggleswitch', [])
                     })
 
                     $scope.disabled = !isEnabled;
+                    $scope.popoverMsg = $scope.msgEnabled;
                 })
+
+
+                if ($scope.disabled) {
+                    $scope.popoverMsg = $scope.msgDisabled;
+                }
 
             },
             templateUrl: 'app/ng/directives/ftdui/toggle-switch/toggle-switch.html'

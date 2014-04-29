@@ -6217,6 +6217,9 @@ button.close {
 .ftd-ui-toggleswitch button {
   position: relative;
 }
+.ftd-ui-toggleswitch + .popover {
+  min-width: 200px;
+}
 body {
   background-image: -webkit-linear-gradient(top, #004d73 0%, #001b37 100%);
   background-image: linear-gradient(to bottom, #004d73 0%, #001b37 100%);

@@ -1,4 +1,4 @@
-<div class="ftd-ui-toggleswitch" ng-click="toggleBtn()">
+<div class="ftd-ui-toggleswitch" ng-click="toggleBtn()" popover="{{popoverMsg}}"  popover-trigger="mouseenter"  popover-placement="right">
     <div class="background-image">
         <img class="pull-right" ng-src="{{onImage}}" ng-show="toggle && !disabled"/>
         <img class="pull-right" ng-src="{{offImage}}" ng-show="toggle && disabled"/>
