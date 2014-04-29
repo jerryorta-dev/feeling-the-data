@@ -6220,6 +6220,9 @@ button.close {
 .ftd-ui-toggleswitch + .popover {
   min-width: 200px;
 }
+.ftd-ui-zoom + .popover {
+  min-width: 200px;
+}
 body {
   background-image: -webkit-linear-gradient(top, #004d73 0%, #001b37 100%);
   background-image: linear-gradient(to bottom, #004d73 0%, #001b37 100%);
@@ -6438,6 +6441,8 @@ circle.clickable:hover {
 }
 .result-title {
   color: #555555;
+  top: -10px;
+  position: relative;
 }
 .result-title span {
   font-size: 8px;

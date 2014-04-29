@@ -2,7 +2,7 @@
 <div class="row">
     <div class="col-md-1">
         <div ng-controller="mapControlsController" class="map-controls">
-            <button type="button" class="btn btn-default" ng-click="reset()" ><span class="glyphicon glyphicon-zoom-out map-reset"></span></button><br />
+            <button type="button" class="btn btn-default ftd-ui-zoom" ng-click="reset()" popover="Reset zoom to 100%." popover-trigger="mouseenter"  popover-placement="right"><span class="glyphicon glyphicon-zoom-out map-reset"></span></button><br />
 
             <ftd-ui-toggleswitch
                 name="jobMarketIndeed"
@@ -14,9 +14,21 @@
                 on-image="app/img/indeed/jobsearch.gif"
                 off-image="app/img/indeed/jobsearch-gs.gif"
                 msg-enabled="Hide / Show Indeed jobs."
-                msg-disabled="Need to search for Indeed jobs."></ftd-ui-toggleswitch>
+                msg-disabled="Need to search for Indeed jobs to use this control."></ftd-ui-toggleswitch>
             <br />
-            </span><br />
+            <ftd-ui-toggleswitch
+                name="zillow"
+                btn-class="btn btn-sm"
+                btn-glyph="true"
+                btn-on="glyphicon glyphicon-eye-open"
+                btn-off="glyphicon glyphicon-eye-close"
+                publish-types="zillow"
+                on-image="app/img/zillow/Zillowlogo_color_notag_sm.png"
+                off-image="app/img/zillow/Zillowlogo_color_notag_sm_gs.png"
+                msg-enabled="Hide / Show Indeed jobs."
+                msg-disabled="Need to search for Indeed jobs to use this control."></ftd-ui-toggleswitch>
+            <br />
+
         </div>
     </div>
 </div>
