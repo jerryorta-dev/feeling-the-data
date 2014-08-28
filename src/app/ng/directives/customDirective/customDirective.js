@@ -15,5 +15,3 @@
                 templateUrl: 'app/ng/directives/customDirective/customDirective.html'
             }
         });
-
-

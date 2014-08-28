@@ -40,9 +40,7 @@ angular.module('ftd.ui')
                         return _types.split(' ');
                     }
 
-                    if (typeof _types === 'array') {
-                        _types;
-                    }
+                    return _types;
                 };
 
                 d.subscriberCallbacks = {};
@@ -149,7 +147,7 @@ angular.module('ftd.ui')
                         fn.call(context, result);
                     };
 
-                    applyDeferredCallbacks();
+                  d.applyDeferredCallbacks();
                 };
 
                 d.error = function (fn, context) {
@@ -158,7 +156,7 @@ angular.module('ftd.ui')
                         fn.call(context, result);
                     };
 
-                    applyDeferredCallbacks();
+                  d.applyDeferredCallbacks();
                 };
 
                 d.notify = function (fn, context) {
