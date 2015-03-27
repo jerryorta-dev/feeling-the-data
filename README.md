@@ -12,13 +12,7 @@ Seed project for Angularjs, Requirejs, Twitter Bootstrap, Less.
     npm install
     bower install
 
-# Optimisation
 
-To run the requirejs optimisation script, type the following in the command line from the rood directory of the project.
-
-    node tools/r.js -o tools/app.build.js
-
-This will make a "build" directory with all files optimised in one js file.
 
 # Run Application
 
