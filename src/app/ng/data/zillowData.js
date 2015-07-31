@@ -12,12 +12,11 @@ angular.module('ftd.zillowData', [])
 
         /**
          * http://www.zillow.com/howto/api/GetRegionChildren.htm
-         *
          * childtype = county, zipcode
          * @type {{zws-id: *, state: null, childtype: string}}
          */
         var config = {
-            baseUrl: 'http://feelingthedata.com/app/php/zillowDataService.php',
+            baseUrl: 'http://www.zillow.com/webservice/GetRegionChildren.htm',
             params: {
                 "url": "GetRegionChildren",
                 "zws-id": zillowApiKey,
